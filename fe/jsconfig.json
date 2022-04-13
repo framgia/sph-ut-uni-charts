@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "allowSyntheticDefaultImports": true,
+    "checkJs": false,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/styles*": ["./styles/*"],
+      "@/src/*": ["./src/*"],
+      "@/routes/*": ["./pages/*"],
+      "@/public/*": ["./public/*"]
+    }
+  },
+  "exclude": ["node_modules", "./out/**/*"]
+}
