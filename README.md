@@ -131,7 +131,7 @@ DATABASE_URL="postgresql://capstone:capstone@localhost:5432/clockify?schema=publ
 ### Run the following commands:
 
 ```bash
-cd backlog
+cd clockify
 npm install
 npm run dev
 npx prisma migrate dev
