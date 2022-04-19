@@ -21,10 +21,7 @@ model Provider {
   user_id Int
   name String
   space_key String
-  client_id String
-  client_secret String
-  access_token String
-  refresh_token String
+  api_key String
   projects Project[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -33,7 +30,8 @@ model Provider {
 model Project {
   id Int @id @default(autoincrement())
   name String
-  project_key String
+  key String
+  project_id String
   provider_id Int
   provider Provider @relation(fields: [provider_id], references: [id])
   created_at DateTime @default(now())
