@@ -1,0 +1,45 @@
+.container {
+	min-height: 50vh;
+	padding: 0 0.5rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.card {
+	margin: 1.5rem;
+	flex-basis: 45%;
+	padding: 1.5rem;
+	text-align: left;
+	text-decoration: none;
+	border: 1px solid #2191fb;
+	border-radius: 8px;
+	transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.cardTitle {
+	margin: 0.5rem;
+	flex-basis: 45%;
+	padding: 2.5rem;
+	text-decoration: none;
+	border-radius: 8px;
+}
+
+.title {
+	text-align: center;
+}
+
+.selectProvider {
+	margin-bottom: 20px;
+}
+
+.connectProvider {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.connectProviderButton {
+	text-align: right;
+	margin-bottom: 10px;
+}
