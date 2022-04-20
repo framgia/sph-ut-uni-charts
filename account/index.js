@@ -4,12 +4,12 @@ const app = express()
 const cors = require('cors')
 const testRoutes = require('./routes/test')
 const userRoutes = require('./routes/user')
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 14000
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.listen(PORT || 14000, () => {
+app.listen(PORT, () => {
   console.log(`Server is online at port ${PORT}`)
 })
 
