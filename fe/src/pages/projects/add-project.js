@@ -1,32 +1,14 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router';
-import {
-	useMantineTheme,
-	Container,
-	Title,
-	Button,
-	Group,
-	Box,
-	Select,
-	TextInput,
-	Text,
-} from '@mantine/core';
+import { Container, Group, Box, Select, Title, Text } from '@mantine/core';
 import styles from '@/styles/add-project.module.css';
+import {
+	PageTitle,
+	PageActions,
+	SetProvider,
+} from '@/src/pages/projects/components';
 
 function AddProject() {
-	const router = useRouter();
-	const [renderFields, setRenderFields] = useState(false);
-	const theme = useMantineTheme();
-
-	const pageTitle = (
-		<div className={styles.cardTitle}>
-			<div className={styles.title}>
-				<Text color='blue'>
-					<Title order={1}>Add Project Page</Title>
-				</Text>
-			</div>
-		</div>
-	);
+	const [showProviderFields, setshowProviderFields] = useState(false);
 
 	const staticProviderData = [
 		{ value: 'bg', label: 'Backlog' },
@@ -41,39 +23,16 @@ function AddProject() {
 
 	const handleChange = (data) => {
 		if (data === 'ap') {
-			setRenderFields(!renderFields);
+			setshowProviderFields(!showProviderFields);
 		} else {
-			setRenderFields(false);
+			setshowProviderFields(false);
 		}
 	};
-
-	const handleClick = (e) => {
-		e.preventDefault();
-		router.push(href);
-	};
-
-	const connectProvider = (
-		// TODO: Will these fields be in a different form or not
-
-		<>
-			<div className={styles.connectProvider}>
-				<Text color='blue'>
-					<Title order={3}>Enter API Key</Title>
-				</Text>
-				<TextInput placeholder='Enter API Key' size='lg' />
-			</div>
-			<div className={styles.connectProviderButton}>
-				<Button size='md' type='submit'>
-					Connect Provider
-				</Button>
-			</div>
-		</>
-	);
 
 	return (
 		<div>
 			<Container fluid color='blue'>
-				{pageTitle}
+				<PageTitle />
 				<Box sx={{ maxWidth: 600 }} mx='auto'>
 					<div className={styles.card}>
 						{/* TODO: handle submission of data */}
@@ -89,7 +48,7 @@ function AddProject() {
 									size='lg'
 								/>
 							</div>
-							{!!renderFields && connectProvider}
+							{showProviderFields && <SetProvider />}
 
 							<Text color='blue'>
 								<Title order={3}>Select Project</Title>
@@ -101,18 +60,7 @@ function AddProject() {
 							/>
 
 							<Group position='right' mt='lg'>
-								<Button
-									onClick={() => router.back('/')}
-									variant='light'
-									color='dark'
-									size='lg'
-								>
-									Cancel
-								</Button>
-
-								<Button size='lg' type='submit'>
-									Add Project
-								</Button>
+								<PageActions />
 							</Group>
 						</form>
 					</div>

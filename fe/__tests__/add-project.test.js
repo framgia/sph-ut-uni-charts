@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import AddProject from '@/src/pages/add-project';
+import AddProject from '@/src/pages/projects/add-project';
 
 describe('Add Project', () => {
 	it('Has a header', () => {
