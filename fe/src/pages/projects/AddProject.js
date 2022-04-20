@@ -4,7 +4,7 @@ import styles from '@/styles/add-project.module.css';
 import {
 	PageTitle,
 	PageActions,
-	SetProvider,
+	FormProvider,
 } from '@/src/pages/projects/components';
 
 function AddProject() {
@@ -48,7 +48,7 @@ function AddProject() {
 									size='lg'
 								/>
 							</div>
-							{showProviderFields && <SetProvider />}
+							{showProviderFields && <FormProvider />}
 
 							<Text color='blue'>
 								<Title order={3}>Select Project</Title>

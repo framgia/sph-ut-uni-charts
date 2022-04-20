@@ -1,3 +1,3 @@
-export { default as PageActions } from './pageActions';
-export { default as SetProvider } from './setProvider';
-export { default as PageTitle } from './pageTitle';
+export { default as PageActions } from './PageActions';
+export { default as FormProvider } from './FormProvider';
+export { default as PageTitle } from './PageTitle';

@@ -1,7 +1,7 @@
 import { Text, Title, TextInput, Button } from '@mantine/core';
 import styles from '@/styles/add-project.module.css';
 
-export default function SetProvider() {
+export default function FormProvider() {
 	return (
 		<>
 			<div className={styles.connectProvider}>
