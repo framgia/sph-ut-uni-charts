@@ -1,65 +1,117 @@
 import Head from 'next/head'
-import Image from 'next/image'
+import {
+  Button,
+  Container,
+  Group,
+  Pagination,
+  Select,
+  Table,
+  Text,
+  TextInput,
+} from '@mantine/core'
 
 import styles from '@/styles/index.module.css'
 
-export default () => {
+import { providersSelectFieldValues } from '@/src/utils/constants'
+import { staticProjects } from '@/src/utils/dummyData'
+import { useState } from 'react'
+
+const Home = () => {
+  const [projectName, setProjectName] = useState('')
+  const [providerName, setProviderName] = useState('')
+  const [page, setPage] = useState(1)
+
+  const resetFilters = () => {
+    setProjectName('')
+    setProviderName('')
+  }
+
   return (
-    <div className={styles.container}>
+    <Container>
       <Head>
-        <title>Create Next App</title>
-        <link rel='icon' href='/favicon.ico' />
+        <title>Uni Chart</title>
+        {/* TODO: add icon */}
+        {/* <link rel='icon' href='/favicon.ico' /> */}
       </Head>
 
       <main>
-        <h1 className={styles.title}>
-          Welcome to <a href='https://nextjs.org'>Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href='https://nextjs.org/docs' className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href='https://nextjs.org/learn' className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href='https://github.com/vercel/next.js/tree/canary/examples'
-            className={styles.card}
+        <Text color='blue'>
+          <h1>Welcome to Uni Chart!</h1>
+        </Text>
+        <Button className={styles['add-button']}>Add project</Button>
+        <Group className={styles['group-wrapper']}>
+          <Group grow className={styles.group}>
+            <TextInput
+              placeholder='Project Name'
+              label='Filter by name'
+              value={projectName}
+              onChange={(e) => {
+                setProjectName(e.target.value)
+              }}
+            />
+            <Select
+              label='Filter by provider'
+              placeholder='Provider'
+              data={providersSelectFieldValues}
+              value={providerName}
+              onChange={(e) => {
+                setProviderName(e)
+              }}
+            />
+          </Group>
+          <Button
+            className={styles['reset-filters-button']}
+            compact
+            onClick={resetFilters}
           >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a href='https://vercel.com/new' className={styles.card}>
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+            Reset filters
+          </Button>
+        </Group>
+        <Table striped>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Provider</th>
+              <th>Member Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            {staticProjects.map((project) => {
+              return (
+                <tr key={`${project.name}_${project.provider}`}>
+                  <td>{project.name}</td>
+                  <td>{project.provider}</td>
+                  <td>{project.memberCount}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </Table>
+        <Pagination
+          page={page}
+          onChange={setPage}
+          total={10}
+          className={styles.pagination}
+          getItemAriaLabel={(page) => {
+            switch (page) {
+              case 'dots':
+                return 'dots'
+              case 'prev':
+                return 'previous page'
+              case 'next':
+                return 'next page'
+              case 'first':
+                return 'first page'
+              case 'last':
+                return 'last page'
+              default:
+                return `page ${page}`
+            }
+          }}
+        />
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href='https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src='/vercel.svg' alt='Vercel Logo' width={72} height={16} />
-          </span>
-        </a>
-      </footer>
-    </div>
+    </Container>
   )
 }
+
+export default Home
