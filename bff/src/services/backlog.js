@@ -2,7 +2,7 @@ require('dotenv').config()
 const axios = require('axios')
 const URL = process.env.BACKLOG_API_SERVICE
 
-class Backlog extends Base {
+class Backlog {
   static async allTests() {
     let data
 
