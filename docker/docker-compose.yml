@@ -10,16 +10,28 @@ services:
       - POSTGRES_DB=root
 
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
-  
+
+  postgrestests:
+    image: postgres
+    restart: always
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+      POSTGRES_DB: tests
+    volumes:
+      - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+
   pgadmin-compose:
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: "test@gmail.com"
-      PGADMIN_DEFAULT_PASSWORD: "test123!"
+      PGADMIN_DEFAULT_EMAIL: 'test@gmail.com'
+      PGADMIN_DEFAULT_PASSWORD: 'test123!'
     ports:
-      - "16543:80"
+      - '16543:80'
     depends_on:
       - postgres

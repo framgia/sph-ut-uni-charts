@@ -4,14 +4,17 @@ const app = express()
 const cors = require('cors')
 const testRoutes = require('./routes/test')
 const userRoutes = require('./routes/user')
+const providerRoutes = require('./routes/provider')
 const PORT = process.env.PORT
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.listen(PORT || 11000, () => {
-  console.log(`Server is online at port ${PORT}`)
-})
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT || 11000, () => {
+    console.log(`Server is online at port ${PORT}`)
+  })
+}
 
 // optional, to check response on localhost
 app.get('/', (req, res) => {
@@ -21,5 +24,6 @@ app.get('/', (req, res) => {
 app.use(cors())
 app.use('/api/tests', testRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/providers', providerRoutes)
 
 module.exports = app
