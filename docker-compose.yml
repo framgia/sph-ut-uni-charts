@@ -24,6 +24,7 @@ services:
     tty: true
     working_dir: /home/node/app
     ports:
+      - '5551:5555'
       - '11000:11000'
     volumes:
       - './bff:/home/node/app'
@@ -41,6 +42,7 @@ services:
     tty: true
     working_dir: /home/node/app
     ports:
+      - '5552:5555'
       - '14000:14000'
     volumes:
       - './account:/home/node/app'
@@ -58,6 +60,7 @@ services:
     tty: true
     working_dir: /home/node/app
     ports:
+      - '5553:5555'
       - '12000:12000'
     volumes:
       - './backlog:/home/node/app'
@@ -75,6 +78,7 @@ services:
     tty: true
     working_dir: /home/node/app
     ports:
+      - '5554:5555'
       - '13000:13000'
     volumes:
       - './clockify:/home/node/app'
