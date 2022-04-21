@@ -1,0 +1,113 @@
+version: '3.6'
+services:
+  frontend:
+    build:
+      context: .
+      target: frontend
+    restart: unless-stopped
+    tty: true
+    working_dir: /home/node/app
+    ports:
+      - '3004:3000'
+    volumes:
+      - './fe:/home/node/app'
+      - /home/node/app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true yarn dev
+    command: yarn dev
+
+  bff:
+    build:
+      context: .
+      target: bff
+    restart: unless-stopped
+    tty: true
+    working_dir: /home/node/app
+    ports:
+      - '5551:5555'
+      - '11000:11000'
+    volumes:
+      - './bff:/home/node/app'
+      - './scripts:/home/node/app/scripts'
+      - /home/node/app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true yarn dev
+    command: /home/node/app/scripts/boot.sh
+
+  account:
+    build:
+      context: .
+      target: account
+    restart: unless-stopped
+    tty: true
+    working_dir: /home/node/app
+    ports:
+      - '5552:5555'
+      - '14000:14000'
+    volumes:
+      - './account:/home/node/app'
+      - './scripts:/home/node/app/scripts'
+      - /home/node/app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true yarn dev
+    command: /home/node/app/scripts/boot.sh
+
+  backlog:
+    build:
+      context: .
+      target: backlog
+    restart: unless-stopped
+    tty: true
+    working_dir: /home/node/app
+    ports:
+      - '5553:5555'
+      - '12000:12000'
+    volumes:
+      - './backlog:/home/node/app'
+      - './scripts:/home/node/app/scripts'
+      - /home/node/app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true yarn dev
+    command: /home/node/app/scripts/boot.sh
+
+  clockify:
+    build:
+      context: .
+      target: clockify
+    restart: unless-stopped
+    tty: true
+    working_dir: /home/node/app
+    ports:
+      - '5554:5555'
+      - '13000:13000'
+    volumes:
+      - './clockify:/home/node/app'
+      - './scripts:/home/node/app/scripts'
+      - /home/node/app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true yarn dev
+    command: /home/node/app/scripts/boot.sh
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - DATABASE_HOST=127.0.0.1
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=root
+
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./docker/docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+
+  pgadmin-compose:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'test@gmail.com'
+      PGADMIN_DEFAULT_PASSWORD: 'test123!'
+    ports:
+      - '16543:80'
+    depends_on:
+      - postgres

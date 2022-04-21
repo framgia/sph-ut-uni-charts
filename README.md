@@ -1,95 +1,62 @@
 # Uni-Chart
 
+## Build the Docker Environment
 
-## FE Setup
-```bash
-cd fe
-yarn install
+```
+docker-compose up --build -d
 ```
 
+## Run All Services
 
-## Docker Setup
-Note: _If docker is not yet installed in your machine, please install it first._
-Then, run the following commands:
+To run all run service just run this one
 
-```bash
-cd docker
-sudo docker-compose up
+```
+docker-compose start -d || docker compose up -d
 ```
 
-<br />
+To shutdown all service run this one
 
-## Backend For Frontend (BFF)
-Go to the bff directory and add .env file in the root directory with the following values below:
-```bash
-PORT=11000
-BACKLOG_API_SERVICE=http://localhost:12000/api
-CLOCKIFY_API_SERVICE=http://localhost:13000/api
-ACCOUNT_API_SERVICE=http://localhost:14000/api
+```
+docker-compose down
 ```
 
-Run the following commands:
+To shutdown specific service just run this one
 
-```bash
-cd bff
-npm install
-npm run dev
+```
+docker-compose stop <SERVICE>
 ```
 
-<br />
+## Checking Logs
 
-## Account Service
-Go to the account directory and add .env file in the root directory with the following values below:
-```bash
-PORT=14000
-TOKEN_KEY=test
-DATABASE_URL="postgresql://capstone:capstone@localhost:5432/account?schema=public"
 ```
-Run the following commands:
-```bash
-cd account
-npm install
-npm run dev
-npx prisma migrate dev
-npx prisma studio
+docker-compose logs -f
 ```
 
-<br />
-<br />
+Check logs on specific service
 
-## Backlog Service
-Go to the backlog directory and add .env file in the root directory with the following values below:
-```bash
-PORT=12000
-DATABASE_URL="postgresql://capstone:capstone@localhost:5432/backlog?schema=public"
 ```
-Run the following commands:
-```bash
-cd backlog
-npm install
-npm run dev
-npx prisma migrate dev
-npx prisma studio
+docker-compose logs -f <SERVICE>
 ```
 
-<br />
+## Using Prisma Studio on each Service
 
-## Clockify Service
-Go to the clockify directory and add .env file in the root directory with the following values below:
-```bash
-PORT=13000
-DATABASE_URL="postgresql://capstone:capstone@localhost:5432/clockify?schema=public"
+Just run this command to use prisma studio
+
+### All Service
+
 ```
-Run the following commands:
-```bash
-cd clockify
-npm install
-npm run dev
-npx prisma migrate dev
-npx prisma studio
+docker-compose exec <SERVICE> yarn prisma studio
 ```
 
-<br />
+Visit the prisma studio according to the service port
+
+```
+bff:     5551
+account: 5552
+backlog: 5553
+clockify:5554
+```
 
 ## Development Flow Chart
+
 Google Drive: https://drive.google.com/file/d/1BkmTChuuscGnAqj-hwWd6vUKUNEqlC8E/view?usp=sharing
