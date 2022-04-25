@@ -30,6 +30,10 @@ COPY --chown=node:node ./backlog/package*.json ./
 COPY --chown=node:node ./backlog/yarn.lock ./
 RUN yarn --pure-lockfile install
 COPY --chown=node:node ./backlog .
+<<<<<<< Updated upstream
+=======
+CMD ["node", "build/index.js"]
+>>>>>>> Stashed changes
 
 FROM base AS clockify
 COPY --chown=node:node ./clockify/package*.json ./
