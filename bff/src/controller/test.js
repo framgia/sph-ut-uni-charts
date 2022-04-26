@@ -1,4 +1,4 @@
-const BacklogService = require('../services/backlog')
+const BacklogService = require('../services/Backlog')
 const ClockifyService = require('../services/clockify')
 const AccountService = require('../services/account')
 

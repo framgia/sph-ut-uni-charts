@@ -25,13 +25,14 @@ model Provider {
   projects Project[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  @@unique([user_id, api_key])
 }
 
 model Project {
   id Int @id @default(autoincrement())
   name String
   key String
-  project_id String
+  project_id Int
   provider_id Int
   provider Provider @relation(fields: [provider_id], references: [id])
   created_at DateTime @default(now())
