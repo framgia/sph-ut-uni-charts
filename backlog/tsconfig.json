@@ -1,28 +1,13 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
-    "noImplicitAny": true,
+    "types": ["jest", "node"],
+    "target": "es5",
     "module": "commonjs",
-    "target": "es2019",
-    "lib": ["es6"],
-    "types": ["node"],
     "esModuleInterop": true,
-    "moduleResolution": "node",
-    "removeComments": true,
+    "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": false,
-    "noImplicitReturns": true,
-    "strictPropertyInitialization": false,
-    "noFallthroughCasesInSwitch": true,
-    "strictFunctionTypes": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "outDir": "dist",
-    "noEmit": true
+    "skipLibCheck": true
   },
-  "include": ["**/*.ts", "**/*.test.ts"],
+  "include": ["./**/*.ts"],
   "exclude": ["node_modules", "**/dist/*.js"]
 }

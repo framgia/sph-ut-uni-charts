@@ -7,8 +7,8 @@
     "build": "tsc -p .",
     "test": "jest -i",
     "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
-    "start": "NODE_PATH=./dist node dist/src/index.js",
-    "dev": "nodemon ./src/index.ts"
+    "start": "NODE_PATH=./dist node dist/index.js",
+    "dev": "nodemon --watch src --ext ts,json --exec node -r ts-node/register index.ts"
   },
   "author": "",
   "license": "ISC",
