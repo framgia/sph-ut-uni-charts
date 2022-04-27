@@ -38,7 +38,14 @@ describe('Project Detail', () => {
     const header = screen.getByRole('heading', { name: /developers/i })
     expect(header).toBeInTheDocument()
 
-    const card = screen.getAllByRole('card')
-    expect(card).toHaveLength(developersList.length)
+    const table = screen.getByRole('table')
+    expect(table).toBeInTheDocument()
+
+    // includes the table header
+    const rows = screen.getAllByRole('row')
+    expect(rows).toHaveLength(developersList.length + 1)
+
+    const columns = screen.getAllByRole('columnheader')
+    expect(columns).toHaveLength(2)
   })
 })

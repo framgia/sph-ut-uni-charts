@@ -1,4 +1,4 @@
-import { Card, Container, Group, Text, Title } from '@mantine/core'
+import { Card, Container, Group, Table, Text, Title } from '@mantine/core'
 
 import { Chart, PageTitle } from './components'
 import {
@@ -51,21 +51,24 @@ const ProjectDetail = () => {
           <Text color='blue'>
             <Title order={4}>Developers</Title>
           </Text>
-          <Group>
-            {developersList.map((developer, index) => {
-              return (
-                <div style={{ width: '32%' }} key={index + developer.name}>
-                  <Card shadow='lg' p='lg' role='card'>
-                    <Card.Section />
-                    <Card.Section>
-                      <Text>Name: {developer.name}</Text>
-                      <Text>Position: {developer.position}</Text>
-                    </Card.Section>
-                  </Card>
-                </div>
-              )
-            })}
-          </Group>
+          <Table striped>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Position</th>
+              </tr>
+            </thead>
+            <tbody>
+              {developersList.map((developer) => {
+                return (
+                  <tr key={`${developer.name}_${developer.position}`}>
+                    <td>{developer.name}</td>
+                    <td>{developer.position}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </Table>
         </Container>
       </Container>
     </div>

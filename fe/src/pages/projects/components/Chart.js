@@ -12,26 +12,16 @@ import {
 } from 'chart.js'
 
 const Chart = ({ title, labels, datasets, type = 'bar' }) => {
-  if (type === 'bar') {
-    ChartJS.register(
-      CategoryScale,
-      LinearScale,
-      BarElement,
-      Title,
-      Tooltip,
-      Legend
-    )
-  } else {
-    ChartJS.register(
-      CategoryScale,
-      LinearScale,
-      PointElement,
-      LineElement,
-      Title,
-      Tooltip,
-      Legend
-    )
-  }
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  )
   const options = {
     responsive: true,
     plugins: {
