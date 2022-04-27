@@ -4,6 +4,7 @@ const app = express()
 const cors = require('cors')
 const testRoutes = require('./routes/test')
 const userRoutes = require('./routes/user')
+const providerRoutes = require('./routes/provider')
 const PORT = process.env.PORT || 11000
 
 app.use(express.json())
