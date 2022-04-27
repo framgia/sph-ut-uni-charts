@@ -1,4 +1,4 @@
-import ProviderController from '../controllers/ProviderController'
+import ProviderController from '../../controllers/ProviderController'
 const httpMocks = require('node-mocks-http')
 const { faker } = require('@faker-js/faker')
 

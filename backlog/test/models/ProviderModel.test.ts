@@ -1,5 +1,5 @@
-const Provider = require('../models/Provider')
-import { MockContext, Context, createMockContext } from '../utils/context'
+const Provider = require('../../models/Provider')
+import { MockContext, Context, createMockContext } from '../../utils/context'
 
 let mockCtx: MockContext
 let ctx: Context
