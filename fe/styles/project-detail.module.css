@@ -1,0 +1,18 @@
+.burn-up-chart {
+  padding-top: 63px;
+}
+
+.burn-down-chart-select {
+  width: 100px;
+  margin-left: auto;
+  margin-right: 40px;
+}
+
+.velocity-chart {
+  margin-top: 4em;
+  width: 50%;
+}
+
+.velocity-chart-velocity {
+  text-align: right;
+}

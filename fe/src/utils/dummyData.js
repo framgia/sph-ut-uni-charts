@@ -34,6 +34,12 @@ export const sprintLabels = [
   'Sprint 5',
 ]
 
+export const sprintSelectFields = [
+  { value: 1, label: 'Sprint 1' },
+  { value: 2, label: 'Sprint 2' },
+  { value: 3, label: 'Sprint 3' },
+]
+
 export const velocityChartData = {
   estimated: [40, 37, 39, 40, 32],
   actual: [35, 31, 40, 40, 32],
