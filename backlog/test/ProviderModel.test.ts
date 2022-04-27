@@ -55,7 +55,6 @@ describe('Provider Model', () => {
   test('Test #1: Should return empty array - Project not registered', async () => {
     mockCtx.prisma.project.findMany.mockResolvedValue([])
     const res = await Model.isProjectRegistered(provider, ctx)
-    console.log({ test1: res })
     expect(res).toMatchObject([])
   })
 
@@ -85,7 +84,6 @@ describe('Provider Model', () => {
   test('Test #3: Should return Porject Object - Project is registered', async () => {
     mockCtx.prisma.project.findMany.mockResolvedValue(project)
     const res = await Model.isProjectRegistered(project, ctx)
-    console.log({ test3: res })
     expect(res[0]).toEqual({
       id: 1001,
       name: 'project_name',

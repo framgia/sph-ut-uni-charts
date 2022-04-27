@@ -26,7 +26,6 @@ describe('Provider Controller', () => {
     await Controller.add(req, res)
     expect(res.statusCode).toEqual(200)
     expect(res._getData()).toMatchObject({
-      id: 2,
       user_id: 1,
       name: 'backlog',
       space_key: 'UNI-CHART',
