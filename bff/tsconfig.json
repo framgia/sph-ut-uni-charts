@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "types": ["jest", "node"],
+    "target": "es2016",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts", "src/services/account.js", "src/routes/ProviderRoute.ts"]
+}

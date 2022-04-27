@@ -1,6 +1,8 @@
-const BacklogService = require('../services/Backlog')
+import BacklogService from '../services/BacklogService'
+import { Request, Response } from 'express';
+
 class ProviderController {
-  static async add(req, res) {
+  static async add(req: Request, res: Response) {
     let result
 
     switch (req.body.provider) {
@@ -15,4 +17,4 @@ class ProviderController {
   }
 }
 
-module.exports = ProviderController
+export default ProviderController
