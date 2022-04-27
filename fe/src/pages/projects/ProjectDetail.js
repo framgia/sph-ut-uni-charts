@@ -30,7 +30,7 @@ const ProjectDetail = () => {
       <Container fluid color='blue'>
         <PageTitle pageTitle='Project Name Detail' />
         <Button component='a' href='/'>
-          {'< Home Page'}
+          {'< Back to home'}
         </Button>
         <Group grow>
           <div role='burn-up-chart' className={styles['burn-up-chart']}>

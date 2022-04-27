@@ -107,7 +107,9 @@ describe('Project Detail', () => {
   it('has button to redirect to home page', () => {
     render(<ProjectDetail />)
 
-    const redirectButton = screen.getByRole('link', { name: /home page/i })
+    const redirectButton = screen.getByRole('link', {
+      name: /back to home/i,
+    })
     expect(redirectButton).toBeInTheDocument()
   })
 })
