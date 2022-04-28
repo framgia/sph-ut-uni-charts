@@ -15,7 +15,7 @@ describe('User.insertOrUpdateUser', () => {
     const { created_at, updated_at, ...userPayload } = userMock
     prismaMock.user.upsert.mockResolvedValue(userMock)
 
-    let userModel = new User()
+    const userModel = new User()
     await expect(userModel.insertOrUpdateUser(userPayload)).resolves.toMatchObject(userPayload)
   })
 
@@ -26,7 +26,7 @@ describe('User.insertOrUpdateUser', () => {
     prismaMock.user.create.mockResolvedValue(userMock)
     prismaMock.user.upsert.mockResolvedValue(newUser)
 
-    let userModel = new User()
+    const userModel = new User()
     const result = await userModel.insertOrUpdateUser(userPayload)
 
     expect(result).toMatchObject(userPayload)
@@ -39,7 +39,7 @@ describe('User.destroyToken', () => {
     const { created_at, updated_at, ...userPayload } = userMock
     prismaMock.user.create.mockResolvedValue(userMock)
 
-    let userModel = new User()
+    const userModel = new User()
     await userModel.destroyToken(userPayload)
     prismaMock.user.findFirst.mockResolvedValue({ ...userMock, token_id: null })
 
