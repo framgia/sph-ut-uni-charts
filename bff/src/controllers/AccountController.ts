@@ -2,11 +2,11 @@ import AccountService from '../services/AccountService'
 import { Request, Response, ErrorRequestHandler } from 'express'
 
 export type ResponseError = {
-  status: number
   message: string
   response: {
     status: number
     message: string
+    data: string
   }
 }
 
@@ -17,6 +17,11 @@ export default class AccountController {
       res.status(200).send(result)
     } catch (error) {
       const output = error as ResponseError
+      if (!output?.response) {
+        return res.status(500).json({
+          message: 'an internal error occured'
+        })
+      }
       res.status(output.response.status).json(output)
     }
   }
@@ -27,9 +32,12 @@ export default class AccountController {
       res.status(200).json(result)
     } catch (error) {
       const output = error as ResponseError
-      res.status(500).json({
-        message: output.message
-      })
+      if (!output?.response) {
+        return res.status(500).json({
+          message: 'an internal error occured'
+        })
+      }
+      res.status(output.response.status).json(output)
     }
   }
 
@@ -41,9 +49,12 @@ export default class AccountController {
       res.status(200).json(result)
     } catch (error) {
       const output = error as ResponseError
-      res.status(output.response.status).json({
-        message: output.message
-      })
+      if (!output?.response) {
+        return res.status(500).json({
+          message: 'an internal error occured'
+        })
+      }
+      res.status(output.response.status).json(output)
     }
   }
 }

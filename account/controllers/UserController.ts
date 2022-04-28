@@ -70,7 +70,10 @@ class UserController extends Controller {
       })
       const payload = ticket.getPayload()
 
-      res.status(200).json(payload)
+      res.status(200).json({
+        ...payload,
+        token_id: result?.token_id
+      })
     } catch (error) {
       res.status(419).json({
         message: 'Session has been expired'

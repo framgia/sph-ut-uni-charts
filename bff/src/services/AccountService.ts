@@ -5,14 +5,13 @@ const URL = process.env.ACCOUNT_API_SERVICE
 
 export default class AccountService {
   static async login(payload: any) {
-    return await axios
-      .post(`${URL}/users/signIn`, { ...payload })
-      .then((response: AxiosResponse) => {
-        return response
-      })
-      .catch((error) => {
-        return error.response
-      })
+    return axios({
+      url: `${URL}/users/signIn`,
+      method: 'post',
+      data: payload
+    }).then((response: AxiosResponse) => {
+      return response.data
+    })
   }
 
   static async logout(payload: any) {
