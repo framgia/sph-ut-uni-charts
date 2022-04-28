@@ -24,4 +24,27 @@ export default class ProjectController {
       res.send(!result ? { message: 'No Data Found' } : result)
     }
   }
+
+  async deleteProjectById(req: Request, res: Response) {
+    if (/[a-zA-z]/.test(req.params.id)) {
+      res.send({
+        message: 'Invalid ID'
+      })
+    } else {
+      const project = await prisma.project.findUnique({
+        where: {
+          id: Number(req.params.id)
+        }
+      })
+  
+      const result : any = !project ? { message: 'ID does not exist' } : await prisma.project.delete({
+        where: {
+          id: Number(req.params.id)
+        }
+      })
+      
+      res.send(result)
+    }
+    
+  }
 }

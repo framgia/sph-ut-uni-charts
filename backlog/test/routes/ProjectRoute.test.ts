@@ -84,4 +84,9 @@ describe('Project Router Test Suite', () => {
     const data = await prisma.project.findMany()
     expect(data).toStrictEqual([])
   })
+
+  test('Test #6: /projects/delete/:id - It should remove a project', async () => {
+    const data = await request(app).get('/1111111')
+    expect(JSON.parse(data.text)).toHaveProperty('message', 'No Data Found')
+  })
 })
