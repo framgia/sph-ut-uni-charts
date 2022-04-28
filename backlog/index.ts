@@ -1,9 +1,10 @@
 require('dotenv').config()
 import express, { Request, Response } from 'express'
-import cors from 'cors'
 import ProjectRoutes from './routes/ProjectRoute'
 import ProviderRoutes from './routes/ProviderRoute'
+import BacklogRoutes from './routes/BacklogRoutes'
 
+const cors = require('cors')
 const app = express()
 const PORT = process.env.PORT || 12000
 
@@ -25,5 +26,4 @@ app.get('/', (req: Request, res: Response) => {
 app.use(cors())
 app.use('/api/projects', ProjectRoutes)
 app.use('/api/providers', ProviderRoutes)
-
-export default app
+app.use('/api/backlog', BacklogRoutes)
