@@ -85,12 +85,12 @@ describe('Project Router Test Suite', () => {
     expect(data).toStrictEqual([])
   })
 
-  test('Test #6: /delete/:id - if ID does not exist', async () => {
+  test('Test #6: /projects/:id - if ID does not exist', async () => {
     const data = await request(app).get('/1111111')
     expect(JSON.parse(data.text)).toHaveProperty('message', 'No Data Found')
   })
 
-  test('Test #7: /delete/:id - invalid ID, it should be a number', async () => {
+  test('Test #7: /projects/:id - invalid ID, it should be a number', async () => {
     const data = await request(app).get('/test')
     expect(JSON.parse(data.text)).toHaveProperty('message', 'Invalid ID')
   })

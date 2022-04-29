@@ -27,6 +27,6 @@ class ProjectRoute {
 const routes = new ProjectRoute(projectController)
 routes.getProjects('/')
 routes.getProjectById('/:id')
-routes.deleteProjectById('/delete/:id')
+routes.deleteProjectById('/:id')
 
 export default router

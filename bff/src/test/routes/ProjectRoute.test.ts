@@ -38,4 +38,17 @@ describe('Project Route Test Suite', () => {
     if (!data.length) expect(data).toStrictEqual([])
     else expect(data[0]).toHaveProperty('id')
   })
+
+  test('Test #5: deleteProjectById - if ID does not exist in the database', async () => {
+    const result = await request(app).delete('/111111').send({ service: 'backlog' })
+    const data = JSON.parse(result.text)
+    expect(data).toHaveProperty('message', 'ID does not exist')
+  })
+
+  test('Test #6: deleteProjectById - invalid ID, letters are not valid, should be number', async () => {
+    const result = await request(app).delete('/test').send({ service: 'backlog' })
+    const data = JSON.parse(result.text)
+    expect(data).toHaveProperty('message', 'Invalid ID')
+  })
+
 })

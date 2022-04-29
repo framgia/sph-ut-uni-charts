@@ -129,8 +129,8 @@ describe('Project Controller Test Suite', () => {
 
   test('Test #6: deleteProjectById - if ID does not exist orin the database', async () => {
     const request = httpMocks.createRequest({
-      method: 'GET',
-      url: '/delete/:id',
+      method: 'DELETE',
+      url: '/:id',
       params: {
         id: '111111'
       }
@@ -145,7 +145,7 @@ describe('Project Controller Test Suite', () => {
   test('Test #7: deleteProjectById - invalid ID, it should be a number', async () => {
     const request = httpMocks.createRequest({
       method: 'DELETE',
-      url: '/delete/:id',
+      url: '/:id',
       params: {
         id: 'test'
       }

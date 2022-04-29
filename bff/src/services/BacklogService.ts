@@ -32,7 +32,20 @@ export default class BacklogService {
     return data
   }
 
-  // PROVIDER MICROSERVICES
+  async deleteProjectById(id: String) {
+    let data
+
+    await axios({
+      url:`${URL}/projects/${id}`,
+      method: 'delete'
+    }).then((response: AxiosResponse) => {
+      data = response.data
+    })
+
+    return data
+  }
+
+ // PROVIDER MICROSERVICES
 
   static async add(payload: any) {
     return await axios

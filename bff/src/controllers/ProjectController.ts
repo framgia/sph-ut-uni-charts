@@ -23,4 +23,19 @@ export default class ProjectController {
 
     res.send(response)
   }
+
+  async deleteProjectById(req: Request, res: Response) {
+    let response
+
+    switch (req.body.service) {
+      case 'backlog':
+        const result = await backlogService.deleteProjectById(req.params.id)
+        response = result
+        break
+      default:
+        response = { message: 'Service information is not provided.' }
+    }
+
+    res.send(response)
+  }
 }
