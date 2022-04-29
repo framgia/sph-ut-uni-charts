@@ -1,6 +1,6 @@
 import ProviderController from '../../controllers/ProviderController'
-const httpMocks = require('node-mocks-http')
-const { faker } = require('@faker-js/faker')
+import httpMocks from 'node-mocks-http'
+import { faker } from '@faker-js/faker'
 
 const payload = {
   user_id: 1,
@@ -13,14 +13,16 @@ const payload = {
 }
 
 const payload2 = {
-  user_id: 2,
+  user_id: 1,
   provider: 'backlog',
-  space_key: 'UNI-CHART-2',
-  api_key: 'apikey1234567890111',
-  project_key: 'unichart-key-2',
-  project_name: 'project_name-2',
+  space_key: 'UNI-CHART',
+  api_key: 'apikey1234567890',
+  project_key: 'unichart-key',
+  project_name: 'project_name',
   project_id: faker.datatype.number()
 }
+
+const providerController = new ProviderController()
 
 describe('Provider Controller', () => {
   let req: { body: any }, res: { statusCode: any; _getData: () => any }, Controller: any
@@ -116,5 +118,47 @@ describe('Provider Controller', () => {
     await Controller.getProviders(req, res)
     const result = res._getData()
     expect.arrayContaining(result)
+  })
+
+  describe('Provider controller - get using id', () => {
+    it('Test #7 /:id [400]: non numerical id', async () => {
+      const getReq = httpMocks.createRequest()
+      const getRes = httpMocks.createResponse()
+
+      getReq.params = { id: 'as' }
+
+      await providerController.getProviderById(getReq, getRes)
+      const data = getRes._getData()
+
+      expect(getRes.statusCode).toEqual(400)
+      expect(JSON.parse(data)).toHaveProperty('message', 'Invalid ID')
+    })
+
+    it('Test #8 /:id [404]: provider with given id not found', async () => {
+      const getReq = httpMocks.createRequest()
+      const getRes = httpMocks.createResponse()
+      getReq.params = { id: '11111' }
+
+      await providerController.getProviderById(getReq, getRes)
+      const data = getRes._getData()
+
+      expect(getRes.statusCode).toEqual(404)
+      expect(JSON.parse(data)).toHaveProperty('message', 'No Provider Found')
+    })
+
+    it('Test #9 /:id [200]: valid id', async () => {
+      const postReq = httpMocks.createRequest()
+      const postRes = httpMocks.createResponse()
+      postReq.body = payload2
+      await Controller.add(postReq, postRes)
+
+      const getReq = httpMocks.createRequest()
+      const getRes = httpMocks.createResponse()
+      getReq.params = { id: postRes._getData().id }
+      await Controller.getProviderById(getReq, getRes)
+
+      expect(getRes._getData()).toEqual(postRes._getData())
+      expect(getRes.statusCode).toEqual(200)
+    })
   })
 })

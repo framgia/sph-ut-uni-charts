@@ -50,6 +50,55 @@ export const velocityChartData = {
   actual: [35, 31, 40, 40, 32],
 }
 
+export const aaa = [
+  {
+    milestone: 'Sprint 2',
+    issues: [
+      {
+        id: 16758362,
+        actualHours: 0,
+        estimatedHours: 8,
+        currentStatus: 'In Progress',
+      },
+      {
+        id: 16758350,
+        actualHours: 0,
+        estimatedHours: 8,
+        currentStatus: 'Closed',
+      },
+      {
+        id: 16758341,
+        actualHours: 0,
+        estimatedHours: 8,
+        currentStatus: 'Open',
+      },
+    ],
+  },
+  {
+    milestone: 'Sprint1',
+    issues: [
+      {
+        id: 16758166,
+        actualHours: 0,
+        estimatedHours: 8,
+        currentStatus: 'Open',
+      },
+      {
+        id: 16758137,
+        actualHours: 0,
+        estimatedHours: 8,
+        currentStatus: 'Open',
+      },
+      {
+        id: 16683650,
+        actualHours: 0.25,
+        estimatedHours: 8,
+        currentStatus: 'Open',
+      },
+    ],
+  },
+]
+
 export const burnDownChartData = {
   totalTasks: [30, 32, 32, 35, 36],
   remainingTasks: [30, 21, 15, 12, 5],

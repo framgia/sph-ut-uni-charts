@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   Button,
   Container,
@@ -17,11 +18,43 @@ import {
   sprintLabels,
   sprintSelectFields,
   velocityChartData,
+  aaa,
 } from '@/src/utils/dummyData'
-import { ChartDataFormatter } from '@/src/utils/helpers'
+import { ChartDataFormatter, VelocityDataFormatter } from '@/src/utils/helpers'
+import { getIssues } from '@/src/services/bffService'
+import { useRouter } from 'next/router'
 
 const ProjectDetail = () => {
-  const velocityChartDataSet = ChartDataFormatter(velocityChartData)
+  const router = useRouter()
+  const [velocityResponse, setVelocityResponse] = useState()
+  const [velocityChartDataSet, setVelocityChartDataSet] = useState(
+    ChartDataFormatter(velocityChartData)
+  )
+  const [velocityDataLabels, setVelocityDataLabels] = useState([])
+
+  const query = router.query.id
+
+  useEffect(() => {
+    if (query) {
+      const issues = getIssues(Number(router.query.id), 'backlog')
+      setVelocityResponse(issues)
+    }
+  }, [query])
+
+  useEffect(() => {
+    if (
+      !(
+        typeof velocityResponse === 'object' &&
+        typeof velocityResponse.then === 'function'
+      )
+    ) {
+      const velocityData = VelocityDataFormatter(velocityResponse)
+
+      setVelocityDataLabels(velocityData.labels)
+      setVelocityChartDataSet(ChartDataFormatter(velocityData.data))
+    }
+  }, [velocityResponse])
+
   const burnDownChartDataSet = ChartDataFormatter(burnDownChartData)
   const burnUpChartDataSet = ChartDataFormatter(burnUpChartData)
 
@@ -65,7 +98,7 @@ const ProjectDetail = () => {
             </Text>
             <Chart
               title='Velocity Chart'
-              labels={sprintLabels}
+              labels={velocityDataLabels}
               datasets={velocityChartDataSet}
             />
           </div>
