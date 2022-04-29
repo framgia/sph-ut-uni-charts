@@ -42,16 +42,15 @@ const ProjectDetail = () => {
   }, [query])
 
   useEffect(() => {
-    if (
-      !(
-        typeof velocityResponse === 'object' &&
-        typeof velocityResponse.then === 'function'
-      )
-    ) {
-      const velocityData = VelocityDataFormatter(velocityResponse)
+    async function justToWait() {
+      const velocityData = await VelocityDataFormatter(velocityResponse)
 
       setVelocityDataLabels(velocityData.labels)
       setVelocityChartDataSet(ChartDataFormatter(velocityData.data))
+    }
+
+    if (velocityResponse) {
+      justToWait()
     }
   }, [velocityResponse])
 

@@ -17,18 +17,16 @@ export const ChartDataFormatter = (data) => {
   return datasets
 }
 
-export const VelocityDataFormatter = (rawData) => {
-  console.log(rawData)
+export const VelocityDataFormatter = async (rawData) => {
   const data = {
     commitment: [],
     completed: [],
   }
   const labels = []
+  const tempData = await rawData
 
-  if (!rawData) return { data, labels }
-
-  rawData.reverse()
-  rawData.forEach((item) => {
+  tempData.reverse()
+  tempData.forEach((item) => {
     let commitment = 0
     let completed = 0
 
