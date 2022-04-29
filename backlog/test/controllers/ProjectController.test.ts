@@ -127,10 +127,10 @@ describe('Project Controller Test Suite', () => {
     expect(data).toStrictEqual([])
   })
 
-  test('Test #6: getProjectById - if ID does not exist orin the database', async () => {
+  test('Test #6: deleteProjectById - if ID does not exist orin the database', async () => {
     const request = httpMocks.createRequest({
       method: 'GET',
-      url: '/projects/:id',
+      url: '/delete/:id',
       params: {
         id: '111111'
       }
