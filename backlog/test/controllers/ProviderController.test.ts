@@ -12,6 +12,16 @@ const payload = {
   project_id: faker.datatype.number()
 }
 
+const payload2 = {
+  user_id: 2,
+  provider: 'backlog',
+  space_key: 'UNI-CHART-2',
+  api_key: 'apikey1234567890111',
+  project_key: 'unichart-key-2',
+  project_name: 'project_name-2',
+  project_id: faker.datatype.number()
+}
+
 describe('Provider Controller', () => {
   let req: { body: any }, res: { statusCode: any; _getData: () => any }, Controller: any
 
@@ -82,5 +92,29 @@ describe('Provider Controller', () => {
         message: 'Required value.'
       }
     ])
+  })
+
+  it('Test #4 - getProviders() - Empty array', async () => {
+    req.body = { user_id: '111111' }
+    await Controller.getProviders(req, res)
+    const data = res._getData()
+    expect(data).toStrictEqual([])
+  })
+
+  it('Test #5 - getProviders() - Invalid user ID', async () => {
+    req.body = { user_id: 'test' }
+    await Controller.getProviders(req, res)
+    const data = res._getData()
+    expect(data).toHaveProperty('message', 'Invalid User ID')
+  })
+
+  it('Test #6 - getProviders() - Array of objects', async () => {
+    req.body = payload2
+    await Controller.add(req, res)
+    const data = res._getData()
+    req.body = { user_id: data.user_id }
+    await Controller.getProviders(req, res)
+    const result = res._getData()
+    expect.arrayContaining(result)
   })
 })

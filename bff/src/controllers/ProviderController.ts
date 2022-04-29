@@ -1,5 +1,5 @@
 import BacklogService from '../services/BacklogService'
-import { Request, Response } from 'express';
+import { Request, Response } from 'express'
 
 class ProviderController {
   static async add(req: Request, res: Response) {
@@ -14,6 +14,14 @@ class ProviderController {
     }
 
     res.status(result.status).send(result.data)
+  }
+
+  static async getProviders(req: Request, res: Response) {
+    const backlogService = await BacklogService.getProviders(req.body.user_id)
+
+    res.send({
+      backlog: backlogService
+    })
   }
 }
 

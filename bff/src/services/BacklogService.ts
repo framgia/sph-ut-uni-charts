@@ -1,5 +1,5 @@
 require('dotenv').config()
-import axios, { AxiosResponse } from 'axios'
+import axios, { AxiosResponse, AxiosError } from 'axios'
 
 const URL = process.env.BACKLOG_API_SERVICE
 
@@ -38,5 +38,25 @@ export default class BacklogService {
       .catch((error) => {
         return error.response
       })
+  }
+
+  static async getProviders(user_id: number) {
+    let data
+
+    await axios({
+      url: `${URL}/providers`,
+      method: 'get',
+      data: {
+        user_id: user_id
+      }
+    })
+      .then((response: AxiosResponse) => {
+        data = response.data
+      })
+      .catch((error: AxiosError) => {
+        data = error.message
+      })
+
+    return data
   }
 }
