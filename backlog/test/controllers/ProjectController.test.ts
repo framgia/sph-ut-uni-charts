@@ -127,7 +127,7 @@ describe('Project Controller Test Suite', () => {
     expect(data).toStrictEqual([])
   })
 
-  test('Test #6: deleteProjectById - It should remove a project', async () => {
+  test('Test #6: deleteProjectById - invalid ID, it should be a number', async () => {
     const request = httpMocks.createRequest({
       method: 'DELETE',
       url: '/delete/:id'

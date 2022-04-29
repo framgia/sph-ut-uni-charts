@@ -85,7 +85,7 @@ describe('Project Router Test Suite', () => {
     expect(data).toStrictEqual([])
   })
 
-  test('Test #6: /projects/delete/:id - It should remove a project', async () => {
+  test('Test #6: /projects/delete/:id - Invalid ID, it should be a number', async () => {
     const data = await request(app).get('/1111111')
     expect(JSON.parse(data.text)).toHaveProperty('message', 'No Data Found')
   })
