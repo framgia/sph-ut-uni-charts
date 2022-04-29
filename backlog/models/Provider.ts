@@ -51,9 +51,6 @@ class Provider {
     return await ctx.prisma.provider.findMany({
       where: {
         user_id: user_id
-      },
-      include: {
-        projects: true
       }
     })
   }
