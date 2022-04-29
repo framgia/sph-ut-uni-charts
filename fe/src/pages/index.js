@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import Link from 'next/link'
 import {
   Button,
   Container,
@@ -38,8 +39,13 @@ const Home = () => {
         <Text color='blue'>
           <h1>Welcome to Uni Chart!</h1>
         </Text>
-        <Button className={styles['add-button']}>Add project</Button>
-        <Group className={styles['group-wrapper']}>
+        <Button
+          onClick={() => location.href = '/add-project'}
+          className={styles['add-button']}
+        >
+            Add project
+        </Button>
+        {/* <Group className={styles['group-wrapper']}>
           <Group grow className={styles.group}>
             <TextInput
               placeholder='Project Name'
@@ -66,7 +72,7 @@ const Home = () => {
           >
             Reset filters
           </Button>
-        </Group>
+        </Group> */}
         <Table striped>
           <thead>
             <tr>
@@ -79,7 +85,7 @@ const Home = () => {
             {staticProjects.map((project) => {
               return (
                 <tr key={`${project.name}_${project.provider}`}>
-                  <td>{project.name}</td>
+                  <td><Link href={`/project-detail/${project.id}`}>{project.name}</Link></td>
                   <td>{project.provider}</td>
                   <td>{project.memberCount}</td>
                 </tr>

@@ -13,6 +13,11 @@
   width: 50%;
 }
 
+.brn-down-chart {
+  margin-top: 4em;
+  width: 50%;
+}
+
 .velocity-chart-velocity {
   text-align: right;
 }

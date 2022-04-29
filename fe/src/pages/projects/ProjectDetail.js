@@ -32,16 +32,16 @@ const ProjectDetail = () => {
         <Button component='a' href='/'>
           {'< Back to home'}
         </Button>
-        <Group grow>
-          <div role='burn-up-chart' className={styles['burn-up-chart']}>
+        <Group position='center'>
+          {/* <div role='burn-up-chart' className={styles['burn-up-chart']}>
             <Chart
               title='Burn Up Chart'
               labels={sprintLabels}
               datasets={burnUpChartDataSet}
               type='line'
             />
-          </div>
-          <div role='burn-down-chart'>
+          </div> */}
+          <div role='burn-down-chart' className={styles['brn-down-chart']}>
             <Select
               label='Selected Sprint'
               placeholder='Select Sprint'

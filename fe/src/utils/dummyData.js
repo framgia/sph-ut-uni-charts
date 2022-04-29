@@ -1,25 +1,30 @@
 export const staticProjects = [
   {
+    id: 1,
     name: '01booster',
     provider: 'Backlog',
     memberCount: 7,
   },
   {
+    id: 2,
     name: 'Safie',
     provider: 'Trello',
     memberCount: 3,
   },
   {
+    id: 3,
     name: 'Edge',
     provider: 'Asana',
     memberCount: 2,
   },
   {
+    id: 4,
     name: 'Yamato',
     provider: 'Notion',
     memberCount: 8,
   },
   {
+    id: 5,
     name: 'Test',
     provider: 'Jira',
     memberCount: 6,
