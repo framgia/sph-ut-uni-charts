@@ -31,6 +31,7 @@ const ProjectDetail = () => {
     ChartDataFormatter(velocityChartData)
   )
   const [velocityDataLabels, setVelocityDataLabels] = useState([])
+  const [velocity, setVelocity] = useState(0)
 
   const query = router.query.id
 
@@ -47,6 +48,14 @@ const ProjectDetail = () => {
 
       setVelocityDataLabels(velocityData.labels)
       setVelocityChartDataSet(ChartDataFormatter(velocityData.data))
+
+      let tempVelocity = 0
+      velocityData.data.completed.forEach((item) => {
+        tempVelocity += item
+      })
+
+      tempVelocity = tempVelocity / velocityData.data.commitment?.length
+      setVelocity(tempVelocity)
     }
 
     if (velocityResponse) {
@@ -92,7 +101,7 @@ const ProjectDetail = () => {
           <div role='velocity-chart' className={styles['velocity-chart']}>
             <Text color='blue'>
               <Title order={5} className={styles['velocity-chart-velocity']}>
-                Velocity: {3}
+                Velocity: {velocity}
               </Title>
             </Text>
             <Chart
