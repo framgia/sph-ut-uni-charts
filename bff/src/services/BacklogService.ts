@@ -4,6 +4,15 @@ import axios, { AxiosResponse } from 'axios'
 const URL = process.env.BACKLOG_API_SERVICE
 
 export default class BacklogService {
+  static async backlogProjects(payload: any) {
+    return await axios({
+      baseURL: URL,
+      url: '/backlog/projects',
+      method: 'get',
+      params: payload
+    })
+  }
+
   async getProjects() {
     let data
 

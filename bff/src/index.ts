@@ -4,6 +4,7 @@ import cors from 'cors'
 import AccountRoute from './routes/AccountRoute'
 import ProviderRoutes from './routes/ProviderRoute'
 import ProjectRoutes from './routes/ProjectRoute'
+import BacklogRoutes from './routes/BacklogRoute'
 
 const app = express()
 const PORT = process.env.PORT
@@ -26,5 +27,6 @@ app.get('/', (req: Request, res: Response) => {
 app.use(cors())
 app.use('/api/providers', ProviderRoutes)
 app.use('/api/projects', ProjectRoutes)
+app.use('/api/backlog', BacklogRoutes)
 app.use('/api/account', AccountRoute)
 export default app
