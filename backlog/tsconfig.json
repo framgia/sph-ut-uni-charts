@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "noImplicitAny": true,
     "module": "commonjs",
     "target": "ES2020",

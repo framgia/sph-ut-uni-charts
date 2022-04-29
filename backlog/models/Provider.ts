@@ -46,6 +46,14 @@ class Provider {
       }
     })
   }
+
+  public async getProviders(user_id: number, ctx: Context) {
+    return await ctx.prisma.provider.findMany({
+      where: {
+        user_id: user_id
+      }
+    })
+  }
 }
 
 module.exports = Provider

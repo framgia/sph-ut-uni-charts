@@ -103,4 +103,18 @@ describe('Provider Model', () => {
       }
     })
   })
+
+  test('Test #4: getProviders() - Empty array', async () => {
+    mockCtx.prisma.provider.findMany.mockResolvedValue([])
+    const response = await Model.getProviders(111111, ctx)
+    expect.arrayContaining(response)
+  })
+
+  test('Test #5: getProviders() - Array of objects', async () => {
+    mockCtx.prisma.provider.upsert.mockResolvedValue(provider)
+    const data = await Model.add(provider, ctx)
+    mockCtx.prisma.provider.findMany.mockResolvedValue([provider])
+    const response = await Model.getProviders(data.user_id, ctx)
+    expect.arrayContaining(response)
+  })
 })
