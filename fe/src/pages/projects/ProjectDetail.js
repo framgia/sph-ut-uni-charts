@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   Button,
   Container,
@@ -17,11 +18,51 @@ import {
   sprintLabels,
   sprintSelectFields,
   velocityChartData,
+  aaa,
 } from '@/src/utils/dummyData'
-import { ChartDataFormatter } from '@/src/utils/helpers'
+import { ChartDataFormatter, VelocityDataFormatter } from '@/src/utils/helpers'
+import { getIssues } from '@/src/services/bffService'
+import { useRouter } from 'next/router'
 
 const ProjectDetail = () => {
-  const velocityChartDataSet = ChartDataFormatter(velocityChartData)
+  const router = useRouter()
+  const [velocityResponse, setVelocityResponse] = useState()
+  const [velocityChartDataSet, setVelocityChartDataSet] = useState(
+    ChartDataFormatter(velocityChartData)
+  )
+  const [velocityDataLabels, setVelocityDataLabels] = useState([])
+  const [velocity, setVelocity] = useState(0)
+
+  const query = router.query.id
+
+  useEffect(() => {
+    if (query) {
+      const issues = getIssues(Number(router.query.id), 'backlog')
+      setVelocityResponse(issues)
+    }
+  }, [query])
+
+  useEffect(() => {
+    async function justToWait() {
+      const velocityData = await VelocityDataFormatter(velocityResponse)
+
+      setVelocityDataLabels(velocityData.labels)
+      setVelocityChartDataSet(ChartDataFormatter(velocityData.data))
+
+      let tempVelocity = 0
+      velocityData.data.completed.forEach((item) => {
+        tempVelocity += item
+      })
+
+      tempVelocity = tempVelocity / velocityData.data.commitment?.length
+      setVelocity(tempVelocity)
+    }
+
+    if (velocityResponse) {
+      justToWait()
+    }
+  }, [velocityResponse])
+
   const burnDownChartDataSet = ChartDataFormatter(burnDownChartData)
   const burnUpChartDataSet = ChartDataFormatter(burnUpChartData)
 
@@ -60,12 +101,12 @@ const ProjectDetail = () => {
           <div role='velocity-chart' className={styles['velocity-chart']}>
             <Text color='blue'>
               <Title order={5} className={styles['velocity-chart-velocity']}>
-                Velocity: {3}
+                Velocity: {velocity}
               </Title>
             </Text>
             <Chart
               title='Velocity Chart'
-              labels={sprintLabels}
+              labels={velocityDataLabels}
               datasets={velocityChartDataSet}
             />
           </div>

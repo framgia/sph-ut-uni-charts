@@ -6,5 +6,6 @@ const Provider = new ProviderController()
 
 router.post('/add', Provider.add)
 router.get('/', Provider.getProviders)
+router.get('/:id', Provider.getProviderById)
 
 export default router
