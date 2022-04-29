@@ -1,6 +1,7 @@
 require('dotenv').config()
 import express, { Request, Response } from 'express'
 import cors from 'cors'
+import AccountRoute from './routes/AccountRoute'
 import ProviderRoutes from './routes/ProviderRoute'
 import ProjectRoutes from './routes/ProjectRoute'
 import BacklogRoutes from './routes/BacklogRoute'
@@ -27,4 +28,5 @@ app.use(cors())
 app.use('/api/providers', ProviderRoutes)
 app.use('/api/projects', ProjectRoutes)
 app.use('/api/backlog', BacklogRoutes)
+app.use('/api/account', AccountRoute)
 export default app
