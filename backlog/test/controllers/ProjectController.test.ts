@@ -127,10 +127,28 @@ describe('Project Controller Test Suite', () => {
     expect(data).toStrictEqual([])
   })
 
-  test('Test #6: deleteProjectById - invalid ID, it should be a number', async () => {
+  test('Test #6: getProjectById - if ID does not exist orin the database', async () => {
+    const request = httpMocks.createRequest({
+      method: 'GET',
+      url: '/projects/:id',
+      params: {
+        id: '111111'
+      }
+    })
+
+    const response = httpMocks.createResponse()
+    await projectController.getProjectById(request, response)
+    const data = response._getData()
+    expect(data).toHaveProperty('message', 'No Data Found')
+  })
+
+  test('Test #7: deleteProjectById - invalid ID, it should be a number', async () => {
     const request = httpMocks.createRequest({
       method: 'DELETE',
-      url: '/delete/:id'
+      url: '/delete/:id',
+      params: {
+        id: 'test'
+      }
     })
 
     const response = httpMocks.createResponse()
