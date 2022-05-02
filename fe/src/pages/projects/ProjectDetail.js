@@ -1,13 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-  Button,
-  Container,
-  Group,
-  Select,
-  Table,
-  Text,
-  Title,
-} from '@mantine/core'
+import { Button, Container, Group, Select, Table, Text, Title } from '@mantine/core'
 
 import styles from '@/styles/project-detail.module.css'
 import { Chart, PageTitle } from './components'
@@ -18,11 +10,12 @@ import {
   sprintLabels,
   sprintSelectFields,
   velocityChartData,
-  aaa,
+  aaa
 } from '@/src/utils/dummyData'
 import { ChartDataFormatter, VelocityDataFormatter } from '@/src/utils/helpers'
 import { getIssues } from '@/src/services/bffService'
 import { useRouter } from 'next/router'
+import AuthMiddleware from '@/src/components/molecules/AuthMiddleware'
 
 const ProjectDetail = () => {
   const router = useRouter()
@@ -67,13 +60,13 @@ const ProjectDetail = () => {
   const burnUpChartDataSet = ChartDataFormatter(burnUpChartData)
 
   return (
-    <div>
-      <Container fluid color='blue'>
-        <PageTitle pageTitle='Project Name Detail' />
-        <Button component='a' href='/'>
+    <AuthMiddleware>
+      <Container fluid color="blue">
+        <PageTitle pageTitle="Project Name Detail" />
+        <Button component="a" href="/">
           {'< Back to home'}
         </Button>
-        <Group position='center'>
+        <Group position="center">
           {/* <div role='burn-up-chart' className={styles['burn-up-chart']}>
             <Chart
               title='Burn Up Chart'
@@ -82,38 +75,38 @@ const ProjectDetail = () => {
               type='line'
             />
           </div> */}
-          <div role='burn-down-chart' className={styles['brn-down-chart']}>
+          <div role="burn-down-chart" className={styles['brn-down-chart']}>
             <Select
-              label='Selected Sprint'
-              placeholder='Select Sprint'
+              label="Selected Sprint"
+              placeholder="Select Sprint"
               data={sprintSelectFields}
               className={styles['burn-down-chart-select']}
             />
             <Chart
-              title='Burn Down Chart'
+              title="Burn Down Chart"
               labels={sprintLabels}
               datasets={burnDownChartDataSet}
-              type='line'
+              type="line"
             />
           </div>
         </Group>
-        <Group position='center'>
-          <div role='velocity-chart' className={styles['velocity-chart']}>
-            <Text color='blue'>
+        <Group position="center">
+          <div role="velocity-chart" className={styles['velocity-chart']}>
+            <Text color="blue">
               <Title order={5} className={styles['velocity-chart-velocity']}>
                 Velocity: {velocity}
               </Title>
             </Text>
             <Chart
-              title='Velocity Chart'
+              title="Velocity Chart"
               labels={velocityDataLabels}
               datasets={velocityChartDataSet}
             />
           </div>
         </Group>
 
-        <Container py='lg'>
-          <Text color='blue'>
+        <Container py="lg">
+          <Text color="blue">
             <Title order={4}>Developers</Title>
           </Text>
           <Table striped>
@@ -136,7 +129,7 @@ const ProjectDetail = () => {
           </Table>
         </Container>
       </Container>
-    </div>
+    </AuthMiddleware>
   )
 }
 

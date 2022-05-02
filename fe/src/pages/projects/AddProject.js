@@ -1,24 +1,21 @@
 import { useState } from 'react'
 import { Container, Group, Box, Select, Title, Text } from '@mantine/core'
 import styles from '@/styles/add-project.module.css'
-import {
-  PageTitle,
-  PageActions,
-  FormProvider,
-} from '@/src/pages/projects/components'
+import { PageTitle, PageActions, FormProvider } from '@/src/pages/projects/components'
+import AuthMiddleware from '@/src/components/molecules/AuthMiddleware'
 
 function AddProject() {
   const [showProviderFields, setshowProviderFields] = useState(false)
 
   const staticProviderData = [
     { value: 'bg', label: 'Backlog' },
-    { value: 'ap', label: 'Add new provider' },
+    { value: 'ap', label: 'Add new provider' }
   ]
 
   const staticProjectData = [
     { value: 'ymt', label: 'Yamato' },
     { value: 'sf', label: 'Safie' },
-    { value: '01b', label: '01Booster' },
+    { value: '01b', label: '01Booster' }
   ]
 
   const handleChange = (data) => {
@@ -30,43 +27,39 @@ function AddProject() {
   }
 
   return (
-    <div>
-      <Container fluid color='blue'>
-        <PageTitle pageTitle='Add Project Page' />
-        <Box sx={{ maxWidth: 600 }} mx='auto'>
+    <AuthMiddleware>
+      <Container fluid color="blue">
+        <PageTitle pageTitle="Add Project Page" />
+        <Box sx={{ maxWidth: 600 }} mx="auto">
           <div className={styles.card}>
             {/* TODO: handle submission of data */}
             <form onSubmit={(values) => console.log(values)}>
               <div className={styles.selectProvider}>
-                <Text color='blue'>
+                <Text color="blue">
                   <Title order={3}>Select Provider</Title>
                 </Text>
                 <Select
-                  placeholder='Select a Provider'
+                  placeholder="Select a Provider"
                   data={staticProviderData}
                   onChange={(val) => handleChange(val)}
-                  size='lg'
+                  size="lg"
                 />
               </div>
               {showProviderFields && <FormProvider />}
 
-              <Text color='blue'>
+              <Text color="blue">
                 <Title order={3}>Select Project</Title>
               </Text>
-              <Select
-                placeholder='Select a Project'
-                data={staticProjectData}
-                size='lg'
-              />
+              <Select placeholder="Select a Project" data={staticProjectData} size="lg" />
 
-              <Group position='right' mt='lg'>
+              <Group position="right" mt="lg">
                 <PageActions />
               </Group>
             </form>
           </div>
         </Box>
       </Container>
-    </div>
+    </AuthMiddleware>
   )
 }
 

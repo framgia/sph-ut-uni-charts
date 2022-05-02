@@ -22,7 +22,11 @@ export default class AccountController {
           message: 'an internal error occured'
         })
       }
-      res.status(output.response.status).json(output)
+
+      res.status(output.response.status).json({
+        message: output.response.message,
+        data: output.response.data
+      })
     }
   }
 
@@ -37,7 +41,11 @@ export default class AccountController {
           message: 'an internal error occured'
         })
       }
-      res.status(output.response.status).json(output)
+
+      res.status(output.response.status).json({
+        message: output.response.message,
+        data: output.response.data
+      })
     }
   }
 
@@ -54,7 +62,11 @@ export default class AccountController {
           message: 'an internal error occured'
         })
       }
-      res.status(output.response.status).json(output)
+
+      res.status(output.response.status).json({
+        message: output.response.message,
+        data: output.response.data
+      })
     }
   }
 }
