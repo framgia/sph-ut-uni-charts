@@ -6,7 +6,6 @@ import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 
 let ctx: Context = { prisma: new PrismaClient() }
-const prisma = new PrismaClient()
 
 class ProviderController extends Controller {
   public async add(req: Request, res: Response) {
@@ -42,17 +41,13 @@ class ProviderController extends Controller {
 
   async getProviderById(req: Request, res: Response) {
     if (/[^0-9]/.test(req.params.id)) {
-      // non-numerical id
-      res.status(400).json({ message: 'Invalid ID' })
+      res.send({ message: 'Invalid ID' })
     } else {
-      const provider = await prisma.provider.findUnique({
-        where: {
-          id: Number(req.params.id)
-        }
-      })
+      const ProviderModel = new Provider()
+      const provider = await ProviderModel.getProviderById(Number(req.params.id), ctx)
 
       if (!provider) {
-        res.status(404).json({ message: 'No Provider Found' })
+        res.send({ message: 'No Provider Found' })
       } else {
         res.send(provider)
       }

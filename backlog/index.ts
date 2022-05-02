@@ -27,3 +27,5 @@ app.use(cors())
 app.use('/api/projects', ProjectRoutes)
 app.use('/api/providers', ProviderRoutes)
 app.use('/api/backlog', BacklogRoutes)
+
+export default app
