@@ -20,18 +20,34 @@ import {
   velocityChartData,
   aaa,
 } from '@/src/utils/dummyData'
-import { ChartDataFormatter, VelocityDataFormatter } from '@/src/utils/helpers'
-import { getIssues } from '@/src/services/bffService'
+import {
+  ChartDataFormatter,
+  VelocityDataFormatter,
+  sprintDataFormat,
+  getDates,
+  formatSprintDates,
+} from '@/src/utils/helpers'
+import {
+  getIssues,
+  getIssuesRelatedToSprint,
+  getSprints,
+} from '@/src/services/bffService'
 import { useRouter } from 'next/router'
 
 const ProjectDetail = () => {
   const router = useRouter()
   const [velocityResponse, setVelocityResponse] = useState()
+  const [sprintData, setSprintData] = useState()
   const [velocityChartDataSet, setVelocityChartDataSet] = useState(
     ChartDataFormatter(velocityChartData)
   )
   const [velocityDataLabels, setVelocityDataLabels] = useState([])
   const [velocity, setVelocity] = useState(0)
+  const [formattedSprints, setFormattedSprint] = useState([])
+  const [issuesData, setIssuesData] = useState([])
+  const [burndownChartLabel, setburndownChartLabel] = useState([])
+
+  // console.log(sprints)
 
   const query = router.query.id
 
@@ -39,14 +55,21 @@ const ProjectDetail = () => {
     if (query) {
       const issues = getIssues(Number(router.query.id), 'backlog')
       setVelocityResponse(issues)
+      const sprints = getSprints(Number(router.query.id), 'backlog')
+      setSprintData(sprints)
     }
   }, [query])
 
   useEffect(() => {
     async function justToWait() {
       const velocityData = await VelocityDataFormatter(velocityResponse)
+      const formattedSprintData = await sprintDataFormat(sprintData)
+      // const getSprintDates = await getDates(sprintData)
+      console.log(formattedSprintData)
 
+      setFormattedSprint(formattedSprintData)
       setVelocityDataLabels(velocityData.labels)
+      // setburndownChartLabel(formattedSprintData.labels)
       setVelocityChartDataSet(ChartDataFormatter(velocityData.data))
 
       let tempVelocity = 0
@@ -58,13 +81,25 @@ const ProjectDetail = () => {
       setVelocity(tempVelocity)
     }
 
-    if (velocityResponse) {
+    if (velocityResponse && sprintData) {
       justToWait()
     }
-  }, [velocityResponse])
+  }, [velocityResponse, sprintData])
 
-  const burnDownChartDataSet = ChartDataFormatter(burnDownChartData)
-  const burnUpChartDataSet = ChartDataFormatter(burnUpChartData)
+  const burnDownChartDataSet = ChartDataFormatter(issuesData.ETData)
+  // const burnUpChartDataSet = ChartDataFormatter(burnUpChartData)
+
+  const handleChange = async (milestoneId) => {
+    const relatedIssues = await getIssuesRelatedToSprint(
+      Number(router.query.id),
+      milestoneId,
+      'backlog'
+    )
+
+    // console.log(relatedIssues)
+    const getDates = formatSprintDates(relatedIssues.issuesData, milestoneId)
+    setIssuesData(relatedIssues)
+  }
 
   return (
     <div>
@@ -86,12 +121,18 @@ const ProjectDetail = () => {
             <Select
               label='Selected Sprint'
               placeholder='Select Sprint'
-              data={sprintSelectFields}
+              data={formattedSprints}
               className={styles['burn-down-chart-select']}
+              // onChange={(e) => console.log(formattedSprints[0])}
+              onChange={(e) => handleChange(e)}
+              // value={}
             />
+
             <Chart
               title='Burn Down Chart'
-              labels={sprintLabels}
+              labels={formattedSprints}
+              // labels={formattedSprints.datesList}
+              // TODO: display issues
               datasets={burnDownChartDataSet}
               type='line'
             />

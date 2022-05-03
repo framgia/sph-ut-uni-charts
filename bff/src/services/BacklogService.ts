@@ -121,4 +121,23 @@ export default class BacklogService {
       params: payload
     })
   }
+
+  async getIssuesByMilestones(
+    space_key: string,
+    key: string,
+    project_id: number,
+    milestone_id: number
+  ) {
+    let data
+
+    await axios({
+      baseURL: `https://${space_key}.backlog.com/api/v2`,
+      url: '/issues',
+      method: 'get',
+      params: { apiKey: key, 'projectId[]': project_id, 'milestoneId[]': milestone_id }
+    }).then((response: AxiosResponse) => {
+      data = response.data
+    })
+    return data
+  }
 }

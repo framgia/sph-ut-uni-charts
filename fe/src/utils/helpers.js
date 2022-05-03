@@ -1,6 +1,7 @@
 import { chartColors } from './constants'
 
 export const ChartDataFormatter = (data) => {
+  // console.log(data)
   const datasets = []
   let index = 0
 
@@ -13,6 +14,8 @@ export const ChartDataFormatter = (data) => {
 
     index++
   }
+
+  // console.log(datasets)
 
   return datasets
 }
@@ -43,3 +46,71 @@ export const VelocityDataFormatter = async (rawData) => {
 
   return { data, labels }
 }
+
+// export const getDates = (start, end) => {
+//   const dates = []
+
+//   for (
+//     var arr = [], dt = new Date(start);
+//     dt <= new Date(end);
+//     dt.setDate(dt.getDate() + 1)
+//   ) {
+//     arr.push(new Date(dt).toLocaleDateString())
+//   }
+
+//   return arr
+// }
+
+export const sprintDataFormat = async (data) => {
+  // const formattedData = {
+  //   labels: [],
+  //   sprints: [],
+  // }
+
+  // let datesList
+  const sprintList = []
+  const tempData = await data
+
+  tempData.reverse()
+
+  tempData?.forEach((it) => {
+    // console.log(it)
+    // TODO: GET list of dates btween startDate and endDate for x-axis data in chart
+    // const startDate = new Date(it.startDate)
+    // const endDate = new Date(it.releaseDueDate)
+    // const dates = getDates(startDate, endDate)
+
+    sprintList.push({
+      label: it.name,
+      value: it.id,
+    })
+    return sprintList
+  })
+  //   formattedData.sprints.unshift({
+  //     label: it.name,
+  //     value: it.id,
+  //   })
+  //   formattedData.labels.unshift(dates)
+  //   // datesList = dates
+  // })
+
+  // console.log(formattedData)
+
+  // return { sprintList, datesList }
+
+  // return formattedData
+}
+
+// export const formatSprintDates = (issues, milestone) => {
+//   // console.log(issues)
+//   // console.log(milestone)
+//   const sprints = []
+//   issues.map((issue) => {
+//     const milestones = issue.milestone
+//     milestones.map((it) => {
+//       if (it.id === milestone) {
+//         console.log(it)
+//       }
+//     })
+//   })
+// }
