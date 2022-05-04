@@ -2,14 +2,6 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProjectDetail from '@/src/pages/projects/ProjectDetail'
 import { developersList, sprintSelectFields } from '@/src/utils/dummyData'
-import { Fragment } from 'react'
-
-jest.mock('../src/components/molecules/AuthMiddleware', () => ({ children }) => {
-  const isStatusActive = true
-  if (!isStatusActive) Router.push('/login')
-
-  return <Fragment>{children}</Fragment>
-})
 
 describe('Project Detail', () => {
   it('has page header', () => {
@@ -37,7 +29,7 @@ describe('Project Detail', () => {
     expect(burnDownChart).toBeInTheDocument()
 
     const selectField = screen.getByRole('textbox', {
-      name: /selected sprint/i
+      name: /selected sprint/i,
     })
     expect(selectField).toBeInTheDocument()
   })
@@ -46,7 +38,7 @@ describe('Project Detail', () => {
     render(<ProjectDetail />)
 
     const selectField = screen.getByRole('textbox', {
-      name: /selected sprint/i
+      name: /selected sprint/i,
     })
     expect(selectField).toBeInTheDocument()
 
@@ -72,7 +64,7 @@ describe('Project Detail', () => {
   it('lets the user change the select field value', async () => {
     render(<ProjectDetail />)
     const selectField = screen.getByRole('textbox', {
-      name: /selected sprint/i
+      name: /selected sprint/i,
     })
 
     // click the select field
@@ -80,7 +72,7 @@ describe('Project Detail', () => {
 
     // select the second option
     const secondOption = await screen.findByRole('option', {
-      name: sprintSelectFields[1].label
+      name: sprintSelectFields[1].label,
     })
     userEvent.click(secondOption)
 
@@ -116,7 +108,7 @@ describe('Project Detail', () => {
     render(<ProjectDetail />)
 
     const redirectButton = screen.getByRole('link', {
-      name: /back to home/i
+      name: /back to home/i,
     })
     expect(redirectButton).toBeInTheDocument()
   })
