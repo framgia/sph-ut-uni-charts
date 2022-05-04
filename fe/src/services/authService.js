@@ -37,6 +37,10 @@ export const signOut = async () => {
 
   const { google_id, ...payload } = userData
   await logout(payload)
+  clearData()
+}
+
+export const clearData = () => {
   Cookies.remove('user_signed')
 }
 

@@ -1,8 +1,9 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import Router from 'next/router'
 
-import { checkActiveStatus } from '../../services/authService'
-import Loader from './Loader'
+import { checkActiveStatus, clearData } from '../services/authService'
+import Routes from '../const/routes.json'
+import Loader from '../components/molecules/Loader'
 
 const AuthMiddleware = ({ children }) => {
   const [fetching, setFetching] = useState(true)
@@ -10,10 +11,20 @@ const AuthMiddleware = ({ children }) => {
 
   const loadStatus = async () => {
     if (disableAuthentication) return setFetching(false)
-    const result = await checkActiveStatus()
 
-    if (!result) Router.push('/login')
-    else setFetching(false)
+    const isGuestPage = Routes.guest.includes(Router.pathname)
+    const activeUser = await checkActiveStatus()
+
+    if (isGuestPage && activeUser) {
+      return Router.push('/')
+    }
+
+    if (!isGuestPage && !activeUser) {
+      clearData()
+      return Router.push('/login')
+    }
+
+    setFetching(false)
   }
 
   useEffect(() => {

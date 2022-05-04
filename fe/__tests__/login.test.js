@@ -3,13 +3,6 @@ import { Fragment } from 'react'
 
 import Login from '@/src/pages/login'
 
-jest.mock('../src/components/molecules/GuestMiddleware', () => ({ children }) => {
-  const isStatusActive = false
-  if (isStatusActive) Router.push('/')
-
-  return <Fragment>{children}</Fragment>
-})
-
 describe('Login.js', () => {
   it('should render login page when user is not authenticated', () => {
     render(<Login />)

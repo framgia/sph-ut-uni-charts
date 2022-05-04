@@ -4,13 +4,6 @@ import userEvent from '@testing-library/user-event'
 import Home from '@/src/pages'
 import { Fragment } from 'react'
 
-jest.mock('../src/components/molecules/AuthMiddleware', () => ({ children }) => {
-  const isStatusActive = true
-  if (!isStatusActive) Router.push('/login')
-
-  return <Fragment>{children}</Fragment>
-})
-
 describe('Home', () => {
   it('should render home page when user is authenticated', () => {
     render(<Home />)
