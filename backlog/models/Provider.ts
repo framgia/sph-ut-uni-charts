@@ -54,6 +54,17 @@ class Provider {
       }
     })
   }
+
+  public async getProviderById(id: number, ctx: Context) {
+    return await ctx.prisma.provider.findUnique({
+      where: {
+        id: id
+      },
+      include: {
+        projects: true
+      }
+    })
+  }
 }
 
 module.exports = Provider

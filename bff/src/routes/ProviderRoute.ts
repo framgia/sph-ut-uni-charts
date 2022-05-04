@@ -4,6 +4,7 @@ import ProviderController from '../controllers/ProviderController'
 const router = express.Router()
 router.post('/add', ProviderController.add)
 router.get('/', ProviderController.getProviders)
+router.get('/:id', ProviderController.filterListByProvider)
 
 export default router
 

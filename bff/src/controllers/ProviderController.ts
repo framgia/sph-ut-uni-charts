@@ -23,6 +23,25 @@ class ProviderController {
       backlog: backlogService
     })
   }
+
+  static async filterListByProvider(req: Request, res: Response) {
+    const backlogService = new BacklogService()
+    let result
+
+    switch (req.query.service) {
+      case 'backlog':
+        result = await backlogService.getProviderById(req.params.id)
+        break
+      default:
+        result = { message: 'Invalid Provider' }
+    }
+
+    if (result.projects) {
+      res.send(result.projects)
+    } else {
+      res.send(result)
+    }
+  }
 }
 
 export default ProviderController

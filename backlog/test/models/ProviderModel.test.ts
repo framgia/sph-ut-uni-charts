@@ -117,4 +117,17 @@ describe('Provider Model', () => {
     const response = await Model.getProviders(data.user_id, ctx)
     expect.arrayContaining(response)
   })
+
+  test('Test #6: getProviderById() - Provider ID not found', async () => {
+    const response = await Model.getProviderById(111111, ctx)
+    expect(response).toStrictEqual(undefined)
+  })
+
+  test('Test #6: getProviderById() - Provider ID Found', async () => {
+    mockCtx.prisma.provider.upsert.mockResolvedValue(provider)
+    const data = await Model.add(provider, ctx)
+    mockCtx.prisma.provider.findUnique.mockResolvedValue(provider)
+    const response = await Model.getProviderById(data.id, ctx)
+    expect(response).toMatchObject(data)
+  })
 })
