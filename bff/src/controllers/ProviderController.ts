@@ -4,10 +4,11 @@ import { Request, Response } from 'express'
 class ProviderController {
   static async add(req: Request, res: Response) {
     let result
+    const payload = { ...req.body, user_id: 1 }
 
-    switch (req.body.provider) {
-      case 'backlog':
-        result = await BacklogService.add(req.body)
+    switch (req.body.name) {
+      case 'Backlog':
+        result = await BacklogService.add(payload)
         break
       default:
         return res.status(400).send({ message: 'Invalid Provider' })
@@ -17,11 +18,12 @@ class ProviderController {
   }
 
   static async getProviders(req: Request, res: Response) {
-    const backlogService = await BacklogService.getProviders(req.body.user_id)
-
-    res.send({
-      backlog: backlogService
-    })
+    try {
+      const backlog = await BacklogService.getProviders(req.query)
+      res.send([{ backlog: backlog.data }])
+    } catch (error: any) {
+      res.status(error?.response?.status ?? 500).send(error)
+    }
   }
 
   static async filterListByProvider(req: Request, res: Response) {

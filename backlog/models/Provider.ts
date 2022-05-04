@@ -13,7 +13,7 @@ class Provider {
   }
 
   public async add(data: ProviderAdd, ctx: Context) {
-    const { project_name, project_key, project_id, user_id, api_key, provider, space_key } = data
+    const { project_name, project_key, project_id, user_id, api_key, name, space_key } = data
 
     return await ctx.prisma.provider.upsert({
       where: {
@@ -32,10 +32,10 @@ class Provider {
         }
       },
       create: {
-        user_id: user_id,
-        name: provider,
-        space_key: space_key,
-        api_key: api_key,
+        user_id,
+        name,
+        space_key,
+        api_key,
         projects: {
           create: {
             name: project_name,
@@ -50,7 +50,12 @@ class Provider {
   public async getProviders(user_id: number, ctx: Context) {
     return await ctx.prisma.provider.findMany({
       where: {
-        user_id: user_id
+        user_id
+      },
+      select: {
+        id: true,
+        name: true,
+        space_key: true
       }
     })
   }
