@@ -2,16 +2,19 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import Home from '@/src/pages'
+import { Fragment } from 'react'
 
 describe('Home', () => {
-  it('renders home page title', () => {
+  it('should render home page when user is authenticated', () => {
     render(<Home />)
 
-    const heading = screen.getByRole('heading', {
-      name: /welcome to uni chart/i,
+    const hasHeading = screen.getByRole('heading', {
+      name: /welcome to uni chart/i
     })
+    const hasLogoutButton = screen.getByRole('button', { name: /logout/i })
 
-    expect(heading).toBeInTheDocument()
+    expect(hasHeading).toBeInTheDocument()
+    expect(hasLogoutButton).toBeInTheDocument()
   })
 
   it('renders the table correctly', () => {
@@ -42,7 +45,7 @@ describe('Home', () => {
     render(<Home />)
 
     const selectField = screen.getByRole('textbox', {
-      name: /filter by provider/i,
+      name: /filter by provider/i
     })
     expect(selectField).toBeInTheDocument()
 
@@ -68,7 +71,7 @@ describe('Home', () => {
   it('lets the user change the select field value', async () => {
     render(<Home />)
     const selectField = screen.getByRole('textbox', {
-      name: /filter by provider/i,
+      name: /filter by provider/i
     })
 
     // click the select field
@@ -86,7 +89,7 @@ describe('Home', () => {
     render(<Home />)
 
     const selectField = screen.getByRole('textbox', {
-      name: /filter by provider/i,
+      name: /filter by provider/i
     })
     const resetButton = screen.getByRole('button', { name: /reset filters/i })
     const inputField = screen.getByRole('textbox', { name: /filter by name/i })
@@ -108,7 +111,7 @@ describe('Home', () => {
     render(<Home />)
 
     const selectField = screen.getByRole('textbox', {
-      name: /filter by provider/i,
+      name: /filter by provider/i
     })
     const resetButton = screen.getByRole('button', { name: /reset filters/i })
     const inputField = screen.getByRole('textbox', { name: /filter by name/i })
@@ -128,7 +131,7 @@ describe('Home', () => {
     render(<Home />)
 
     const selectField = screen.getByRole('textbox', {
-      name: /filter by provider/i,
+      name: /filter by provider/i
     })
     const resetButton = screen.getByRole('button', { name: /reset filters/i })
     const inputField = screen.getByRole('textbox', { name: /filter by name/i })
@@ -176,7 +179,7 @@ describe('Home', () => {
     render(<Home />)
 
     const addProjectButton = screen.getByRole('button', {
-      name: /add project/i,
+      name: /add project/i
     })
     expect(addProjectButton).toBeInTheDocument()
   })
