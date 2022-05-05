@@ -1,21 +1,13 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import {
-  Button,
-  Container,
-  Group,
-  Pagination,
-  Select,
-  Table,
-  Text,
-  TextInput,
-} from '@mantine/core'
-
+import { Button, Container, Group, Pagination, Select, Table, Text, TextInput } from '@mantine/core'
 import styles from '@/styles/index.module.css'
 
 import { providersSelectFieldValues } from '@/src/utils/constants'
 import { staticProjects } from '@/src/utils/dummyData'
 import { useState } from 'react'
+
+import Navbar from '../components/molecules/Navbar'
 
 const Home = () => {
   const [projectName, setProjectName] = useState('')
@@ -31,33 +23,30 @@ const Home = () => {
     <Container>
       <Head>
         <title>Uni Chart</title>
-        {/* TODO: add icon */}
-        {/* <link rel='icon' href='/favicon.ico' /> */}
       </Head>
 
       <main>
-        <Text color='blue'>
+        <Navbar />
+
+        <Text color="blue">
           <h1>Welcome to Uni Chart!</h1>
         </Text>
-        <Button
-          onClick={() => location.href = '/add-project'}
-          className={styles['add-button']}
-        >
-            Add project
+        <Button onClick={() => (location.href = '/add-project')} className={styles['add-button']}>
+          Add project
         </Button>
-        {/* <Group className={styles['group-wrapper']}>
+        <Group className={styles['group-wrapper']}>
           <Group grow className={styles.group}>
             <TextInput
-              placeholder='Project Name'
-              label='Filter by name'
+              placeholder="Project Name"
+              label="Filter by name"
               value={projectName}
               onChange={(e) => {
                 setProjectName(e.target.value)
               }}
             />
             <Select
-              label='Filter by provider'
-              placeholder='Provider'
+              label="Filter by provider"
+              placeholder="Provider"
               data={providersSelectFieldValues}
               value={providerName}
               onChange={(e) => {
@@ -65,14 +54,10 @@ const Home = () => {
               }}
             />
           </Group>
-          <Button
-            className={styles['reset-filters-button']}
-            compact
-            onClick={resetFilters}
-          >
+          <Button className={styles['reset-filters-button']} compact onClick={resetFilters}>
             Reset filters
           </Button>
-        </Group> */}
+        </Group>
         <Table striped>
           <thead>
             <tr>
@@ -85,7 +70,9 @@ const Home = () => {
             {staticProjects.map((project) => {
               return (
                 <tr key={`${project.name}_${project.provider}`}>
-                  <td><Link href={`/project-detail/${project.id}`}>{project.name}</Link></td>
+                  <td>
+                    <Link href={`/project-detail/${project.id}`}>{project.name}</Link>
+                  </td>
                   <td>{project.provider}</td>
                   <td>{project.memberCount}</td>
                 </tr>
