@@ -122,7 +122,7 @@ export default class BacklogService {
     })
   }
 
-  async getIssuesByMilestones(
+  async getActiveSprintData(
     space_key: string,
     key: string,
     project_id: number,

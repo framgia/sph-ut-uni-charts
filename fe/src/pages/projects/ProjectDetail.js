@@ -11,27 +11,13 @@ import {
 
 import styles from '@/styles/project-detail.module.css'
 import { Chart, PageTitle } from './components'
-import {
-  burnDownChartData,
-  burnUpChartData,
-  developersList,
-  sprintLabels,
-  sprintSelectFields,
-  velocityChartData,
-  aaa,
-} from '@/src/utils/dummyData'
+import { developersList, velocityChartData } from '@/src/utils/dummyData'
 import {
   ChartDataFormatter,
   VelocityDataFormatter,
-  sprintDataFormat,
-  getDates,
-  formatSprintDates,
+  obtainData,
 } from '@/src/utils/helpers'
-import {
-  getIssues,
-  getIssuesRelatedToSprint,
-  getSprints,
-} from '@/src/services/bffService'
+import { getIssues, getActiveSprintData } from '@/src/services/bffService'
 import { useRouter } from 'next/router'
 
 const ProjectDetail = () => {
@@ -43,11 +29,7 @@ const ProjectDetail = () => {
   )
   const [velocityDataLabels, setVelocityDataLabels] = useState([])
   const [velocity, setVelocity] = useState(0)
-  const [formattedSprints, setFormattedSprint] = useState([])
-  const [issuesData, setIssuesData] = useState([])
-  const [burndownChartLabel, setburndownChartLabel] = useState([])
-
-  // console.log(sprints)
+  const [formattedSprint, setFormattedSprint] = useState()
 
   const query = router.query.id
 
@@ -55,21 +37,22 @@ const ProjectDetail = () => {
     if (query) {
       const issues = getIssues(Number(router.query.id), 'backlog')
       setVelocityResponse(issues)
-      const sprints = getSprints(Number(router.query.id), 'backlog')
-      setSprintData(sprints)
+      const activeSprint = getActiveSprintData(
+        Number(router.query.id),
+        'backlog'
+      )
+
+      setSprintData(activeSprint)
     }
   }, [query])
 
   useEffect(() => {
     async function justToWait() {
       const velocityData = await VelocityDataFormatter(velocityResponse)
-      const formattedSprintData = await sprintDataFormat(sprintData)
-      // const getSprintDates = await getDates(sprintData)
-      console.log(formattedSprintData)
+      const formattedSprintData = await obtainData(sprintData)
 
       setFormattedSprint(formattedSprintData)
       setVelocityDataLabels(velocityData.labels)
-      // setburndownChartLabel(formattedSprintData.labels)
       setVelocityChartDataSet(ChartDataFormatter(velocityData.data))
 
       let tempVelocity = 0
@@ -86,20 +69,8 @@ const ProjectDetail = () => {
     }
   }, [velocityResponse, sprintData])
 
-  const burnDownChartDataSet = ChartDataFormatter(issuesData.ETData)
+  const burnDownChartDataSet = ChartDataFormatter(formattedSprint?.data)
   // const burnUpChartDataSet = ChartDataFormatter(burnUpChartData)
-
-  const handleChange = async (milestoneId) => {
-    const relatedIssues = await getIssuesRelatedToSprint(
-      Number(router.query.id),
-      milestoneId,
-      'backlog'
-    )
-
-    // console.log(relatedIssues)
-    const getDates = formatSprintDates(relatedIssues.issuesData, milestoneId)
-    setIssuesData(relatedIssues)
-  }
 
   return (
     <div>
@@ -118,21 +89,18 @@ const ProjectDetail = () => {
             />
           </div> */}
           <div role='burn-down-chart' className={styles['brn-down-chart']}>
-            <Select
+            {/* Select component is for velocity chart */}
+            {/* <Select
               label='Selected Sprint'
               placeholder='Select Sprint'
               data={formattedSprints}
               className={styles['burn-down-chart-select']}
-              // onChange={(e) => console.log(formattedSprints[0])}
               onChange={(e) => handleChange(e)}
-              // value={}
-            />
+            /> */}
 
             <Chart
               title='Burn Down Chart'
-              labels={formattedSprints}
-              // labels={formattedSprints.datesList}
-              // TODO: display issues
+              labels={formattedSprint?.dates}
               datasets={burnDownChartDataSet}
               type='line'
             />
