@@ -10,11 +10,13 @@ const URL = process.env.NEXT_PUBLIC_BFF_API
 
 describe('Add Project', () => {
   beforeEach(() => {
-    mockAxios.onGet(`${URL}providers/`).reply(200, {
-      id: 33,
-      name: 'Backlog',
-      space_key: 'framgiaph',
-    })
+    mockAxios.onGet(`${URL}providers/`).reply(200, [
+      {
+        id: 33,
+        name: 'Backlog',
+        space_key: 'framgiaph',
+      },
+    ])
   })
 
   it('Has a header', () => {
@@ -33,13 +35,11 @@ describe('Add Project', () => {
 
   it('Has initial values under provider dropdown after fetch provider api call', async () => {
     render(<AddProject />)
-
     const providerDropdown = await screen.getByPlaceholderText(
       /select a provider/i
     )
 
     userEvent.click(providerDropdown)
-
     const initialOptions = await screen.findAllByRole('option')
 
     expect(initialOptions).toHaveLength(2)
