@@ -17,6 +17,18 @@ describe('When adding a project', () => {
         space_key: 'framgiaph',
       },
     ])
+    mockAxios.onGet(`${URL}backlog/projects`).reply(200, [
+      {
+        id: 18616,
+        projectKey: 'FRAMGIAPH_BOOKSHELF',
+        name: 'FramgiaPH BookShelf',
+      },
+      {
+        id: 25770,
+        projectKey: 'DOKODEMO',
+        name: 'Dokodemo-English',
+      },
+    ])
   })
 
   it('should have a header', () => {
@@ -69,7 +81,36 @@ describe('When adding a project', () => {
     })
   })
 
-  it('should show the "Select Project" if "Provider Dropdown" is clicked and selected one of registered option', async () => {})
+  it('should show the "Select Project" if "Provider Dropdown" is clicked and selected one of registered option', async () => {
+    render(<AddProject />)
+    const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
+
+    userEvent.click(providerDropdown)
+
+    waitFor(() => {
+      const addProvider = screen.getByRole('option', {
+        name: /add new provider/i,
+      })
+      expect(addProvider).toBeInTheDocument()
+
+      userEvent.click(addProvider)
+
+      const apiKey = screen.getByPlaceholderText(/enter api key/i)
+
+      const connectButton = screen.getByRole('button', {
+        name: /connect provider/i,
+      })
+
+      apiKey.instance().value = 'apikey123'
+      userEvent.click(connectButton)
+
+      const projects = screen.getByRole('option', {
+        name: /FramgiaPH BookShelf/i,
+        name: /Dokodemo-English/i,
+      })
+      expect(projects).toBeInTheDocument()
+    })
+  })
 
   it('should show the "Select Project" with dropdown options from api if Entered an apikey and clicks Connect Provide button', async () => {})
 
@@ -78,28 +119,4 @@ describe('When adding a project', () => {
   it('should show "Error Invalid API Key" if api key is invalid', async () => {})
 
   it('should user clicks add new provider option', () => {})
-
-  // it('initial values under project dropdown', async () => {
-  //   render(<AddProject />)
-
-  //   const projectDropdown = screen.getByPlaceholderText(/select a project/i)
-  //   userEvent.click(projectDropdown)
-
-  //   const listProjects = await screen.findAllByRole('option')
-  //   const projects = listProjects.map((proj) => proj.textContent)
-  //   expect(projects).toEqual(['Yamato', 'Safie', '01Booster'])
-  // })
-
-  // it('Action buttons', () => {
-  //   render(<AddProject />)
-
-  //   const addProjectButton = screen.getByRole('button', {
-  //     name: /add project/i,
-  //   })
-
-  //   const cancelButton = screen.getByRole('button', { name: /cancel/i })
-
-  //   expect(addProjectButton).toBeInTheDocument()
-  //   expect(cancelButton).toBeInTheDocument()
-  // })
 })
