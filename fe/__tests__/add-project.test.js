@@ -1,5 +1,5 @@
 require('dotenv').config()
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AddProject from '@/src/pages/projects/AddProject'
 const axios = require('axios')
@@ -55,29 +55,30 @@ describe('Add Project', () => {
 
   it('Error Invalid API Key will show if api key is invalid', async () => {})
 
-  // it('user clicks add new provider option', () => {
-  //   render(<AddProject />)
-  //   const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
+  it('user clicks add new provider option', () => {
+    render(<AddProject />)
+    const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
 
-  //   userEvent.click(providerDropdown)
+    userEvent.click(providerDropdown)
 
-  //   const addProvider = screen.getByRole('option', {
-  //     name: /add new provider/i,
-  //   })
+    waitFor(() => {
+      const addProvider = screen.getByRole('option', {
+        name: /add new provider/i,
+      })
+      expect(addProvider).toBeInTheDocument()
 
-  //   expect(addProvider).toBeInTheDocument()
+      userEvent.click(addProvider)
 
-  //   userEvent.click(addProvider)
+      const apiKey = screen.getByPlaceholderText(/enter api key/i)
 
-  //   const apiKey = screen.getByPlaceholderText(/enter api key/i)
+      const connectButton = screen.getByRole('button', {
+        name: /connect provider/i,
+      })
 
-  //   const connectButton = screen.getByRole('button', {
-  //     name: /connect provider/i,
-  //   })
-
-  //   expect(apiKey).toBeInTheDocument()
-  //   expect(connectButton).toBeInTheDocument()
-  // })
+      expect(apiKey).toBeInTheDocument()
+      expect(connectButton).toBeInTheDocument()
+    })
+  })
 
   // it('initial values under project dropdown', async () => {
   //   render(<AddProject />)
