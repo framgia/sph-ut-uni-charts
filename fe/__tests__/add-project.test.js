@@ -27,19 +27,11 @@ describe('Add Project', () => {
   it('Has Select Provider Dropdown', () => {
     render(<AddProject />)
     const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
-    // const projectDropdown = screen.getByPlaceholderText(/select a project/i)
-    // const dropdownFields = screen.getAllByRole('textbox')
-    // const addProjectButton = screen.getByRole('button', {
-    //   name: /add project/i,
-    // })
 
     expect(providerDropdown).toBeInTheDocument()
-    // expect(projectDropdown).toBeInTheDocument()
-    // expect(dropdownFields).toHaveLength(2)
-    // expect(addProjectButton).toBeInTheDocument()
   })
 
-  it('initial values under provider dropdown', async () => {
+  it('Has initial values under provider dropdown after fetch provider api call', async () => {
     render(<AddProject />)
 
     const providerDropdown = await screen.getByPlaceholderText(
@@ -52,6 +44,16 @@ describe('Add Project', () => {
 
     expect(initialOptions).toHaveLength(2)
   })
+
+  it('Enter API key will show if Provider Dropdown is clicked and new provider option is selected', async () => {})
+
+  it('Select Project will show if Provider Dropdown is clicked and selected one of registered option', async () => {})
+
+  it('Select Project will show with dropdown options from api if Entered an apikey and clicks Connect Provide button', async () => {})
+
+  it('Success or Error notification will show once Add Project is clicked', async () => {})
+
+  it('Error Invalid API Key will show if api key is invalid', async () => {})
 
   // it('user clicks add new provider option', () => {
   //   render(<AddProject />)

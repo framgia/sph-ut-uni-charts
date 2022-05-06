@@ -18,7 +18,8 @@ class BacklogController {
       const result = await Service.getProjects(payload)
       return res.send(result.data)
     } catch (error: any) {
-      return res.status(error.response.status ?? 500).send(error)
+      console.log({ error })
+      return res.status(error.response.status ?? 500).send(error?.response?.data ?? error)
     }
   }
 }

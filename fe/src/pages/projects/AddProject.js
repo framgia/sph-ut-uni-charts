@@ -55,6 +55,17 @@ function AddProject() {
     setLoading(false)
   }
 
+  const formProvider = useForm({
+    initialValues: {
+      apiKey,
+    },
+
+    validate: {
+      apiKey: (value) =>
+        [undefined, ''].includes(value) ? 'API key is required' : null,
+    },
+  })
+
   const handleConnectProvider = async (values) => {
     setLoading(true)
     setApiKey(values.apiKey)
@@ -69,7 +80,7 @@ function AddProject() {
       })
       setProjects(data)
     } catch (error) {
-      form.setErrors({ apiKey: 'Invalid API Key' })
+      formProvider.setErrors({ apiKey: 'Invalid API Key' })
     }
     setLoading(false)
   }
@@ -163,10 +174,7 @@ function AddProject() {
             </div>
             {showProviderFields && (
               <FormProvider
-                setProjects={setProjects}
-                apiKey={apiKey}
-                setApiKey={setApiKey}
-                setLoading={setLoading}
+                formProvider={formProvider}
                 handleConnectProvider={handleConnectProvider}
               />
             )}
