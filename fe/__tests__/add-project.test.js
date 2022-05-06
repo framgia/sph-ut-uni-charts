@@ -8,7 +8,7 @@ const MockAdapter = require('axios-mock-adapter')
 const mockAxios = new MockAdapter(axios)
 const URL = process.env.NEXT_PUBLIC_BFF_API
 
-describe('Add Project', () => {
+describe('When adding a project', () => {
   beforeEach(() => {
     mockAxios.onGet(`${URL}providers/`).reply(200, [
       {
@@ -19,21 +19,21 @@ describe('Add Project', () => {
     ])
   })
 
-  it('Test #1: Has a header', () => {
+  it('should have a header', () => {
     render(<AddProject />)
     const header = screen.getByRole('heading', { name: /ADD PROJECT/i })
 
     expect(header).toBeInTheDocument()
   })
 
-  it('Test #2: Has Select Provider Dropdown', () => {
+  it('should have a select "Provider Dropdown"', () => {
     render(<AddProject />)
     const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
 
     expect(providerDropdown).toBeInTheDocument()
   })
 
-  it('Test #3: Has initial values under provider dropdown after fetch provider api call', async () => {
+  it('should have initial values under "Provider Dropdown" after fetch provider api call', async () => {
     render(<AddProject />)
     const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
 
@@ -44,7 +44,7 @@ describe('Add Project', () => {
     })
   })
 
-  it('Test #4: Enter API key will show if Provider Dropdown is clicked and new provider option is selected', async () => {
+  it('should show api key field if "Provider Dropdown" is clicked and "New Provider Option" is selected', async () => {
     render(<AddProject />)
     const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
 
@@ -69,15 +69,15 @@ describe('Add Project', () => {
     })
   })
 
-  it('Test #5: Select Project will show if Provider Dropdown is clicked and selected one of registered option', async () => {})
+  it('should show the "Select Project" if "Provider Dropdown" is clicked and selected one of registered option', async () => {})
 
-  it('Test #6: Select Project will show with dropdown options from api if Entered an apikey and clicks Connect Provide button', async () => {})
+  it('should show the "Select Project" with dropdown options from api if Entered an apikey and clicks Connect Provide button', async () => {})
 
-  it('Test #7: Success or Error notification will show once Add Project is clicked', async () => {})
+  it('should show "Success or Error notification" once "Add Project" is clicked', async () => {})
 
-  it('Test #8: Error Invalid API Key will show if api key is invalid', async () => {})
+  it('should show "Error Invalid API Key" if api key is invalid', async () => {})
 
-  it('Test #9: user clicks add new provider option', () => {})
+  it('should user clicks add new provider option', () => {})
 
   // it('initial values under project dropdown', async () => {
   //   render(<AddProject />)
