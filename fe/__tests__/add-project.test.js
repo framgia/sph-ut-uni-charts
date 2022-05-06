@@ -19,43 +19,32 @@ describe('Add Project', () => {
     ])
   })
 
-  it('Has a header', () => {
+  it('Test #1: Has a header', () => {
     render(<AddProject />)
     const header = screen.getByRole('heading', { name: /ADD PROJECT/i })
 
     expect(header).toBeInTheDocument()
   })
 
-  it('Has Select Provider Dropdown', () => {
+  it('Test #2: Has Select Provider Dropdown', () => {
     render(<AddProject />)
     const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
 
     expect(providerDropdown).toBeInTheDocument()
   })
 
-  it('Has initial values under provider dropdown after fetch provider api call', async () => {
+  it('Test #3: Has initial values under provider dropdown after fetch provider api call', async () => {
     render(<AddProject />)
-    const providerDropdown = await screen.getByPlaceholderText(
-      /select a provider/i
-    )
+    const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
 
     userEvent.click(providerDropdown)
-    const initialOptions = await screen.findAllByRole('option')
 
-    expect(initialOptions).toHaveLength(2)
+    waitFor(() => {
+      expect(screen.findAllByRole('option')).toHaveLength(2)
+    })
   })
 
-  it('Enter API key will show if Provider Dropdown is clicked and new provider option is selected', async () => {})
-
-  it('Select Project will show if Provider Dropdown is clicked and selected one of registered option', async () => {})
-
-  it('Select Project will show with dropdown options from api if Entered an apikey and clicks Connect Provide button', async () => {})
-
-  it('Success or Error notification will show once Add Project is clicked', async () => {})
-
-  it('Error Invalid API Key will show if api key is invalid', async () => {})
-
-  it('user clicks add new provider option', () => {
+  it('Test #4: Enter API key will show if Provider Dropdown is clicked and new provider option is selected', async () => {
     render(<AddProject />)
     const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
 
@@ -79,6 +68,16 @@ describe('Add Project', () => {
       expect(connectButton).toBeInTheDocument()
     })
   })
+
+  it('Test #5: Select Project will show if Provider Dropdown is clicked and selected one of registered option', async () => {})
+
+  it('Test #6: Select Project will show with dropdown options from api if Entered an apikey and clicks Connect Provide button', async () => {})
+
+  it('Test #7: Success or Error notification will show once Add Project is clicked', async () => {})
+
+  it('Test #8: Error Invalid API Key will show if api key is invalid', async () => {})
+
+  it('Test #9: user clicks add new provider option', () => {})
 
   // it('initial values under project dropdown', async () => {
   //   render(<AddProject />)
