@@ -22,7 +22,7 @@ class ProviderValidation {
   static getList = (data) => {
     let validationErrors
 
-    var check = validator.isObject().withRequired('user_id')
+    var check = validator.isObject().withRequired('user_id', validator.isNumber())
 
     validator.run(check, data, function (errorCount, errors) {
       if (errorCount) validationErrors = errors

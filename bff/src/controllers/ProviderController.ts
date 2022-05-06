@@ -19,8 +19,8 @@ class ProviderController {
 
   static async getProviders(req: Request, res: Response) {
     try {
-      const backlog = await BacklogService.getProviders(req.query)
-      res.send([{ backlog: backlog.data }])
+      const backlog = await BacklogService.getProviders({ user_id: 1 })
+      res.send(backlog.data)
     } catch (error: any) {
       res.status(error?.response?.status ?? 500).send(error)
     }

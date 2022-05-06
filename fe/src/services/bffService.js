@@ -1,11 +1,11 @@
 import axios from 'axios'
 
-const URL = process.env.NEXT_PUBLIC_BE_APP
+const URL = process.env.NEXT_PUBLIC_BFF_API
 
 export const getIssues = async (project_id, provider) => {
   let data
   await axios
-    .get(`${URL}/api/issues/${project_id}?service=${provider}`)
+    .get(`${URL}issues/${project_id}?service=${provider}`)
     .then((response) => {
       data = response.data
     })
@@ -13,14 +13,14 @@ export const getIssues = async (project_id, provider) => {
   return data
 }
 
-export const getProviders = async (payload) => {
-  return await axios.get(`${URL}/api/providers/`, { params: payload })
+export const getProviders = async () => {
+  return await axios.get(`${URL}providers/`)
 }
 
 export const getBacklogProjects = async (payload) => {
-  return await axios.get(`${URL}/api/backlog/projects`, { params: payload })
+  return await axios.get(`${URL}backlog/projects`, { params: payload })
 }
 
 export const addProvider = async (payload) => {
-  return await axios.post(`${URL}/api/providers/add`, payload)
+  return await axios.post(`${URL}providers/add`, payload)
 }

@@ -19,6 +19,7 @@ class ProviderController extends Controller {
 
     if (payload.id) {
       const provider = await ProviderModel.getProviderById(Number(payload.id), ctx)
+      console.log({ provider })
       payload = { ...payload, ...provider }
     }
 

@@ -43,18 +43,13 @@ function AddProject() {
   const getUserProviders = async () => {
     setLoading(true)
     const data = []
-    const result = await getProviders({ user_id: 1 })
+    const result = await getProviders()
     result?.data?.map((provider) => {
-      if (provider.backlog) {
-        const backlogArr = provider.backlog
-        backlogArr.map((backlog) => {
-          const backlogProvider = {
-            label: `${backlog.name} - ${backlog.space_key}`,
-            value: backlog.id,
-          }
-          data.push(backlogProvider)
-        })
+      const backlogProvider = {
+        label: `${provider.name} - ${provider.space_key}`,
+        value: provider.id,
       }
+      data.push(backlogProvider)
     })
     setProviders([...data, ...staticProviderData])
     setLoading(false)
@@ -92,7 +87,7 @@ function AddProject() {
 
   const form = useForm({
     initialValues: {
-      project_id: '',
+      project_id: null,
     },
 
     validate: {

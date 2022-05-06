@@ -1,36 +1,55 @@
+require('dotenv').config()
 import ProviderController from '../../controllers/ProviderController'
 import httpMocks from 'node-mocks-http'
 import { faker } from '@faker-js/faker'
+const axios = require('axios')
+const MockAdapter = require('axios-mock-adapter')
 
 const payload = {
   user_id: 1,
-  provider: 'backlog',
-  space_key: 'UNI-CHART',
-  api_key: 'apikey1234567890',
-  project_key: 'unichart-key',
-  project_name: 'project_name',
+  name: 'Backlog',
+  api_key: '123apikey123',
   project_id: faker.datatype.number()
 }
 
 const payload2 = {
-  user_id: 2,
-  provider: 'backlog',
-  space_key: 'UNI-CHART',
-  api_key: 'apikey1234567890',
-  project_key: 'unichart-key',
-  project_name: 'project_name',
+  user_id: 1,
+  name: 'Backlog',
+  api_key: '123apikey123',
   project_id: faker.datatype.number()
 }
 
 const providerController = new ProviderController()
 
 describe('Provider Controller', () => {
-  let req: { body: any }, res: { statusCode: any; _getData: () => any }, Controller: any
+  let req: { body?: any; query?: any; params?: any },
+    res: { statusCode: any; _getData: () => any },
+    Controller: any
+  const mockAxios = new MockAdapter(axios)
 
   beforeEach(() => {
     req = httpMocks.createRequest()
     res = httpMocks.createResponse()
     Controller = new ProviderController()
+    mockAxios.onGet('/api/v2/space', { params: { apiKey: payload.api_key } }).reply(200, {
+      spaceKey: 'nulab',
+      name: 'Nulab Inc.',
+      ownerId: 1
+    })
+    mockAxios
+      .onGet(`/api/v2/projects/${payload.project_id}`, { params: { apiKey: payload.api_key } })
+      .reply(200, {
+        id: 1,
+        projectKey: 'TEST',
+        name: 'test'
+      })
+    mockAxios
+      .onGet(`/api/v2/projects/${payload2.project_id}`, { params: { apiKey: payload.api_key } })
+      .reply(200, {
+        id: 1,
+        projectKey: 'TEST',
+        name: 'test'
+      })
   })
 
   it('Test #1 [200]: Insert provider success case', async () => {
@@ -39,9 +58,9 @@ describe('Provider Controller', () => {
     expect(res.statusCode).toEqual(200)
     expect(res._getData()).toMatchObject({
       user_id: 1,
-      name: 'backlog',
-      space_key: 'UNI-CHART',
-      api_key: 'apikey1234567890'
+      name: 'Backlog',
+      space_key: 'nulab',
+      api_key: '123apikey123'
     })
   })
 
@@ -49,9 +68,6 @@ describe('Provider Controller', () => {
     req.body = payload
     await Controller.add(req, res)
     expect(res.statusCode).toEqual(400)
-    expect(res._getData()).toMatchObject([
-      { message: 'You already registered this project: project_name' }
-    ])
   })
 
   it('Test #3 [422]: Insert provider fail case, validation error', async () => {
@@ -63,31 +79,7 @@ describe('Provider Controller', () => {
         value: undefined,
         message: 'Required value.'
       },
-      {
-        parameter: 'provider',
-        value: undefined,
-        message: 'Required value.'
-      },
-      {
-        parameter: 'space_key',
-        value: undefined,
-        message: 'Required value.'
-      },
-      {
-        parameter: 'api_key',
-        value: undefined,
-        message: 'Required value.'
-      },
-      {
-        parameter: 'project_key',
-        value: undefined,
-        message: 'Required value.'
-      },
-      {
-        parameter: 'project_name',
-        value: undefined,
-        message: 'Required value.'
-      },
+      { parameter: 'name', value: undefined, message: 'Required value.' },
       {
         parameter: 'project_id',
         value: undefined,
@@ -97,24 +89,26 @@ describe('Provider Controller', () => {
   })
 
   it('Test #4 - getProviders() - Empty array', async () => {
-    req.body = { user_id: '111111' }
+    req.query = { user_id: 9999999 }
     await Controller.getProviders(req, res)
     const data = res._getData()
     expect(data).toStrictEqual([])
   })
 
   it('Test #5 - getProviders() - Invalid user ID', async () => {
-    req.body = { user_id: 'test' }
+    req.query = { user_id: 'test' }
     await Controller.getProviders(req, res)
     const data = res._getData()
-    expect(data).toHaveProperty('message', 'Invalid User ID')
+    expect(data).toMatchObject([
+      { message: 'Incorrect type. Expected number.', parameter: 'user_id', value: 'test' }
+    ])
   })
 
   it('Test #6 - getProviders() - Array of objects', async () => {
     req.body = payload
     await Controller.add(req, res)
     const data = res._getData()
-    req.body = { user_id: data.user_id }
+    req.query = { user_id: data.user_id }
     await Controller.getProviders(req, res)
     const result = res._getData()
     expect.arrayContaining(result)
