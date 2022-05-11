@@ -43,3 +43,11 @@ export const VelocityDataFormatter = async (rawData) => {
 
   return { data, labels }
 }
+
+export const obtainData = async (rawData) => {
+  const tempData = await rawData
+
+  const { dates, data } = tempData
+
+  return { dates, data }
+}

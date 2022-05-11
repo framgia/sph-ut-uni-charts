@@ -14,7 +14,6 @@ class IssueController {
     let response
     let project: ProjectInterface = {} as ProjectInterface
     let provider: ProviderInterface = {} as ProviderInterface
-    console.log(req)
 
     switch (req.query.service) {
       case 'backlog':

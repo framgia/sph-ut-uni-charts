@@ -22,11 +22,14 @@ class ProjectRoute {
   deleteProjectById(endpoint: string) {
     return router.delete(`${endpoint}`, this.controller.deleteProjectById)
   }
+  getActiveSprintData(endpoint: string) {
+    return router.get(`${endpoint}`, this.controller.getActiveSprintData)
+  }
 }
 
 const routes = new ProjectRoute(projectController)
 routes.getProjects('/')
 routes.getProjectById('/:id')
 routes.deleteProjectById('/:id')
-
+routes.getActiveSprintData('/:id/active-sprint-data')
 export default router
