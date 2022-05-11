@@ -15,6 +15,7 @@ export interface ProjectInterface {
   project_id: number
   provider_id: number
   provider: ProviderInterface
+  message?: string
 }
 
 export interface IssuesInterface {

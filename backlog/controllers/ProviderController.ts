@@ -41,13 +41,13 @@ class ProviderController extends Controller {
 
   async getProviderById(req: Request, res: Response) {
     if (/[^0-9]/.test(req.params.id)) {
-      res.send({ message: 'Invalid ID' })
+      res.status(400).json({ message: 'Invalid ID' })
     } else {
       const ProviderModel = new Provider()
       const provider = await ProviderModel.getProviderById(Number(req.params.id), ctx)
 
       if (!provider) {
-        res.send({ message: 'No Provider Found' })
+        res.status(404).json({ message: 'No Provider Found' })
       } else {
         res.send(provider)
       }

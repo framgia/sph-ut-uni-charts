@@ -1,11 +1,10 @@
 require('dotenv').config()
-import axios, { AxiosResponse, AxiosError, Axios } from 'axios'
-import { ProviderInterface } from '../utils/interfaces'
+import axios, { AxiosResponse, AxiosError } from 'axios'
 
 const URL = process.env.BACKLOG_API_SERVICE
 
 export default class BacklogService {
-  // PROJECTS MICRO SERVICES
+  // PROJECTS ENDPOINT
 
   async getProjects() {
     let data
@@ -36,7 +35,7 @@ export default class BacklogService {
     let data
 
     await axios({
-      url:`${URL}/projects/${id}`,
+      url: `${URL}/projects/${id}`,
       method: 'delete'
     }).then((response: AxiosResponse) => {
       data = response.data
@@ -45,7 +44,7 @@ export default class BacklogService {
     return data
   }
 
- // PROVIDER MICROSERVICES
+  // PROVIDERS ENDPOINT
 
   static async add(payload: any) {
     return await axios
@@ -95,9 +94,14 @@ export default class BacklogService {
       milestone_id ? `&milestoneId[]=${milestone_id}` : ''
     }`
 
-    await axios.get(url).then((response: AxiosResponse) => {
-      data = response.data
-    })
+    await axios
+      .get(url)
+      .then((response: AxiosResponse) => {
+        data = response.data
+      })
+      .catch((error) => {
+        data = { errors: error.response.data, status: error.response.status }
+      })
     return data
   }
 
@@ -110,8 +114,13 @@ export default class BacklogService {
       .then((response: AxiosResponse) => {
         data = response.data
       })
+      .catch((error) => {
+        data = { errors: error.response.data, status: error.response.status }
+      })
     return data
   }
+
+  // BACKLOG ENDPOINT
 
   static async backlogProjects(payload: any) {
     return await axios({

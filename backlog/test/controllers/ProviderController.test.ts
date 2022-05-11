@@ -1,6 +1,8 @@
 import ProviderController from '../../controllers/ProviderController'
 import httpMocks from 'node-mocks-http'
 import { faker } from '@faker-js/faker'
+import { Request, Response } from 'express'
+const Provider = require('../../models/Provider')
 
 const payload = {
   user_id: 1,
@@ -13,7 +15,7 @@ const payload = {
 }
 
 const payload2 = {
-  user_id: 2,
+  user_id: 1,
   provider: 'backlog',
   space_key: 'UNI-CHART',
   api_key: 'apikey1234567890',
@@ -21,8 +23,6 @@ const payload2 = {
   project_name: 'project_name',
   project_id: faker.datatype.number()
 }
-
-const providerController = new ProviderController()
 
 describe('Provider Controller', () => {
   let req: { body: any }, res: { statusCode: any; _getData: () => any }, Controller: any
@@ -119,37 +119,77 @@ describe('Provider Controller', () => {
     const result = res._getData()
     expect.arrayContaining(result)
   })
+})
 
-  describe('Provider controller - get using id', () => {
-    it('Test #7 /:id [400]: non numerical id', async () => {
-      const getReq = httpMocks.createRequest()
-      const getRes = httpMocks.createResponse()
-      getReq.params = { id: 'as' }
-      await providerController.getProviderById(getReq, getRes)
-      const data = getRes._getData()
-      expect(data).toHaveProperty('message', 'Invalid ID')
-    })
+describe('getProviderById()', () => {
+  interface TypedResponse extends Response {
+    statusCode: any
+    _getData: () => any
+  }
 
-    it('Test #8 /:id [404]: provider with given id not found', async () => {
-      const getReq = httpMocks.createRequest()
-      const getRes = httpMocks.createResponse()
-      getReq.params = { id: '11111' }
-      await providerController.getProviderById(getReq, getRes)
-      const data = getRes._getData()
-      expect(data).toHaveProperty('message', 'No Provider Found')
-    })
+  let req: Request
+  let Controller: any
+  let res: TypedResponse
 
-    it('Test #9 /:id [200]: valid id', async () => {
-      const postReq = httpMocks.createRequest()
-      const postRes = httpMocks.createResponse()
-      postReq.body = payload2
-      await Controller.add(postReq, postRes)
-      const getReq = httpMocks.createRequest()
-      const getRes = httpMocks.createResponse()
-      getReq.params = { id: postRes._getData().id }
-      await Controller.getProviderById(getReq, getRes)
-      expect(getRes._getData()).toMatchObject(postRes._getData())
-      expect(getRes.statusCode).toEqual(200)
-    })
+  beforeEach(() => {
+    req = httpMocks.createRequest()
+    res = httpMocks.createResponse()
+    Controller = new ProviderController()
+  })
+
+  it('should return 400 and error details when ID is not number', async () => {
+    req.params = { id: 'as' }
+
+    Controller.getProviderById(req, res)
+    const data = res._getData()
+
+    expect(res.statusCode).toEqual(400)
+    expect(JSON.parse(data)).toHaveProperty('message', 'Invalid ID')
+  })
+
+  it('should return 404 and error details if ID does not exist', async () => {
+    req.params = { id: '11111' }
+
+    await Controller.getProviderById(req, res)
+    const data = res._getData()
+
+    expect(res.statusCode).toEqual(404)
+    expect(JSON.parse(data)).toHaveProperty('message', 'No Provider Found')
+  })
+
+  it('should return 200 and provider details if ID exist', async () => {
+    const mockedResponse = {
+      id: 1,
+      user_id: 1,
+      name: 'backlog',
+      space_key: 'UNI-CHART',
+      api_key: 'apikey1234567890',
+      created_at: '2022-05-10T08:48:47.926Z',
+      updated_at: '2022-05-10T08:48:47.927Z',
+      projects: [
+        {
+          id: 1,
+          name: 'project_name',
+          key: 'unichart-key',
+          project_id: 99846,
+          provider_id: 1,
+          created_at: '2022-05-10T09:26:03.707Z',
+          updated_at: '2022-05-10T09:26:03.707Z'
+        }
+      ]
+    }
+
+    jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => mockedResponse)
+
+    const postReq = httpMocks.createRequest()
+    const postRes = httpMocks.createResponse()
+    postReq.body = payload2
+    await Controller.add(postReq, postRes)
+
+    req.params = { id: postRes._getData().id }
+    await Controller.getProviderById(req, res)
+
+    expect(res._getData()).toEqual(mockedResponse)
+    expect(res.statusCode).toEqual(200)
   })
 })
