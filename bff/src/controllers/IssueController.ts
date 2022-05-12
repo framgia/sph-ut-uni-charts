@@ -38,7 +38,7 @@ class IssueController {
           res.status(400).json({ message: project.message })
           break
         default:
-          // default case is data not found
+          // default case is 'No Data Found'
           res.status(404).json({ message: project.message })
       }
     } else {
