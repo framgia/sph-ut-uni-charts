@@ -32,6 +32,26 @@ function AddProject() {
 
   const staticProviderData = [{ value: 'ap', label: 'Add new provider' }]
 
+  const formProvider = useForm({
+    initialValues: {
+      apiKey,
+    },
+
+    validate: {
+      apiKey: (value) => (!value ? 'API key is required' : null),
+    },
+  })
+
+  const formProject = useForm({
+    initialValues: {
+      project_id: '',
+    },
+
+    validate: {
+      project_id: (value) => (!value ? 'Please select a project' : null),
+    },
+  })
+
   const resetForm = () => {
     setshowProviderFields(false)
     setSelectedProvider(null)
@@ -54,17 +74,6 @@ function AddProject() {
     setProviders([...data, ...staticProviderData])
     setLoading(false)
   }
-
-  const formProvider = useForm({
-    initialValues: {
-      apiKey,
-    },
-
-    validate: {
-      apiKey: (value) =>
-        [undefined, ''].includes(value) ? 'API key is required' : null,
-    },
-  })
 
   const handleConnectProvider = async (values) => {
     setLoading(true)
@@ -95,17 +104,6 @@ function AddProject() {
       handleConnectProvider({ providerId: value })
     }
   }
-
-  const form = useForm({
-    initialValues: {
-      project_id: null,
-    },
-
-    validate: {
-      project_id: (value) =>
-        [undefined, ''].includes(value) ? 'Please select a project' : null,
-    },
-  })
 
   const handleAddProvider = async (values) => {
     setLoading(true)
@@ -168,7 +166,7 @@ function AddProject() {
               <Select
                 placeholder='Select a Provider'
                 data={providers}
-                onChange={(val) => handleChangeProvider(val)}
+                onChange={handleChangeProvider}
                 size='lg'
               />
             </div>
@@ -180,7 +178,7 @@ function AddProject() {
             )}
 
             {projects.length ? (
-              <form onSubmit={form.onSubmit(handleAddProvider)}>
+              <form onSubmit={formProject.onSubmit(handleAddProvider)}>
                 <Text color='blue'>
                   <Title order={3}>Select Project</Title>
                 </Text>
@@ -188,7 +186,7 @@ function AddProject() {
                   placeholder='Select a Project'
                   data={projects}
                   size='lg'
-                  {...form.getInputProps('project_id')}
+                  {...formProject.getInputProps('project_id')}
                 />
 
                 <Group position='right' mt='lg'>

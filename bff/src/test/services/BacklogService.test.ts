@@ -29,4 +29,15 @@ describe('Backlog Service Test Suite', () => {
     if (!projects.length) expect(projects).toStrictEqual([])
     else expect(projects[0]).toHaveProperty('id')
   })
+
+  test('Test #5: deleteProjectById - if ID does not exist in the database', async () => {
+    const project: any = await backlogService.deleteProjectById('/111111')
+    expect(project).toHaveProperty('message', 'ID does not exist')
+  })
+
+  test('Test #6: deleteProjectById - invalid ID, letters are not valid, should be number', async () => {
+    const project: any = await backlogService.deleteProjectById('/test')
+    expect(project).toHaveProperty('message', 'Invalid ID')
+  })
+
 })

@@ -11,27 +11,25 @@ import {
 
 import styles from '@/styles/project-detail.module.css'
 import { Chart, PageTitle } from './components'
+import { developersList, velocityChartData } from '@/src/utils/dummyData'
 import {
-  burnDownChartData,
-  burnUpChartData,
-  developersList,
-  sprintLabels,
-  sprintSelectFields,
-  velocityChartData,
-  aaa,
-} from '@/src/utils/dummyData'
-import { ChartDataFormatter, VelocityDataFormatter } from '@/src/utils/helpers'
-import { getIssues } from '@/src/services/bffService'
+  ChartDataFormatter,
+  VelocityDataFormatter,
+  obtainData,
+} from '@/src/utils/helpers'
+import { getIssues, getActiveSprintData } from '@/src/services/bffService'
 import { useRouter } from 'next/router'
 
 const ProjectDetail = () => {
   const router = useRouter()
   const [velocityResponse, setVelocityResponse] = useState()
+  const [sprintData, setSprintData] = useState()
   const [velocityChartDataSet, setVelocityChartDataSet] = useState(
     ChartDataFormatter(velocityChartData)
   )
   const [velocityDataLabels, setVelocityDataLabels] = useState([])
   const [velocity, setVelocity] = useState(0)
+  const [formattedSprint, setFormattedSprint] = useState()
 
   const query = router.query.id
 
@@ -39,13 +37,21 @@ const ProjectDetail = () => {
     if (query) {
       const issues = getIssues(Number(router.query.id), 'backlog')
       setVelocityResponse(issues)
+      const activeSprint = getActiveSprintData(
+        Number(router.query.id),
+        'backlog'
+      )
+
+      setSprintData(activeSprint)
     }
   }, [query])
 
   useEffect(() => {
     async function justToWait() {
       const velocityData = await VelocityDataFormatter(velocityResponse)
+      const formattedSprintData = await obtainData(sprintData)
 
+      setFormattedSprint(formattedSprintData)
       setVelocityDataLabels(velocityData.labels)
       setVelocityChartDataSet(ChartDataFormatter(velocityData.data))
 
@@ -58,13 +64,13 @@ const ProjectDetail = () => {
       setVelocity(tempVelocity)
     }
 
-    if (velocityResponse) {
+    if (velocityResponse && sprintData) {
       justToWait()
     }
-  }, [velocityResponse])
+  }, [velocityResponse, sprintData])
 
-  const burnDownChartDataSet = ChartDataFormatter(burnDownChartData)
-  const burnUpChartDataSet = ChartDataFormatter(burnUpChartData)
+  const burnDownChartDataSet = ChartDataFormatter(formattedSprint?.data)
+  // const burnUpChartDataSet = ChartDataFormatter(burnUpChartData)
 
   return (
     <div>
@@ -83,15 +89,18 @@ const ProjectDetail = () => {
             />
           </div> */}
           <div role='burn-down-chart' className={styles['brn-down-chart']}>
-            <Select
+            {/* Select component is for velocity chart */}
+            {/* <Select
               label='Selected Sprint'
               placeholder='Select Sprint'
-              data={sprintSelectFields}
+              data={formattedSprints}
               className={styles['burn-down-chart-select']}
-            />
+              onChange={(e) => handleChange(e)}
+            /> */}
+
             <Chart
               title='Burn Down Chart'
-              labels={sprintLabels}
+              labels={formattedSprint?.dates}
               datasets={burnDownChartDataSet}
               type='line'
             />

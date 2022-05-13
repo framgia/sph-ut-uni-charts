@@ -24,3 +24,14 @@ export const getBacklogProjects = async (payload) => {
 export const addProvider = async (payload) => {
   return await axios.post(`${URL}providers/add`, payload)
 }
+
+export const getActiveSprintData = async (project_id, provider) => {
+  let data
+  await axios
+    .get(`${URL}/projects/${project_id}/active-sprint-data?service=${provider}`)
+    .then((response) => {
+      data = response.data
+    })
+
+  return data
+}

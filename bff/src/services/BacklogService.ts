@@ -32,7 +32,20 @@ export default class BacklogService {
     return data
   }
 
-  // PROVIDER MICROSERVICES
+  async deleteProjectById(id: String) {
+    let data
+
+    await axios({
+      url:`${URL}/projects/${id}`,
+      method: 'delete'
+    }).then((response: AxiosResponse) => {
+      data = response.data
+    })
+
+    return data
+  }
+
+ // PROVIDER MICROSERVICES
 
   static async add(payload: any) {
     return await axios
@@ -97,5 +110,24 @@ export default class BacklogService {
       method: 'get',
       params: payload
     })
+  }
+
+  async getActiveSprintData(
+    space_key: string,
+    key: string,
+    project_id: number,
+    milestone_id: number
+  ) {
+    let data
+
+    await axios({
+      baseURL: `https://${space_key}.backlog.com/api/v2`,
+      url: '/issues',
+      method: 'get',
+      params: { apiKey: key, 'projectId[]': project_id, 'milestoneId[]': milestone_id }
+    }).then((response: AxiosResponse) => {
+      data = response.data
+    })
+    return data
   }
 }
