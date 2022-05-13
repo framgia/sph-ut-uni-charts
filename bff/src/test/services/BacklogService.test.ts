@@ -1,6 +1,6 @@
 import { rest } from 'msw'
-import { setupServer } from 'msw/node'
 import BacklogService from '../../services/BacklogService'
+import { server } from '../../../jest.setup'
 
 import testData from '../constants/issueTestData.json'
 
@@ -46,29 +46,19 @@ describe('Backlog Service Test Suite', () => {
 })
 
 describe('Using getIssues() function', () => {
-  /*
-  Had to setup the server for each test instead of calling beforeAll/beforeEach
-  because it has different parameters
-  */
   describe('Should fetch issues from backlog API', () => {
     test('Correct namespace, project ID and key', async () => {
       // set up the server
-      const server = setupServer(
-        ...[
-          rest.get('*/api/v2/issues', (req, res, ctx) => {
-            return res(ctx.json(testData.backlogServiceIssueResponse))
-          })
-        ]
+      server.use(
+        rest.get('*/api/v2/issues', (req, res, ctx) => {
+          return res(ctx.json(testData.backlogServiceIssueResponse))
+        })
       )
-      server.listen({
-        onUnhandledRequest: 'bypass'
-      })
 
       // call the service
       const issues: any = await backlogService.getIssues('namespace', 'key', 111)
 
       expect(JSON.stringify(issues)).toBe(JSON.stringify(testData.backlogServiceIssueResponse))
-      server.close()
     })
 
     test('Incorrect key', async () => {
@@ -80,65 +70,47 @@ describe('Using getIssues() function', () => {
         }
       ]
       // set up the server
-      const server = setupServer(
-        ...[
-          rest.get('*/api/v2/issues', (req, res, ctx) => {
-            return res(ctx.json(errors), ctx.status(401))
-          })
-        ]
+      server.use(
+        rest.get('*/api/v2/issues', (req, res, ctx) => {
+          return res(ctx.json(errors), ctx.status(401))
+        })
       )
-      server.listen({
-        onUnhandledRequest: 'bypass'
-      })
 
       // call the service
       const issues: any = await backlogService.getIssues('namespace', 'key', 111)
 
       expect(issues.status).toBe(401)
       expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
-      server.close()
     })
 
     test('Incorrect project ID', async () => {
       const errors = [{ message: 'No such project. (key:111)', code: 6, moreInfo: '' }]
       // set up the server
-      const server = setupServer(
-        ...[
-          rest.get('*/api/v2/issues', (req, res, ctx) => {
-            return res(ctx.json(errors), ctx.status(404))
-          })
-        ]
+      server.use(
+        rest.get('*/api/v2/issues', (req, res, ctx) => {
+          return res(ctx.json(errors), ctx.status(404))
+        })
       )
-      server.listen({
-        onUnhandledRequest: 'bypass'
-      })
 
       // call the service
       const issues: any = await backlogService.getIssues('namespace', 'key', 111)
 
       expect(issues.status).toBe(404)
       expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
-      server.close()
     })
 
     test('Incorrect namespace', async () => {
       // set up the server
-      const server = setupServer(
-        ...[
-          rest.get('*/api/v2/issues', (req, res, ctx) => {
-            return res(ctx.status(404))
-          })
-        ]
+      server.use(
+        rest.get('*/api/v2/issues', (req, res, ctx) => {
+          return res(ctx.status(404))
+        })
       )
-      server.listen({
-        onUnhandledRequest: 'bypass'
-      })
 
       // call the service
       const issues: any = await backlogService.getIssues('namespace', 'key', 111)
 
       expect(issues.status).toBe(404)
-      server.close()
     })
   })
 })
@@ -151,16 +123,11 @@ describe('Using getMilestones() function', () => {
   describe('Should fetch milestones from backlog API', () => {
     test('Correct namespace, project ID and key', async () => {
       // set up the server
-      const server = setupServer(
-        ...[
-          rest.get('*/api/v2/projects/*', (req, res, ctx) => {
-            return res(ctx.json(testData.backlogServiceMilestoneResponse))
-          })
-        ]
+      server.use(
+        rest.get('*/api/v2/projects/*', (req, res, ctx) => {
+          return res(ctx.json(testData.backlogServiceMilestoneResponse))
+        })
       )
-      server.listen({
-        onUnhandledRequest: 'bypass'
-      })
 
       // call the service
       const milestones: any = await backlogService.getMilestones('namespace', 'key', 111)
@@ -168,7 +135,6 @@ describe('Using getMilestones() function', () => {
       expect(JSON.stringify(milestones)).toBe(
         JSON.stringify(testData.backlogServiceMilestoneResponse)
       )
-      server.close()
     })
 
     test('Incorrect key', async () => {
@@ -180,65 +146,47 @@ describe('Using getMilestones() function', () => {
         }
       ]
       // set up the server
-      const server = setupServer(
-        ...[
-          rest.get('*/api/v2/projects/*', (req, res, ctx) => {
-            return res(ctx.json(errors), ctx.status(401))
-          })
-        ]
+      server.use(
+        rest.get('*/api/v2/projects/*', (req, res, ctx) => {
+          return res(ctx.json(errors), ctx.status(401))
+        })
       )
-      server.listen({
-        onUnhandledRequest: 'bypass'
-      })
 
       // call the service
       const issues: any = await backlogService.getMilestones('namespace', 'key', 111)
 
       expect(issues.status).toBe(401)
       expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
-      server.close()
     })
 
     test('Incorrect project ID', async () => {
       const errors = [{ message: 'No such project. (key:111)', code: 6, moreInfo: '' }]
       // set up the server
-      const server = setupServer(
-        ...[
-          rest.get('*/api/v2/projects/*', (req, res, ctx) => {
-            return res(ctx.json(errors), ctx.status(404))
-          })
-        ]
+      server.use(
+        rest.get('*/api/v2/projects/*', (req, res, ctx) => {
+          return res(ctx.json(errors), ctx.status(404))
+        })
       )
-      server.listen({
-        onUnhandledRequest: 'bypass'
-      })
 
       // call the service
       const issues: any = await backlogService.getMilestones('namespace', 'key', 111)
 
       expect(issues.status).toBe(404)
       expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
-      server.close()
     })
 
     test('Incorrect namespace', async () => {
       // set up the server
-      const server = setupServer(
-        ...[
-          rest.get('*/api/v2/projects/*', (req, res, ctx) => {
-            return res(ctx.status(404))
-          })
-        ]
+      server.use(
+        rest.get('*/api/v2/projects/*', (req, res, ctx) => {
+          return res(ctx.status(404))
+        })
       )
-      server.listen({
-        onUnhandledRequest: 'bypass'
-      })
 
       // call the service
       const issues: any = await backlogService.getMilestones('namespace', 'key', 111)
 
       expect(issues.status).toBe(404)
-      server.close()
     })
   })
 })
