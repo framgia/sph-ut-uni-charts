@@ -115,7 +115,7 @@ describe('Provider Controller', () => {
   // })
 })
 
-describe('getProviderById()', () => {
+describe('Using getProviderById() function', () => {
   interface TypedResponse extends Response {
     statusCode: any
     _getData: () => any
@@ -131,56 +131,58 @@ describe('getProviderById()', () => {
     Controller = new ProviderController()
   })
 
-  it('should return 400 and error details when ID is not number', async () => {
-    req.params = { id: 'as' }
+  describe('Should fetch the provider', () => {
+    test('ID is not a number', async () => {
+      req.params = { id: 'as' }
 
-    Controller.getProviderById(req, res)
-    const data = res._getData()
+      Controller.getProviderById(req, res)
+      const data = res._getData()
 
-    expect(res.statusCode).toEqual(400)
-    expect(JSON.parse(data)).toHaveProperty('message', 'Invalid ID')
-  })
+      expect(res.statusCode).toEqual(400)
+      expect(JSON.parse(data)).toHaveProperty('message', 'Invalid ID')
+    })
 
-  it('should return 404 and error details if ID does not exist', async () => {
-    jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => null)
+    test('ID does not exist', async () => {
+      jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => null)
 
-    req.params = { id: '11111' }
+      req.params = { id: '11111' }
 
-    await Controller.getProviderById(req, res)
-    const data = res._getData()
+      await Controller.getProviderById(req, res)
+      const data = res._getData()
 
-    expect(res.statusCode).toEqual(404)
-    expect(JSON.parse(data)).toHaveProperty('message', 'No Provider Found')
-  })
+      expect(res.statusCode).toEqual(404)
+      expect(JSON.parse(data)).toHaveProperty('message', 'No Provider Found')
+    })
 
-  it('should return 200 and provider details if ID exist', async () => {
-    const mockedResponse = {
-      id: 1,
-      user_id: 1,
-      name: 'backlog',
-      space_key: 'UNI-CHART',
-      api_key: 'apikey1234567890',
-      created_at: '2022-05-10T08:48:47.926Z',
-      updated_at: '2022-05-10T08:48:47.927Z',
-      projects: [
-        {
-          id: 1,
-          name: 'project_name',
-          key: 'unichart-key',
-          project_id: 99846,
-          provider_id: 1,
-          created_at: '2022-05-10T09:26:03.707Z',
-          updated_at: '2022-05-10T09:26:03.707Z'
-        }
-      ]
-    }
+    test('ID exists', async () => {
+      const mockedResponse = {
+        id: 1,
+        user_id: 1,
+        name: 'backlog',
+        space_key: 'UNI-CHART',
+        api_key: 'apikey1234567890',
+        created_at: '2022-05-10T08:48:47.926Z',
+        updated_at: '2022-05-10T08:48:47.927Z',
+        projects: [
+          {
+            id: 1,
+            name: 'project_name',
+            key: 'unichart-key',
+            project_id: 99846,
+            provider_id: 1,
+            created_at: '2022-05-10T09:26:03.707Z',
+            updated_at: '2022-05-10T09:26:03.707Z'
+          }
+        ]
+      }
 
-    jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => mockedResponse)
+      jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => mockedResponse)
 
-    req.params = { id: '1' }
-    await Controller.getProviderById(req, res)
+      req.params = { id: '1' }
+      await Controller.getProviderById(req, res)
 
-    expect(res._getData()).toEqual(mockedResponse)
-    expect(res.statusCode).toEqual(200)
+      expect(res._getData()).toEqual(mockedResponse)
+      expect(res.statusCode).toEqual(200)
+    })
   })
 })
