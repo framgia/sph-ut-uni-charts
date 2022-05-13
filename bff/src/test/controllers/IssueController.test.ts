@@ -38,7 +38,7 @@ describe('When using getIssues() function', () => {
   })
 
   describe('if ID exists, has milestone and issues', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       request = httpMocks.createRequest({
         method: 'GET',
         url: '/issues/:id',
@@ -49,18 +49,16 @@ describe('When using getIssues() function', () => {
           service: 'backlog'
         }
       })
-
       response = httpMocks.createResponse()
+
+      await issueController.getIssues(request, response)
     })
 
-    it('should return status of 200', async () => {
-      await issueController.getIssues(request, response)
-
+    it('should return status of 200', () => {
       expect(response.statusCode).toBe(200)
     })
 
-    it('should return the expected body', async () => {
-      await issueController.getIssues(request, response)
+    it('should return the expected body', () => {
       const data = response._getData()
 
       const formattedIssue = [
@@ -95,7 +93,7 @@ describe('When using getIssues() function', () => {
   })
 
   describe('if incorrect service is provided', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       request = httpMocks.createRequest({
         method: 'GET',
         url: '/issues/:id',
@@ -107,16 +105,15 @@ describe('When using getIssues() function', () => {
         }
       })
       response = httpMocks.createResponse()
+
+      await issueController.getIssues(request, response)
     })
 
-    it('should return status of 400', async () => {
-      await issueController.getIssues(request, response)
-
+    it('should return status of 400', () => {
       expect(response.statusCode).toBe(400)
     })
 
-    it('should return expected error message', async () => {
-      await issueController.getIssues(request, response)
+    it('should return expected error message', () => {
       const data = response._getData()
 
       expect(JSON.parse(data)).toHaveProperty('message', 'Service information not provided.')
@@ -124,7 +121,7 @@ describe('When using getIssues() function', () => {
   })
 
   describe('if ID is not a number', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       server.use(
         rest.get('*/api/projects/:id', (req, res, ctx) => {
           return res(ctx.status(200), ctx.json({ message: 'Invalid ID' }))
@@ -142,16 +139,15 @@ describe('When using getIssues() function', () => {
         }
       })
       response = httpMocks.createResponse()
+
+      await issueController.getIssues(request, response)
     })
 
-    it('should return a status of 400', async () => {
-      await issueController.getIssues(request, response)
-
+    it('should return a status of 400', () => {
       expect(response.statusCode).toBe(400)
     })
 
-    it('should return the expected error message', async () => {
-      await issueController.getIssues(request, response)
+    it('should return the expected error message', () => {
       const data = response._getData()
 
       expect(JSON.parse(data)).toHaveProperty('message', 'Invalid ID')
@@ -159,7 +155,7 @@ describe('When using getIssues() function', () => {
   })
 
   describe('if project with provided ID does not exist', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       server.use(
         rest.get('*/api/projects/:id', (req, res, ctx) => {
           return res(ctx.status(200), ctx.json({ message: 'No Data Found' }))
@@ -177,16 +173,15 @@ describe('When using getIssues() function', () => {
         }
       })
       response = httpMocks.createResponse()
+
+      await issueController.getIssues(request, response)
     })
 
-    it('should return status of 404', async () => {
-      await issueController.getIssues(request, response)
-
+    it('should return status of 404', () => {
       expect(response.statusCode).toBe(404)
     })
 
-    it('should return expected error message', async () => {
-      await issueController.getIssues(request, response)
+    it('should return expected error message', () => {
       const data = response._getData()
 
       expect(JSON.parse(data)).toHaveProperty('message', 'No Data Found')
@@ -200,7 +195,7 @@ describe('When using getIssues() function', () => {
       { milestone: 'Sprint 1', issues: [] }
     ]
 
-    beforeEach(() => {
+    beforeEach(async () => {
       server.use(
         rest.get('*/api/v2/issues', (req, res, ctx) => {
           return res(ctx.json([]))
@@ -221,18 +216,16 @@ describe('When using getIssues() function', () => {
           service: 'backlog'
         }
       })
-
       response = httpMocks.createResponse()
+
+      await issueController.getIssues(request, response)
     })
 
-    it('should return status of 200', async () => {
-      await issueController.getIssues(request, response)
-
+    it('should return status of 200', () => {
       expect(response.statusCode).toBe(200)
     })
 
-    it('should return expected body', async () => {
-      await issueController.getIssues(request, response)
+    it('should return expected body', () => {
       const data = response._getData()
 
       expect(JSON.stringify(data)).toBe(JSON.stringify(expectedResponse))
@@ -240,7 +233,7 @@ describe('When using getIssues() function', () => {
   })
 
   describe('if ID exists, has no milestone', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       server.use(
         rest.get('*/api/v2/projects/*', (req, res, ctx) => {
           return res(ctx.status(200), ctx.json([]))
@@ -257,18 +250,16 @@ describe('When using getIssues() function', () => {
           service: 'backlog'
         }
       })
-
       response = httpMocks.createResponse()
+
+      await issueController.getIssues(request, response)
     })
 
-    it('should return status of 200', async () => {
-      await issueController.getIssues(request, response)
-
+    it('should return status of 200', () => {
       expect(response.statusCode).toBe(200)
     })
 
-    it('should return expected body', async () => {
-      await issueController.getIssues(request, response)
+    it('should return expected body', () => {
       const data = response._getData()
 
       expect(JSON.stringify(data)).toBe(JSON.stringify([]))

@@ -10,6 +10,8 @@ app.use(express.urlencoded({ extended: false }))
 app.use('/', ProviderRoute)
 
 describe('When accessing /providers/:id route', () => {
+  let response: request.Response
+
   describe('if ID exists', () => {
     const mockedResponse = {
       id: 1,
@@ -22,17 +24,16 @@ describe('When accessing /providers/:id route', () => {
       projects: []
     }
 
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => mockedResponse)
-    })
-    it('should return a status of 200', async () => {
-      const response = await request(app).get(`/1111`)
 
+      response = await request(app).get(`/1111`)
+    })
+    it('should return a status of 200', () => {
       expect(response.statusCode).toBe(200)
     })
 
-    it('should return the expected error message', async () => {
-      const response = await request(app).get(`/1111`)
+    it('should return the expected error message', () => {
       const parsedResponse = JSON.parse(response.text)
 
       expect(parsedResponse).toMatchObject(mockedResponse)
@@ -40,32 +41,30 @@ describe('When accessing /providers/:id route', () => {
   })
 
   describe('if ID does not exist', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => null)
+
+      response = await request(app).get('/1111111')
     })
 
-    it('should return a status of 404', async () => {
-      const response = await request(app).get('/1111111')
-
+    it('should return a status of 404', () => {
       expect(response.statusCode).toBe(404)
     })
 
-    it('should return the expected error message', async () => {
-      const response = await request(app).get('/1111111')
-
+    it('should return the expected error message', () => {
       expect(JSON.parse(response.text)).toHaveProperty('message', 'No Provider Found')
     })
   })
   describe('ID is not a number', () => {
-    it('should return a status of 400', async () => {
-      const response = await request(app).get('/tests')
+    beforeEach(async () => {
+      response = await request(app).get('/tests')
+    })
 
+    it('should return a status of 400', () => {
       expect(response.statusCode).toBe(400)
     })
 
-    it('should return the expected error message', async () => {
-      const response = await request(app).get('/tests')
-
+    it('should return the expected error message', () => {
       expect(JSON.parse(response.text)).toHaveProperty('message', 'Invalid ID')
     })
   })

@@ -132,16 +132,16 @@ describe('When using getProviderById() function', () => {
   })
 
   describe('if ID is not a number', () => {
-    it('should return a status of 400', () => {
+    beforeEach(async () => {
       req.params = { id: 'as' }
-      Controller.getProviderById(req, res)
+      await Controller.getProviderById(req, res)
+    })
 
+    it('should return a status of 400', () => {
       expect(res.statusCode).toEqual(400)
     })
 
     it('should return the expected error message', () => {
-      req.params = { id: 'as' }
-      Controller.getProviderById(req, res)
       const data = res._getData()
 
       expect(JSON.parse(data)).toHaveProperty('message', 'Invalid ID')
@@ -149,20 +149,18 @@ describe('When using getProviderById() function', () => {
   })
 
   describe('if ID does not exist', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => null)
-    })
 
-    it('should return a status of 404', async () => {
       req.params = { id: '11111' }
       await Controller.getProviderById(req, res)
+    })
 
+    it('should return a status of 404', () => {
       expect(res.statusCode).toEqual(404)
     })
 
-    it('should return the expected error message', async () => {
-      req.params = { id: '11111' }
-      await Controller.getProviderById(req, res)
+    it('should return the expected error message', () => {
       const data = res._getData()
 
       expect(JSON.parse(data)).toHaveProperty('message', 'No Provider Found')
@@ -191,21 +189,18 @@ describe('When using getProviderById() function', () => {
       ]
     }
 
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => mockedResponse)
-    })
 
-    it('should return a status of 200', async () => {
       req.params = { id: '1' }
       await Controller.getProviderById(req, res)
+    })
 
+    it('should return a status of 200', () => {
       expect(res.statusCode).toEqual(200)
     })
 
-    it('should return the expected body', async () => {
-      req.params = { id: '1' }
-      await Controller.getProviderById(req, res)
-
+    it('should return the expected body', () => {
       expect(res._getData()).toEqual(mockedResponse)
     })
   })

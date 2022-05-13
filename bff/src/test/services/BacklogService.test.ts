@@ -46,6 +46,8 @@ describe('Backlog Service Test Suite', () => {
 })
 
 describe('When using getIssues() function', () => {
+  let issues: any
+
   describe('if it has correct namespace, project ID and key', () => {
     it('should return expected body', async () => {
       server.use(
@@ -54,7 +56,7 @@ describe('When using getIssues() function', () => {
         })
       )
 
-      const issues: any = await backlogService.getIssues('namespace', 'key', 111)
+      issues = await backlogService.getIssues('namespace', 'key', 111)
 
       expect(JSON.stringify(issues)).toBe(JSON.stringify(testData.backlogServiceIssueResponse))
     })
@@ -69,24 +71,22 @@ describe('When using getIssues() function', () => {
       }
     ]
 
-    beforeEach(() => {
+    beforeEach(async () => {
       server.use(
         rest.get('*/api/v2/issues', (req, res, ctx) => {
           return res(ctx.json(errors), ctx.status(401))
         })
       )
+
+      issues = await backlogService.getIssues('namespace', 'key', 111)
     })
 
-    it('should return status of 401', async () => {
-      const issues: any = await backlogService.getIssues('namespace', 'key', 111)
-
+    it('should return status of 401', () => {
       expect(issues.status).toBe(401)
       expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
     })
 
-    it('should return expected error message', async () => {
-      const issues: any = await backlogService.getIssues('namespace', 'key', 111)
-
+    it('should return expected error message', () => {
       expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
     })
   })
@@ -94,62 +94,58 @@ describe('When using getIssues() function', () => {
   describe('if it has incorrect project ID', () => {
     const errors = [{ message: 'No such project. (key:111)', code: 6, moreInfo: '' }]
 
-    beforeEach(() => {
+    beforeEach(async () => {
       server.use(
         rest.get('*/api/v2/issues', (req, res, ctx) => {
           return res(ctx.json(errors), ctx.status(404))
         })
       )
+
+      issues = await backlogService.getIssues('namespace', 'key', 111)
     })
 
-    it('should return status of 404', async () => {
-      const issues: any = await backlogService.getIssues('namespace', 'key', 111)
-
+    it('should return status of 404', () => {
       expect(issues.status).toBe(404)
     })
 
-    it('should return expected error message', async () => {
-      const issues: any = await backlogService.getIssues('namespace', 'key', 111)
-
+    it('should return expected error message', () => {
       expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
     })
   })
 
   describe('if it has incorrect namespace', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       server.use(
         rest.get('*/api/v2/issues', (req, res, ctx) => {
           return res(ctx.status(404))
         })
       )
+
+      issues = await backlogService.getIssues('namespace', 'key', 111)
     })
 
-    it('should return status of 404', async () => {
-      const issues: any = await backlogService.getIssues('namespace', 'key', 111)
-
+    it('should return status of 404', () => {
       expect(issues.status).toBe(404)
     })
 
-    it('should not return an error message', async () => {
-      const issues: any = await backlogService.getIssues('namespace', 'key', 111)
-
+    it('should not return an error message', () => {
       expect(issues).toHaveProperty('errors', '')
     })
   })
 })
 
 describe('When using getMilestones() function', () => {
+  let milestones: any
+
   describe('if it has correct namespace, project ID and key', () => {
-    beforeEach(() => {
+    it('should return expected body', async () => {
       server.use(
         rest.get('*/api/v2/projects/*', (req, res, ctx) => {
           return res(ctx.json(testData.backlogServiceMilestoneResponse))
         })
       )
-    })
 
-    it('should return expected body', async () => {
-      const milestones: any = await backlogService.getMilestones('namespace', 'key', 111)
+      milestones = await backlogService.getMilestones('namespace', 'key', 111)
 
       expect(JSON.stringify(milestones)).toBe(
         JSON.stringify(testData.backlogServiceMilestoneResponse)
@@ -166,71 +162,64 @@ describe('When using getMilestones() function', () => {
       }
     ]
 
-    beforeEach(() => {
+    beforeEach(async () => {
       server.use(
         rest.get('*/api/v2/projects/*', (req, res, ctx) => {
           return res(ctx.json(errors), ctx.status(401))
         })
       )
+
+      milestones = await backlogService.getMilestones('namespace', 'key', 111)
     })
 
-    it('should return status of 401', async () => {
-      const issues: any = await backlogService.getMilestones('namespace', 'key', 111)
-
-      expect(issues.status).toBe(401)
+    it('should return status of 401', () => {
+      expect(milestones.status).toBe(401)
     })
 
-    it('should return expected error message', async () => {
-      const issues: any = await backlogService.getMilestones('namespace', 'key', 111)
-
-      expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
+    it('should return expected error message', () => {
+      expect(JSON.stringify(milestones.errors)).toBe(JSON.stringify(errors))
     })
   })
 
   describe('if it has incorrect project ID', () => {
     const errors = [{ message: 'No such project. (key:111)', code: 6, moreInfo: '' }]
 
-    beforeEach(() => {
+    beforeEach(async () => {
       server.use(
         rest.get('*/api/v2/projects/*', (req, res, ctx) => {
           return res(ctx.json(errors), ctx.status(404))
         })
       )
+
+      milestones = await backlogService.getMilestones('namespace', 'key', 111)
     })
 
-    it('should return status of 404', async () => {
-      const issues: any = await backlogService.getMilestones('namespace', 'key', 111)
-
-      expect(issues.status).toBe(404)
+    it('should return status of 404', () => {
+      expect(milestones.status).toBe(404)
     })
 
-    it('should return expected error message', async () => {
-      const issues: any = await backlogService.getMilestones('namespace', 'key', 111)
-
-      expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
+    it('should return expected error message', () => {
+      expect(JSON.stringify(milestones.errors)).toBe(JSON.stringify(errors))
     })
   })
 
   describe('if it has incorrect namespace', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       server.use(
         rest.get('*/api/v2/projects/*', (req, res, ctx) => {
           return res(ctx.status(404))
         })
       )
+
+      milestones = await backlogService.getMilestones('namespace', 'key', 111)
     })
 
-    it('should return status of 404', async () => {
-      // call the service
-      const issues: any = await backlogService.getMilestones('namespace', 'key', 111)
-
-      expect(issues.status).toBe(404)
+    it('should return status of 404', () => {
+      expect(milestones.status).toBe(404)
     })
 
-    it('should not return an error message', async () => {
-      const issues: any = await backlogService.getMilestones('namespace', 'key', 111)
-
-      expect(issues).toHaveProperty('errors', '')
+    it('should not return an error message', () => {
+      expect(milestones).toHaveProperty('errors', '')
     })
   })
 })
