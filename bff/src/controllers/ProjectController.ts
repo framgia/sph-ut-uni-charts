@@ -109,8 +109,8 @@ export default class ProjectController extends Controller {
           break
         }
 
-        const activeSprint = milestones.find((milestone: any) => {
-          const releaseDate = new Date(milestone.releaseDueDate).toLocaleDateString()
+        const activeSprint = milestones?.find((milestone: any) => {
+          const releaseDate = DateTime.fromISO(milestone.releaseDueDate).toLocaleString()
           const dateNow = DateTime.now().toLocaleString()
           if (releaseDate >= dateNow) {
             return milestone
@@ -144,11 +144,11 @@ export default class ProjectController extends Controller {
         dates = arr
 
         // Get initial total ET of sprint
-        issues.forEach((issue: any) => {
+        issues?.forEach((issue: any) => {
           totalET = totalET + issue.estimatedHours
         })
 
-        dates.forEach((date) => {
+        dates?.forEach((date) => {
           const estimatedIssues = issues.filter((issue: any) => {
             let dueDate = new Date(issue.dueDate).toLocaleDateString()
             if (dueDate === date) {
