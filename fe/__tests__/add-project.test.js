@@ -1,86 +1,134 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import AddProject from '@/src/pages/projects/AddProject';
+require('dotenv').config()
+import {
+  render,
+  screen,
+  fireEvent,
+  waitForElementToBeRemoved,
+} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import AddProject from '@/src/pages/projects/AddProject'
+const axios = require('axios')
+const MockAdapter = require('axios-mock-adapter')
 
-describe('Add Project', () => {
-	it('Has a header', () => {
-		render(<AddProject />);
-		const header = screen.getByRole('heading', { name: /add project page/i });
+const mockAxios = new MockAdapter(axios)
+const URL = process.env.NEXT_PUBLIC_BFF_API
 
-		expect(header).toBeInTheDocument();
-	});
+describe('When adding a project', () => {
+  beforeEach(async () => {
+    mockAxios.onGet(`${URL}providers/`).reply(200, [
+      {
+        id: 33,
+        name: 'Backlog',
+        space_key: 'framgiaph',
+      },
+    ])
+    mockAxios.onGet(`${URL}backlog/projects`).reply(200, [
+      {
+        id: 18616,
+        projectKey: 'FRAMGIAPH_BOOKSHELF',
+        name: 'FramgiaPH BookShelf',
+      },
+      {
+        id: 25770,
+        projectKey: 'DOKODEMO',
+        name: 'Dokodemo-English',
+      },
+    ])
+    render(<AddProject />)
+  })
 
-	it('Has 2 dropdown buttons and 1 submit button', () => {
-		render(<AddProject />);
-		const providerDropdown = screen.getByPlaceholderText(/select a provider/i);
-		const projectDropdown = screen.getByPlaceholderText(/select a project/i);
-		const dropdownFields = screen.getAllByRole('textbox');
-		const addProjectButton = screen.getByRole('button', {
-			name: /add project/i,
-		});
+  it('should have a header and a select "Provider Dropdown"', () => {
+    const header = screen.getByRole('heading', { name: /ADD PROJECT/i })
+    const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
 
-		expect(providerDropdown).toBeInTheDocument();
-		expect(projectDropdown).toBeInTheDocument();
-		expect(dropdownFields).toHaveLength(2);
-		expect(addProjectButton).toBeInTheDocument();
-	});
+    expect(header).toBeInTheDocument()
+    expect(providerDropdown).toBeInTheDocument()
+  })
 
-	it('initial values under provider dropdown', async () => {
-		render(<AddProject />);
-		const providerDropdown = screen.getByPlaceholderText(/select a provider/i);
+  describe('When clicking the providers dropdown', () => {
+    beforeEach(() => {
+      userEvent.click(screen.getByPlaceholderText(/select a provider/i))
+    })
 
-		userEvent.click(providerDropdown);
+    it('should have initial values under "Provider Dropdown" after fetch provider api call', async () => {
+      const options = await screen.findAllByRole('option')
+      expect(options).toHaveLength(2)
+    })
 
-		const initialOptions = await screen.findAllByRole('option');
+    describe('When add new provider is selected', () => {
+      beforeEach(async () => {
+        const addProvider = await screen.findByRole('option', {
+          name: /add new provider/i,
+        })
+        userEvent.click(addProvider)
 
-		expect(initialOptions).toHaveLength(2);
-	});
+        const connectButton = await screen.findByRole('button', {
+          name: /connect provider/i,
+        })
+        userEvent.click(connectButton)
+      })
 
-	it('user clicks add new provider option', () => {
-		render(<AddProject />);
-		const providerDropdown = screen.getByPlaceholderText(/select a provider/i);
+      it('should show "Error Invalid API Key" if api key is invalid', async () => {
+        const connectButton = await screen.findByRole('button', {
+          name: /connect provider/i,
+        })
+        userEvent.click(connectButton)
+        const apikeyError = await screen.findByText('API key is required')
+        expect(apikeyError).toBeInTheDocument()
+      })
 
-		userEvent.click(providerDropdown);
+      it('should show success notification when adding project if "enter new provider" is selected', async () => {
+        mockAxios.onGet(`${URL}providers/add`).reply(200, {
+          name: 'Backlog',
+          space_key: 'framgiaph',
+          api_key: 'apikey123',
+        })
 
-		const addProvider = screen.getByRole('option', {
-			name: /add new provider/i,
-		});
+        const apiKeyInput = await screen.findByPlaceholderText(/enter api key/i)
 
-		expect(addProvider).toBeInTheDocument();
+        const connectButton = await screen.findByRole('button', {
+          name: /connect provider/i,
+        })
 
-		userEvent.click(addProvider);
+        expect(apiKeyInput).toBeInTheDocument()
+        expect(connectButton).toBeInTheDocument()
 
-		const apiKey = screen.getByPlaceholderText(/enter api key/i);
+        fireEvent.change(apiKeyInput, { target: { value: 'apikey123' } })
+        userEvent.click(connectButton)
 
-		const connectButton = screen.getByRole('button', {
-			name: /connect provider/i,
-		});
+        const projectDropdown = await screen.findByPlaceholderText(
+          /select a project/i
+        )
+        userEvent.click(projectDropdown)
 
-		expect(apiKey).toBeInTheDocument();
-		expect(connectButton).toBeInTheDocument();
-	});
+        const projects = await screen.findByRole('option', {
+          name: /FramgiaPH BookShelf/i,
+          name: /Dokodemo-English/i,
+        })
+        expect(projects).toBeInTheDocument()
 
-	it('initial values under project dropdown', async () => {
-		render(<AddProject />);
+        const projectOption = await screen.findByRole('option', {
+          name: /framgiaPH bookshelf/i,
+        })
+        expect(projectOption).toBeInTheDocument()
 
-		const projectDropdown = screen.getByPlaceholderText(/select a project/i);
-		userEvent.click(projectDropdown);
+        userEvent.click(projectOption)
+        userEvent.click(projectDropdown)
+        userEvent.click(
+          screen.getByRole('option', {
+            name: /framgiaPH bookshelf/i,
+          })
+        )
 
-		const listProjects = await screen.findAllByRole('option');
-		const projects = listProjects.map((proj) => proj.textContent);
-		expect(projects).toEqual(['Yamato', 'Safie', '01Booster']);
-	});
+        const addProjectButton = await screen.findByRole('button', {
+          name: /add project/i,
+        })
+        expect(addProjectButton).toBeInTheDocument()
+        userEvent.click(addProjectButton)
 
-	it('Action buttons', () => {
-		render(<AddProject />);
-
-		const addProjectButton = screen.getByRole('button', {
-			name: /add project/i,
-		});
-
-		const cancelButton = screen.getByRole('button', { name: /cancel/i });
-
-		expect(addProjectButton).toBeInTheDocument();
-		expect(cancelButton).toBeInTheDocument();
-	});
-});
+        const toast = screen.getByRole('presentation')
+        expect(toast).toBeInTheDocument()
+      })
+    })
+  })
+})

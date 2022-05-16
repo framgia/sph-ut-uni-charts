@@ -7,7 +7,7 @@ class BacklogController {
       const result = await BacklogService.backlogProjects(req.query)
       return res.send(result.data)
     } catch (error: any) {
-      return res.status(error.response.status).send(error.response.data)
+      return res.status(error.response.status).send(error?.response?.data ?? error)
     }
   }
 }

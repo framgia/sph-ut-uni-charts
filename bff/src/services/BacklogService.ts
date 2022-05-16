@@ -57,22 +57,12 @@ export default class BacklogService {
       })
   }
 
-  static async getProviders(user_id: number) {
-    let data
-
-    await axios({
-      url: `${URL}/providers`,
+  static async getProviders(payload: any) {
+    return await axios({
+      url: `${URL}/providers/`,
       method: 'get',
-      data: {
-        user_id: user_id
-      }
+      params: payload
     })
-      .then((response: AxiosResponse) => {
-        data = response.data
-      })
-      .catch((error: AxiosError) => {
-        data = error.message
-      })
   }
 
   async getProviderById(id: any) {
