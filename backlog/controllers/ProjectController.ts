@@ -1,12 +1,36 @@
-import { PrismaClient } from '@prisma/client'
+import prisma from '../utils/client'
 import { Request, Response } from 'express'
-
-const prisma = new PrismaClient()
 
 export default class ProjectController {
   async getProjects(req: Request, res: Response) {
-    const result = await prisma.project.findMany()
-    res.send(result)
+    const filterProvider: any = req.query?.filterProvider
+    const searchProvider: any = req.query?.searchProvider
+
+    let result = await prisma.project.findMany({
+      where: {
+        ...(filterProvider
+          ? {
+              provider: {
+                OR: {
+                  name: {
+                    equals: String(filterProvider),
+                    mode: 'insensitive'
+                  }
+                }
+              }
+            }
+          : {})
+      }
+    })
+
+    if (searchProvider) {
+      result = result.filter(
+        (data) =>
+          data.name.toLocaleLowerCase().indexOf(String(searchProvider.toLocaleLowerCase())) > -1
+      )
+    }
+
+    res.status(200).json(result)
   }
 
   async getProjectById(req: Request, res: Response) {
@@ -36,15 +60,16 @@ export default class ProjectController {
           id: Number(req.params.id)
         }
       })
-  
-      const result : any = !project ? { message: 'ID does not exist' } : await prisma.project.delete({
-        where: {
-          id: Number(req.params.id)
-        }
-      })
-      
+
+      const result: any = !project
+        ? { message: 'ID does not exist' }
+        : await prisma.project.delete({
+            where: {
+              id: Number(req.params.id)
+            }
+          })
+
       res.send(result)
     }
-    
   }
 }

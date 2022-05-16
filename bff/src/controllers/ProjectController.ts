@@ -6,7 +6,7 @@ const backlogService = new BacklogService()
 
 export default class ProjectController {
   async getProjects(req: Request, res: Response) {
-    const result = await backlogService.getProjects()
+    const result = await backlogService.getProjects(req.query)
     res.send(result)
   }
 
