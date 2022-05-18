@@ -7,7 +7,16 @@
       "project_id": 551,
       "provider_id": 186,
       "created_at": "2022-05-13T06:46:50.470Z",
-      "updated_at": "2022-05-13T06:46:50.470Z"
+      "updated_at": "2022-05-13T06:46:50.470Z",
+      "provider": {
+        "id": 186,
+        "user_id": 1,
+        "name": "Backlog",
+        "space_key": "nulab",
+        "api_key": "123apikey123",
+        "created_at": "2022-05-18T03:03:32.273Z",
+        "updated_at": "2022-05-18T03:03:32.275Z"
+      }
     },
     {
       "id": 191,
@@ -16,7 +25,16 @@
       "project_id": 771,
       "provider_id": 187,
       "created_at": "2022-05-13T06:46:50.470Z",
-      "updated_at": "2022-05-13T06:47:06.028Z"
+      "updated_at": "2022-05-13T06:47:06.028Z",
+      "provider": {
+        "id": 187,
+        "user_id": 0,
+        "name": "Mailtrap",
+        "space_key": "m_sp",
+        "api_key": "mailtrap51",
+        "created_at": "2022-05-18T02:58:52.108Z",
+        "updated_at": "2022-05-18T02:59:07.051Z"
+      }
     },
     {
       "id": 192,
@@ -25,7 +43,20 @@
       "project_id": 6224,
       "provider_id": 188,
       "created_at": "2022-05-13T06:46:50.470Z",
-      "updated_at": "2022-05-13T06:47:20.292Z"
+      "updated_at": "2022-05-13T06:47:20.292Z",
+      "provider": {
+        "id": 188,
+        "user_id": 0,
+        "name": "Trello",
+        "space_key": "t_sp",
+        "api_key": "trello666",
+        "created_at": "2022-05-18T02:58:52.108Z",
+        "updated_at": "2022-05-18T02:59:20.735Z"
+      }
     }
-  ]
+  ],
+  "logoutPayload": {
+    "email": "john.doe@company.com",
+    "token_id": "eyJhbGciO"
+  }
 }

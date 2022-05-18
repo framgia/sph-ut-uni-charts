@@ -121,8 +121,8 @@ const Home = () => {
                       {project.name}
                     </Link>
                   </td>
+                  <td>{project.provider.name}</td>
                   <td>{project.id}</td>
-                  <td>{project.memberCount}</td>
                 </tr>
               )
             })}

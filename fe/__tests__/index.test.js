@@ -4,48 +4,73 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
 import userEvent from '@testing-library/user-event'
 import MockAdapter from 'axios-mock-adapter'
+import mockRouter from 'next-router-mock'
 
 import Home from '@/src/pages'
 import testData from './constants/testData.json'
+import Router from 'next/router'
+import Cookies from 'js-cookie'
+import { logout } from '@/src/api/authApi'
 
 const mockAxios = new MockAdapter(axios)
 const URL = process.env.NEXT_PUBLIC_BFF_API
 
-jest.mock('next/router', () => {
-  return {
-    route: '/',
-    pathname: '',
-    query: {
-      provider: '',
-      searchProvider: '',
-    },
-    asPath: '',
-    push: jest.fn(),
-    events: {
-      on: jest.fn(),
-      off: jest.fn(),
-    },
-    beforePopState: jest.fn(() => null),
-    prefetch: jest.fn(() => null),
-  }
-})
+jest.mock('next/router', () => require('next-router-mock'))
+jest.mock('@/src/api/authApi')
+jest.mock('js-cookie', () => ({
+  get: jest.fn(),
+  setMockImplementation: jest.fn(),
+  remove: jest.fn(),
+}))
 
 describe('When rendering home page', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl('/')
     mockAxios.onGet(`${URL}projects`).reply(200, testData.projects)
+
+    Cookies.get.mockReturnValueOnce(
+      JSON.stringify({
+        user_signed: {
+          email: 'joshua.escarilla@sun-asterisk.com',
+          google_id: '109434756611345923855',
+          token_id: 'eyJhbGciOiJSU',
+        },
+      })
+    )
   })
 
-  it('should render successfully when user is authenticated', async () => {
-    await act(async () => render(<Home />))
+  describe('when using logout function', () => {
+    let logoutButton, routerSpy
 
-    const hasHeading = screen.getByRole('heading', {
-      name: /welcome to uni chart/i,
+    beforeEach(async () => {
+      await act(async () => render(<Home />))
+
+      routerSpy = jest.spyOn(Router, 'push')
+      logoutButton = screen.getByRole('button', { name: /logout/i })
+      logout.mockImplementation(() => Promise.resolve())
     })
-    const hasLogoutButton = screen.getByRole('button', { name: /logout/i })
 
-    expect(hasHeading).toBeInTheDocument()
-    expect(hasLogoutButton).toBeInTheDocument()
+    it('should have logout button', () => {
+      expect(logoutButton).toBeInTheDocument()
+    })
+
+    it('should call the "logout" function after clicking', async () => {
+      await act(() => {
+        fireEvent.click(logoutButton)
+      })
+      expect(logout).toHaveBeenCalledTimes(1)
+    })
+    it('should clear the cookies after signing out', () => {
+      const cookieSpy = jest.spyOn(Cookies, 'remove')
+      expect(cookieSpy).toHaveBeenCalledTimes(1)
+      expect(cookieSpy).toHaveBeenCalledWith('user_signed')
+    })
+    it('should redirect to login after signing out', () => {
+      expect(routerSpy).toHaveBeenCalledTimes(1)
+      expect(routerSpy).toHaveBeenCalledWith('/login')
+    })
   })
+
   it('should render the table correctly', async () => {
     await act(async () => render(<Home />))
 
@@ -67,7 +92,7 @@ describe('When rendering home page', () => {
     expect(addProjectButton).toBeInTheDocument()
   })
 
-  describe('when using search functionality', () => {
+  describe('when using search function', () => {
     let searchField
 
     beforeEach(async () => {

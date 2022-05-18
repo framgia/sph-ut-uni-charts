@@ -24,7 +24,7 @@ describe('When calling getProjects function', () => {
     payload = testData.map(({ created_at, updated_at, ...rest }) => rest)
   })
 
-  describe('if fetching is successful', () => {
+  describe('when fetching projects is successful', () => {
     beforeEach(async () => {
       prismaMock.project.findMany.mockResolvedValue(testData)
 
@@ -46,7 +46,7 @@ describe('When calling getProjects function', () => {
     })
   })
 
-  describe('if fetches projects that has provider filter argument', () => {
+  describe('when fetching projects with provider filter argument', () => {
     beforeEach(async () => {
       prismaMock.project.findMany.mockResolvedValue([testData[0]])
 
@@ -69,7 +69,7 @@ describe('When calling getProjects function', () => {
     })
   })
 
-  describe('if fetches projects that has provider search argument', () => {
+  describe('when fetching projects with search argument', () => {
     beforeEach(async () => {
       prismaMock.project.findMany.mockResolvedValue(testData.filter((d, i) => i !== 1))
 

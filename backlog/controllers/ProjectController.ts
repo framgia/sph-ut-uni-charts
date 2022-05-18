@@ -20,7 +20,8 @@ export default class ProjectController {
               }
             }
           : {})
-      }
+      },
+      include: { provider: true }
     })
 
     if (searchProvider) {
