@@ -29,7 +29,7 @@ jest.mock('react-google-login', () => {
   return { GoogleLogin }
 })
 
-describe('when rendering login page', () => {
+describe('When rendering login page', () => {
   beforeEach(async () => {
     mockRouter.setCurrentUrl('/login')
   })

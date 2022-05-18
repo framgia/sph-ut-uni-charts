@@ -91,6 +91,7 @@ const Home = () => {
               data={providersSelectFieldValues}
               value={provider}
               onChange={providerOnChange}
+              key={provider}
             />
           </Group>
           <Button

@@ -39,13 +39,9 @@ export const getActiveSprintData = async (project_id, provider) => {
 export const getProjects = async (params) => {
   let data
 
-  await axios
-    .get(`${URL}projects`, {
-      params: params,
-    })
-    .then((response) => {
-      data = response.data
-    })
+  await axios.get(`${URL}projects`, { params }).then((response) => {
+    data = response.data
+  })
 
   return data
 }
