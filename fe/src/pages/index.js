@@ -113,10 +113,7 @@ const Home = () => {
           <tbody>
             {projects.map((project) => {
               return (
-                <tr
-                  key={`${project.name}_${project.provider}`}
-                  role='project-trow'
-                >
+                <tr key={project.id} role='project-trow'>
                   <td>
                     <Link href={`/project-detail/${project.id}`}>
                       {project.name}
