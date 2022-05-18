@@ -155,7 +155,7 @@ describe('When using getProviderById() function', () => {
     Controller = new ProviderController()
   })
 
-  describe('if ID is not a number', () => {
+  describe('when ID is not a number', () => {
     beforeEach(async () => {
       req.params = { id: 'as' }
       await Controller.getProviderById(req, res)
@@ -172,7 +172,7 @@ describe('When using getProviderById() function', () => {
     })
   })
 
-  describe('if ID does not exist', () => {
+  describe('when ID does not exist', () => {
     beforeEach(async () => {
       jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => null)
 
@@ -191,7 +191,7 @@ describe('When using getProviderById() function', () => {
     })
   })
 
-  describe('if ID exists', () => {
+  describe('when ID exists', () => {
     const mockedResponse = {
       id: 1,
       user_id: 1,
