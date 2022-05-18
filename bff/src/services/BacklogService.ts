@@ -6,7 +6,7 @@ const URL = process.env.BACKLOG_API_SERVICE
 export default class BacklogService {
   // PROJECTS ENDPOINT
 
-  async getProjects(params: any = undefined) {
+  async getProjects(params: any = {}) {
     let data
 
     await axios({
