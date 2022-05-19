@@ -93,6 +93,66 @@ describe('When calling getProjects function', () => {
   })
 })
 
+describe('When calling deleteProjectById function', () => {
+  describe('if ID does not exist', () => {
+    beforeEach(async () => {
+      prismaMock.project.findUnique.mockResolvedValueOnce(null)
+
+      req.params = { id: 1 }
+
+      const controller = new ProjectController()
+      await controller.deleteProjectById(req, res)
+    })
+
+    it('should return status of 200', () => {
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('should return expected response', () => {
+      const data = res._getData()
+      expect(JSON.stringify(data)).toBe(JSON.stringify({ message: 'ID does not exist' }))
+    })
+  })
+
+  describe('if ID is not a number', () => {
+    beforeEach(async () => {
+      req.params = { id: 'test' }
+
+      const controller = new ProjectController()
+      await controller.deleteProjectById(req, res)
+    })
+
+    it('should return status of 200', () => {
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('should return expected response', () => {
+      const data = res._getData()
+      expect(JSON.stringify(data)).toBe(JSON.stringify({ message: 'Invalid ID' }))
+    })
+  })
+
+  describe('if delete is successful', () => {
+    beforeEach(async () => {
+      prismaMock.project.findUnique.mockResolvedValueOnce(testData[0])
+      prismaMock.project.delete.mockResolvedValueOnce(testData[0])
+      req.params = { id: 1 }
+
+      const controller = new ProjectController()
+      await controller.deleteProjectById(req, res)
+    })
+
+    it('should return status of 200', () => {
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('should return expected response', () => {
+      const data = res._getData()
+      expect(JSON.stringify(data)).toBe(JSON.stringify(testData[0]))
+    })
+  })
+})
+
 // describe('Project Controller Test Suite', () => {
 //   // let project: any
 
@@ -214,33 +274,4 @@ describe('When calling getProjects function', () => {
 //   //   expect(data).toStrictEqual([])
 //   // })
 
-//   // test('Test #6: deleteProjectById - if ID does not exist orin the database', async () => {
-//   //   const request = httpMocks.createRequest({
-//   //     method: 'DELETE',
-//   //     url: '/:id',
-//   //     params: {
-//   //       id: '111111'
-//   //     }
-//   //   })
-
-//   //   const response = httpMocks.createResponse()
-//   //   await projectController.getProjectById(request, response)
-//   //   const data = response._getData()
-//   //   expect(data).toHaveProperty('message', 'No Data Found')
-//   // })
-
-//   // test('Test #7: deleteProjectById - invalid ID, it should be a number', async () => {
-//   //   const request = httpMocks.createRequest({
-//   //     method: 'DELETE',
-//   //     url: '/:id',
-//   //     params: {
-//   //       id: 'test'
-//   //     }
-//   //   })
-
-//   //   const response = httpMocks.createResponse()
-//   //   await projectController.deleteProjectById(request, response)
-//   //   const data = response._getData()
-//   //   expect(data).toHaveProperty('message','Invalid ID')
-//   // })
 // })
