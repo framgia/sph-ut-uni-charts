@@ -135,22 +135,73 @@ describe('When getProjectById', () => {
         }
       ])
     })
+  })
+})
 
-    it('should return error message if ID does not exist', async () => {
-      prismaMock.project.findUnique.mockResolvedValue(null)
-      req.params = {
-        id: '111111'
-      }
-      await Controller.deleteProjectById(req, res)
-      const data = res._getData()
-      expect(data).toHaveProperty('message', 'ID does not exist')
+describe('When calling deleteProjectById function', () => {
+  let req: Request
+  let res: TypedResponse
+
+  beforeEach(() => {
+    req = httpMocks.createRequest()
+    res = httpMocks.createResponse()
+  })
+
+  describe('if ID does not exist', () => {
+    beforeEach(async () => {
+      prismaMock.project.findUnique.mockResolvedValueOnce(null)
+
+      req.params = { id: 1 }
+
+      const controller = new ProjectController()
+      await controller.deleteProjectById(req, res)
     })
 
-    test('should return error message if id is not valid', async () => {
-      req.params = { id: 'test' }
-      await Controller.deleteProjectById(req, res)
+    it('should return status of 200', () => {
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('should return expected response', () => {
       const data = res._getData()
-      expect(data).toHaveProperty('message', 'Invalid ID')
+      expect(JSON.stringify(data)).toBe(JSON.stringify({ message: 'ID does not exist' }))
+    })
+  })
+
+  describe('if ID is not a number', () => {
+    beforeEach(async () => {
+      req.params = { id: 'test' }
+
+      const controller = new ProjectController()
+      await controller.deleteProjectById(req, res)
+    })
+
+    it('should return status of 200', () => {
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('should return expected response', () => {
+      const data = res._getData()
+      expect(JSON.stringify(data)).toBe(JSON.stringify({ message: 'Invalid ID' }))
+    })
+  })
+
+  describe('if delete is successful', () => {
+    beforeEach(async () => {
+      prismaMock.project.findUnique.mockResolvedValueOnce(testData[0])
+      prismaMock.project.delete.mockResolvedValueOnce(testData[0])
+      req.params = { id: 1 }
+
+      const controller = new ProjectController()
+      await controller.deleteProjectById(req, res)
+    })
+
+    it('should return status of 200', () => {
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('should return expected response', () => {
+      const data = res._getData()
+      expect(JSON.stringify(data)).toBe(JSON.stringify(testData[0]))
     })
   })
 })
