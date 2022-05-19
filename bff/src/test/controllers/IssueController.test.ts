@@ -1,21 +1,17 @@
 import { rest } from 'msw'
 import httpMocks from 'node-mocks-http'
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import { server } from '../../../jest.setup'
 
 import testData from '../constants/issueTestData.json'
 import IssueController from '../../controllers/IssueController'
+import { CustomTypedResponse } from '../../utils/interfaces'
 
 const issueController = new IssueController()
 
 describe('When using getIssues() function', () => {
-  interface TypedResponse extends Response {
-    statusCode: any
-    _getData: () => any
-  }
-
   let request: Request
-  let response: TypedResponse
+  let response: CustomTypedResponse
 
   beforeEach(() => {
     server.use(

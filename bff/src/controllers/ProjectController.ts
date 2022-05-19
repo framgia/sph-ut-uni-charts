@@ -28,7 +28,7 @@ export default class ProjectController {
   async deleteProjectById(req: Request, res: Response) {
     let response
 
-    switch (req.body.service) {
+    switch (req.query.service) {
       case 'backlog':
         const result = await backlogService.deleteProjectById(req.params.id)
         response = result

@@ -81,7 +81,7 @@ describe('When rendering home page', () => {
     expect(rows).toHaveLength(3)
 
     const columns = screen.getAllByRole('columnheader')
-    expect(columns).toHaveLength(3)
+    expect(columns).toHaveLength(4)
   })
   it('should have a button to add project', async () => {
     await act(async () => render(<Home />))
@@ -207,5 +207,13 @@ describe('When rendering home page', () => {
       const rows = await screen.findAllByRole('project-trow')
       expect(rows).toHaveLength(3)
     })
+  })
+
+  it('should have a delete button for each row', async () => {
+    await act(async () => render(<Home />))
+    const rows = await screen.findAllByRole('project-trow')
+
+    const deleteButtons = screen.queryAllByRole('button', { name: /delete/i })
+    expect(deleteButtons.length).toBe(rows.length)
   })
 })
