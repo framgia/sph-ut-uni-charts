@@ -34,6 +34,15 @@ const Home = () => {
     })
   }
 
+  const deleteSingleProject = async (id, provider) => {
+    const response = await deleteProject(id, provider)
+
+    if (!response.message) {
+      setProjects([])
+      fetchProjects()
+    }
+  }
+
   const providerOnChange = (provider) => {
     Router.push({
       pathname: '/',
@@ -127,7 +136,7 @@ const Home = () => {
                     <Button
                       color='red'
                       onClick={() => {
-                        deleteProject(
+                        deleteSingleProject(
                           project.id,
                           project.provider.name.toLowerCase()
                         )
