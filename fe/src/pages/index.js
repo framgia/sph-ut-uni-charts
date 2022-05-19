@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
+import Router from 'next/router'
 import {
   Button,
   Container,
@@ -11,10 +12,9 @@ import {
   Text,
   TextInput,
 } from '@mantine/core'
-import Router from 'next/router'
 
 import Navbar from '../components/molecules/Navbar'
-import { getProjects } from '@/src/services/bffService'
+import { deleteProject, getProjects } from '@/src/services/bffService'
 import { providersSelectFieldValues } from '@/src/utils/constants'
 import styles from '@/styles/index.module.css'
 
@@ -108,6 +108,7 @@ const Home = () => {
               <th>Name</th>
               <th>Provider</th>
               <th>Project ID</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -121,6 +122,20 @@ const Home = () => {
                   </td>
                   <td>{project.provider.name}</td>
                   <td>{project.id}</td>
+                  <td>{project.memberCount}</td>
+                  <td>
+                    <Button
+                      color='red'
+                      onClick={() => {
+                        deleteProject(
+                          project.id,
+                          project.provider.name.toLowerCase()
+                        )
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </td>
                 </tr>
               )
             })}

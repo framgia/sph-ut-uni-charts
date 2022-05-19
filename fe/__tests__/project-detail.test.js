@@ -4,6 +4,12 @@ import ProjectDetail from '@/src/pages/projects/ProjectDetail'
 import { developersList, sprintSelectFields } from '@/src/utils/dummyData'
 
 describe('Project Detail', () => {
+  beforeAll(() => {
+    jest.spyOn(require('next/router'), 'useRouter').mockImplementation(() => {
+      return { query: { id: 3 } }
+    })
+  })
+
   it('has page header', () => {
     render(<ProjectDetail />)
 
@@ -28,13 +34,15 @@ describe('Project Detail', () => {
     const burnDownChart = screen.getByRole('burn-down-chart')
     expect(burnDownChart).toBeInTheDocument()
 
-    const selectField = screen.getByRole('textbox', {
+    // temporarily commented out since it is commented out in the page
+    /*const selectField = screen.getByRole('textbox', {
       name: /selected sprint/i,
     })
-    expect(selectField).toBeInTheDocument()
+    expect(selectField).toBeInTheDocument()*/
   })
 
-  it('has a select field for the user to choose the sprint for burn down chart', async () => {
+  // temporarily commented out since it is commented out in the page
+  /*it('has a select field for the user to choose the sprint for burn down chart', async () => {
     render(<ProjectDetail />)
 
     const selectField = screen.getByRole('textbox', {
@@ -85,7 +93,7 @@ describe('Project Detail', () => {
 
     const burnUpChart = screen.getByRole('burn-up-chart')
     expect(burnUpChart).toBeInTheDocument()
-  })
+  })*/
 
   it('has developer list', () => {
     render(<ProjectDetail />)
