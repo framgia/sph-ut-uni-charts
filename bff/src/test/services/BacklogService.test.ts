@@ -34,7 +34,38 @@ describe('Backlog Service Test Suite', () => {
     if (!projects.length) expect(projects).toStrictEqual([])
     else expect(projects[0]).toHaveProperty('id')
   })
+})
 
+describe('When using getProjects() function', () => {
+  let project: any
+
+  describe('if there are projects in database', () => {
+    it('should return project details', async () => {
+      server.use(
+        rest.get('*/api/projects', (req, res, ctx) => {
+          return res(ctx.json(projectTestData.sampleProjectList))
+        })
+      )
+
+      project = await backlogService.getProjects()
+
+      expect(JSON.stringify(project)).toBe(JSON.stringify(projectTestData.sampleProjectList))
+    })
+  })
+
+  describe('if there are no projects in database', () => {
+    it('should return empty array', async () => {
+      server.use(
+        rest.get('*/api/projects', (req, res, ctx) => {
+          return res(ctx.json([]))
+        })
+      )
+
+      project = await backlogService.getProjects()
+
+      expect(JSON.stringify(project)).toBe(JSON.stringify([]))
+    })
+  })
 })
 
 describe('When using deleteProjectById() function', () => {
@@ -58,7 +89,7 @@ describe('When using deleteProjectById() function', () => {
     beforeEach(async () => {
       server.use(
         rest.delete('*/api/projects/*', (req, res, ctx) => {
-          return res(ctx.status(404), ctx.json({ message: "ID does not exist" }))
+          return res(ctx.status(404), ctx.json({ message: 'ID does not exist' }))
         })
       )
 
@@ -71,7 +102,7 @@ describe('When using deleteProjectById() function', () => {
 
     it('should return the error messages', () => {
       expect(project).toHaveProperty('errors')
-      expect(JSON.stringify(project.errors)).toBe(JSON.stringify({ message: "ID does not exist" }))
+      expect(JSON.stringify(project.errors)).toBe(JSON.stringify({ message: 'ID does not exist' }))
     })
   })
 
@@ -79,7 +110,7 @@ describe('When using deleteProjectById() function', () => {
     beforeEach(async () => {
       server.use(
         rest.delete('*/api/projects/*', (req, res, ctx) => {
-          return res(ctx.status(400), ctx.json({ message: "Invalid ID" }))
+          return res(ctx.status(400), ctx.json({ message: 'Invalid ID' }))
         })
       )
 
@@ -92,7 +123,7 @@ describe('When using deleteProjectById() function', () => {
 
     it('should return the error messages', () => {
       expect(project).toHaveProperty('errors')
-      expect(JSON.stringify(project.errors)).toBe(JSON.stringify({ message: "Invalid ID" }))
+      expect(JSON.stringify(project.errors)).toBe(JSON.stringify({ message: 'Invalid ID' }))
     })
   })
 })

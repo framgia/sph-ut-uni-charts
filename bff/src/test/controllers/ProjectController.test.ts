@@ -5,7 +5,7 @@ import httpMocks from 'node-mocks-http'
 import BacklogService from '../../services/BacklogService'
 import { server } from '../../../jest.setup'
 import { CustomTypedResponse } from '../../utils/interfaces'
-import testData from '../constants/projectTestData.json'
+import projectTestData from '../constants/projectTestData.json'
 
 const backlogService = new BacklogService()
 const projectController = new ProjectController()
@@ -70,18 +70,66 @@ describe('Project Controller Test Suite', () => {
     const data = response._getData()
     expect(data).toHaveProperty('message', 'Invalid ID')
   })
+})
 
-  test('Test #4: getProjects - either array of objects or empty array', async () => {
-    const request = httpMocks.createRequest({
-      method: 'GET',
-      url: '/projects'
+describe('When calling getProjects function', () => {
+  let request: Request
+  let response: CustomTypedResponse
+
+  describe('if there are projects in database', () => {
+    beforeEach(async () => {
+      server.use(
+        rest.get('*/api/projects', (req, res, ctx) => {
+          return res(ctx.status(200), ctx.json(projectTestData.sampleProjectList))
+        })
+      )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects'
+      })
+      request.query = { service: 'backlog' }
+      response = httpMocks.createResponse()
+
+      await projectController.getProjects(request, response)
     })
 
-    const response = httpMocks.createResponse()
-    await projectController.getProjects(request, response)
-    const data = response._getData()
-    if (!data.length) expect(data).toStrictEqual([])
-    else expect(data[0]).toHaveProperty('id')
+    it('should return status of 200', () => {
+      expect(response.statusCode).toBe(200)
+    })
+
+    it('should return the list of projects', () => {
+      const data = response._getData()
+      expect(JSON.stringify(data)).toBe(JSON.stringify(projectTestData.sampleProjectList))
+    })
+  })
+
+  describe('if there are no projects in database', () => {
+    beforeEach(async () => {
+      server.use(
+        rest.get('*/api/projects', (req, res, ctx) => {
+          return res(ctx.status(200), ctx.json([]))
+        })
+      )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects'
+      })
+      request.query = { service: 'backlog' }
+      response = httpMocks.createResponse()
+
+      await projectController.getProjects(request, response)
+    })
+
+    it('should return status of 200', () => {
+      expect(response.statusCode).toBe(200)
+    })
+
+    it('should return empty list', () => {
+      const data = response._getData()
+      expect(JSON.stringify(data)).toBe(JSON.stringify([]))
+    })
   })
 })
 
@@ -143,7 +191,7 @@ describe('When calling deleteProjectById() function', () => {
     beforeEach(async () => {
       server.use(
         rest.delete('*/api/projects/:id', (req, res, ctx) => {
-          return res(ctx.status(200), ctx.json(testData.sampleProject))
+          return res(ctx.status(200), ctx.json(projectTestData.sampleProject))
         })
       )
 
@@ -159,7 +207,7 @@ describe('When calling deleteProjectById() function', () => {
     it('should return deleted project details', () => {
       const data = response._getData()
 
-      expect(JSON.stringify(data)).toBe(JSON.stringify(testData.sampleProject))
+      expect(JSON.stringify(data)).toBe(JSON.stringify(projectTestData.sampleProject))
     })
   })
 })
