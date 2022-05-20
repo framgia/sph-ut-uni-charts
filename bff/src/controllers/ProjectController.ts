@@ -34,10 +34,14 @@ export default class ProjectController {
         response = result
         break
       default:
-        response = { message: 'Service information is not provided.' }
+        response = { status: 400, errors: { message: 'Service information is not provided.' } }
     }
 
-    res.send(response)
+    if (response?.errors) {
+      res.status(response.status).json(response.errors)
+    } else {
+      res.send(response)
+    }
   }
 
   async getActiveSprintData(req: Request, res: Response) {
