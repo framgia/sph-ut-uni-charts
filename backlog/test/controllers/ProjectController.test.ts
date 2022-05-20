@@ -104,12 +104,12 @@ describe('When calling deleteProjectById function', () => {
       await controller.deleteProjectById(req, res)
     })
 
-    it('should return status of 200', () => {
-      expect(res.statusCode).toBe(200)
+    it('should return status of 404', () => {
+      expect(res.statusCode).toBe(404)
     })
 
     it('should return expected response', () => {
-      const data = res._getData()
+      const data = res._getJSONData()
       expect(JSON.stringify(data)).toBe(JSON.stringify({ message: 'ID does not exist' }))
     })
   })
@@ -122,12 +122,12 @@ describe('When calling deleteProjectById function', () => {
       await controller.deleteProjectById(req, res)
     })
 
-    it('should return status of 200', () => {
-      expect(res.statusCode).toBe(200)
+    it('should return status of 400', () => {
+      expect(res.statusCode).toBe(400)
     })
 
     it('should return expected response', () => {
-      const data = res._getData()
+      const data = res._getJSONData()
       expect(JSON.stringify(data)).toBe(JSON.stringify({ message: 'Invalid ID' }))
     })
   })

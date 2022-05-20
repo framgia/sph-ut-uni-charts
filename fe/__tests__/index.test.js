@@ -11,6 +11,7 @@ import testData from './constants/testData.json'
 import Router from 'next/router'
 import Cookies from 'js-cookie'
 import { logout } from '@/src/api/authApi'
+import * as bffService from '@/src/services/bffService'
 
 const mockAxios = new MockAdapter(axios)
 const URL = process.env.NEXT_PUBLIC_BFF_API
@@ -27,6 +28,9 @@ describe('When rendering home page', () => {
   beforeEach(() => {
     mockRouter.setCurrentUrl('/')
     mockAxios.onGet(`${URL}projects`).reply(200, testData.projects)
+    mockAxios
+      .onDelete(`${URL}projects/190?service=backlog`)
+      .reply(200, testData.projects[0])
 
     Cookies.get.mockReturnValueOnce(
       JSON.stringify({
@@ -169,10 +173,55 @@ describe('When rendering home page', () => {
     })
   })
 
+  describe('when using delete function', () => {
+    let rows, deleteButtons, deleteProjectSpy, getProjectsSpy
+    const projectData = testData.projects[0]
+
+    beforeEach(async () => {
+      console.log('delete')
+      await act(async () => render(<Home />))
+      rows = await screen.findAllByRole('project-trow')
+
+      deleteButtons = screen.queryAllByRole('button', { name: /delete/i })
+
+      deleteProjectSpy = jest.spyOn(bffService, 'deleteProject')
+      getProjectsSpy = jest.spyOn(bffService, 'getProjects')
+
+      userEvent.click(deleteButtons[0])
+    })
+
+    afterEach(() => {
+      deleteProjectSpy.mockClear()
+      getProjectsSpy.mockClear()
+    })
+
+    afterAll(() => {
+      deleteProjectSpy.mockRestore()
+      getProjectsSpy.mockRestore()
+    })
+
+    it('should have a delete button for each row', () => {
+      expect(deleteButtons.length).toBe(rows.length)
+    })
+
+    it('should call the deleteProject service', async () => {
+      expect(deleteProjectSpy).toHaveBeenCalledTimes(1)
+      expect(deleteProjectSpy).toHaveBeenCalledWith(
+        projectData.id,
+        projectData.provider.name.toLowerCase()
+      )
+    })
+
+    it('should call the getProjects service', async () => {
+      expect(getProjectsSpy).toHaveBeenCalledTimes(2)
+    })
+  })
+
   describe('when using reset function', () => {
     let selectField, resetButton, inputField
 
     beforeEach(async () => {
+      console.log('reset')
       mockAxios.onGet(`${URL}projects`).reply(200, testData.projects)
 
       await act(async () => render(<Home />))
@@ -207,13 +256,5 @@ describe('When rendering home page', () => {
       const rows = await screen.findAllByRole('project-trow')
       expect(rows).toHaveLength(3)
     })
-  })
-
-  it('should have a delete button for each row', async () => {
-    await act(async () => render(<Home />))
-    const rows = await screen.findAllByRole('project-trow')
-
-    const deleteButtons = screen.queryAllByRole('button', { name: /delete/i })
-    expect(deleteButtons.length).toBe(rows.length)
   })
 })

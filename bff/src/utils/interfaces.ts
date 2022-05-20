@@ -41,4 +41,5 @@ export interface MilestonesInterface {
 export interface CustomTypedResponse extends Response {
   statusCode: any
   _getData: () => any
+  _getJSONData: () => any
 }
