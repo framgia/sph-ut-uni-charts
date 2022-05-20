@@ -72,4 +72,4 @@ class Provider {
   }
 }
 
-module.exports = Provider
+export default Provider

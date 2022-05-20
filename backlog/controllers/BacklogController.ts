@@ -1,7 +1,8 @@
 import BacklogService from '../services/BacklogService'
 import { Context } from '../utils/context'
 import { PrismaClient } from '@prisma/client'
-const Provider = require('../models/Provider')
+// const Provider = require('../models/Provider')
+import Provider from '../models/Provider'
 import { Request, Response } from 'express'
 
 let ctx: Context = { prisma: new PrismaClient() }
@@ -11,8 +12,8 @@ class BacklogController {
   public async getList(req: Request, res: Response) {
     let payload = req.query
     if (req.query.providerId) {
-      const { api_key } = await ProviderModel.getProviderById(Number(req.query.providerId), ctx)
-      payload = { apiKey: api_key }
+      const provider = await ProviderModel.getProviderById(Number(req.query.providerId), ctx)
+      payload = { apiKey: provider?.api_key }
     }
     try {
       const result = await Service.getProjects(payload)

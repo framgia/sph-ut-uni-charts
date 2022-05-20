@@ -1,4 +1,4 @@
-const Provider = require('../../models/Provider')
+import Provider from '../../models/Provider'
 import { MockContext, Context, createMockContext } from '../../utils/context'
 
 let mockCtx: MockContext
@@ -82,6 +82,7 @@ describe('Provider Model', () => {
   })
 
   test('Test #3: Should return Porject Object - Project is registered', async () => {
+    /* @ts-ignore */
     mockCtx.prisma.project.findMany.mockResolvedValue(project)
     const res = await Model.isProjectRegistered(project, ctx)
     expect(res[0]).toEqual({

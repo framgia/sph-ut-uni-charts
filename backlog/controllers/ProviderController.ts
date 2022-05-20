@@ -1,16 +1,22 @@
-const Provider = require('../models/Provider')
-const Validation = require('../validations/ProviderValidation')
+import Provider from '../models/Provider'
+import Validation from '../validations/ProviderValidation'
 import BacklogService from '../services/BacklogService'
-import Controller from './Controller'
+// import Controller from './Controller'
 import { Context } from '../utils/context'
 import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 
 const Service = new BacklogService()
 const ProviderModel = new Provider()
-let ctx: Context = { prisma: new PrismaClient() }
+// let ctx: Context = { prisma: new PrismaClient() }
 
-class ProviderController extends Controller {
+class ProviderController {
+  ctx: Context
+
+  constructor(ctx = { prisma: new PrismaClient() }) {
+    this.ctx = ctx
+  }
+
   public async add(req: Request, res: Response) {
     let payload = req.body
 
@@ -18,8 +24,7 @@ class ProviderController extends Controller {
     if (errors) return res.status(422).send(errors)
 
     if (payload.id) {
-      const provider = await ProviderModel.getProviderById(Number(payload.id), ctx)
-      console.log({ provider })
+      const provider = await ProviderModel.getProviderById(Number(payload.id), this.ctx)
       payload = { ...payload, ...provider }
     }
 
@@ -34,14 +39,14 @@ class ProviderController extends Controller {
     })
     payload = { ...payload, project_key: project.data.projectKey, project_name: project.data.name }
 
-    const hasProjectRegistered = await ProviderModel.isProjectRegistered(payload, ctx)
+    const hasProjectRegistered = await ProviderModel.isProjectRegistered(payload, this.ctx)
 
     if (hasProjectRegistered.length)
       return res
         .status(400)
         .send([{ message: `You already registered this project: ${payload.project_name}` }])
 
-    const provider = await ProviderModel.add(payload, ctx)
+    const provider = await ProviderModel.add(payload, this.ctx)
 
     return res.send(provider)
   }
@@ -50,7 +55,7 @@ class ProviderController extends Controller {
     const errors = Validation.getList(req.query)
     if (errors) return res.status(422).send(errors)
 
-    const providers = await ProviderModel.getProviders(Number(req.query.user_id), ctx)
+    const providers = await ProviderModel.getProviders(Number(req.query.user_id), this.ctx)
     return res.send(providers)
   }
 
@@ -58,7 +63,7 @@ class ProviderController extends Controller {
     if (/[^0-9]/.test(req.params.id)) {
       res.status(400).json({ message: 'Invalid ID' })
     } else {
-      const provider = await ProviderModel.getProviderById(Number(req.params.id), ctx)
+      const provider = await ProviderModel.getProviderById(Number(req.params.id), this.ctx)
 
       if (!provider) {
         res.status(404).json({ message: 'No Provider Found' })

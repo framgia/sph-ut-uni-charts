@@ -1,5 +1,5 @@
+// @ts-nocheck
 var validator = require('node-validator')
-
 class ProviderValidation {
   static add = (data) => {
     let validationErrors
@@ -32,4 +32,4 @@ class ProviderValidation {
   }
 }
 
-module.exports = ProviderValidation
+export default ProviderValidation
