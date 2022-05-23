@@ -2,16 +2,12 @@ require('dotenv').config()
 import BacklogController from '../../controllers/BacklogController'
 import httpMocks from 'node-mocks-http'
 import { prismaMock } from '../../utils/singleton'
-import { Request, Response } from 'express'
+import { Request } from 'express'
+import { TypedResponse } from 'test/interfaces/response'
 const axios = require('axios')
 const MockAdapter = require('axios-mock-adapter')
 
 describe('When getting project list from external backlog api', () => {
-  interface TypedResponse extends Response {
-    statusCode: any
-    _getData: () => any
-  }
-
   let req: Request
   let res: TypedResponse
   let Controller: any

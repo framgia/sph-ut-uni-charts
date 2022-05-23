@@ -4,15 +4,11 @@ import ProjectController from '../../controllers/ProjectController'
 import { Request, Response } from 'express'
 import { prismaMock } from '../../utils/singleton'
 import { IProjectData } from 'models/interfaces/Project'
-import { testData } from '../const/project'
-import { mockedProjectResponse } from '../const/project'
+import { testData, mockedProjectResponse } from '../const/project'
+import { Request } from 'express'
+import { TypedResponse } from '../interfaces/response'
 
 describe('When getProjectById', () => {
-  interface TypedResponse extends Response {
-    statusCode: any
-    _getData: () => any
-  }
-
   let req: Request
   let res: TypedResponse
   let Controller: any

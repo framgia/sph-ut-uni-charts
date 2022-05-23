@@ -1,7 +1,8 @@
 require('dotenv').config()
 import ProviderController from '../../controllers/ProviderController'
 import httpMocks from 'node-mocks-http'
-import { Request, Response } from 'express'
+import { Request } from 'express'
+import { TypedResponse } from '../interfaces/response'
 import Provider from '../../models/Provider'
 import { prismaMock } from '../../utils/singleton'
 import { mockedProviderResponse, mockedProjectResponse, addProjPayload } from '../const/project'
@@ -9,11 +10,6 @@ const axios = require('axios')
 const MockAdapter = require('axios-mock-adapter')
 
 describe('When adding providers', () => {
-  interface TypedResponse extends Response {
-    statusCode: any
-    _getData: () => any
-  }
-
   let req: Request
   let res: TypedResponse
   let Controller: any
@@ -87,11 +83,6 @@ describe('When adding providers', () => {
 })
 
 describe('When getting list of providers', () => {
-  interface TypedResponse extends Response {
-    statusCode: any
-    _getData: () => any
-  }
-
   let req: Request
   let Controller: any
   let res: TypedResponse
@@ -137,11 +128,6 @@ describe('When getting list of providers', () => {
 })
 
 describe('When using getProviderById() function', () => {
-  interface TypedResponse extends Response {
-    statusCode: any
-    _getData: () => any
-  }
-
   let req: Request
   let Controller: any
   let res: TypedResponse
