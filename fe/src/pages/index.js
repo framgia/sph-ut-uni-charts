@@ -142,7 +142,6 @@ const Home = () => {
                   </td>
                   <td>{project.provider.name}</td>
                   <td>{project.id}</td>
-                  <td>{project.memberCount}</td>
                   <td>
                     <Button
                       color='red'
