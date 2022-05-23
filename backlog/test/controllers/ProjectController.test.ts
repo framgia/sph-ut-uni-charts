@@ -5,6 +5,7 @@ import { Request, Response } from 'express'
 import { prismaMock } from '../../utils/singleton'
 import { IProjectData } from 'models/interfaces/Project'
 import { testData } from '../const/project'
+import { mockedProjectResponse } from '../const/project'
 
 describe('When getProjectById', () => {
   interface TypedResponse extends Response {
@@ -15,16 +16,6 @@ describe('When getProjectById', () => {
   let req: Request
   let res: TypedResponse
   let Controller: any
-
-  const mockedProjectResponse = {
-    id: 999,
-    name: 'Backlog',
-    key: 'UNI-CHART',
-    project_id: 99846,
-    provider_id: 1,
-    created_at: new Date(),
-    updated_at: new Date()
-  }
 
   beforeEach(() => {
     req = httpMocks.createRequest()
@@ -140,9 +131,9 @@ describe('When getProjectById', () => {
       const data = res._getJSONData()
       expect(data).toMatchObject([
         {
-          id: 999,
-          name: 'Backlog',
-          key: 'UNI-CHART',
+          id: 1,
+          key: 'unichart-key',
+          name: 'project_name',
           project_id: 99846,
           provider_id: 1
         }

@@ -4,55 +4,9 @@ import httpMocks from 'node-mocks-http'
 import { Request, Response } from 'express'
 import Provider from '../../models/Provider'
 import { prismaMock } from '../../utils/singleton'
+import { mockedProviderResponse, mockedProjectResponse, addProjPayload } from '../const/project'
 const axios = require('axios')
 const MockAdapter = require('axios-mock-adapter')
-
-const mockedProviderResponse = {
-  id: 1,
-  user_id: 1,
-  name: 'Backlog',
-  space_key: 'UNI-CHART',
-  api_key: 'apikey1234567890',
-  created_at: new Date(),
-  updated_at: new Date(),
-  projects: [
-    {
-      id: 1,
-      name: 'project_name',
-      key: 'unichart-key',
-      project_id: 99846,
-      provider_id: 1,
-      created_at: new Date(),
-      updated_at: new Date()
-    }
-  ]
-}
-
-const mockedProjectResponse = {
-  id: 1,
-  name: 'project_name',
-  key: 'unichart-key',
-  project_id: 99846,
-  provider_id: 1,
-  created_at: new Date(),
-  updated_at: new Date(),
-  provider: {
-    id: 1,
-    user_id: 1,
-    name: 'Backlog',
-    space_key: 'UNI-CHART',
-    api_key: 'apikey1234567890',
-    created_at: new Date(),
-    updated_at: new Date()
-  }
-}
-
-const payload = {
-  user_id: 1,
-  name: 'Backlog',
-  api_key: 'apikey1234567890',
-  project_id: 123
-}
 
 describe('When adding providers', () => {
   interface TypedResponse extends Response {
@@ -70,13 +24,15 @@ describe('When adding providers', () => {
     req = httpMocks.createRequest()
     res = httpMocks.createResponse()
     Controller = new ProviderController()
-    mockAxios.onGet('/api/v2/space', { params: { apiKey: payload.api_key } }).reply(200, {
+    mockAxios.onGet('/api/v2/space', { params: { apiKey: addProjPayload.api_key } }).reply(200, {
       spaceKey: 'UNI-CHART',
       name: 'Project Name',
       ownerId: 1
     })
     mockAxios
-      .onGet(`/api/v2/projects/${payload.project_id}`, { params: { apiKey: payload.api_key } })
+      .onGet(`/api/v2/projects/${addProjPayload.project_id}`, {
+        params: { apiKey: addProjPayload.api_key }
+      })
       .reply(200, {
         id: 1,
         projectKey: 'unichart-key',
@@ -88,7 +44,7 @@ describe('When adding providers', () => {
     prismaMock.project.findMany.mockResolvedValue([])
     prismaMock.provider.upsert.mockResolvedValue(mockedProviderResponse)
 
-    req.body = payload
+    req.body = addProjPayload
     await Controller.add(req, res)
     expect(res.statusCode).toEqual(200)
     expect(res._getData()).toMatchObject({
@@ -103,7 +59,7 @@ describe('When adding providers', () => {
   it('should throw an error if Project already registered', async () => {
     prismaMock.project.findMany.mockResolvedValue([mockedProjectResponse])
 
-    req.body = payload
+    req.body = addProjPayload
     await Controller.add(req, res)
     expect(res.statusCode).toEqual(400)
     expect(res._getData()).toMatchObject([
@@ -168,7 +124,7 @@ describe('When getting list of providers', () => {
   it('should return array of objects after adding some data', async () => {
     prismaMock.project.findMany.mockResolvedValue([])
     prismaMock.provider.upsert.mockResolvedValue(mockedProviderResponse)
-    req.body = payload
+    req.body = addProjPayload
     await Controller.add(req, res)
 
     const data = res._getData()

@@ -1,47 +1,8 @@
 import Provider from '../../models/Provider'
 import { prismaMock } from '../../utils/singleton'
+import { mockedProviderResponse, mockedProjectResponse } from '../const/project'
 
 let Model: any
-
-const provider = {
-  id: 1,
-  user_id: 1,
-  name: 'backlog',
-  space_key: 'UNI-CHART',
-  api_key: 'apikey1234567890',
-  created_at: new Date(),
-  updated_at: new Date(),
-  projects: {
-    id: 1001,
-    name: 'project_name',
-    key: 'unichart-key',
-    project_id: 101,
-    provider_id: 1,
-    created_at: new Date(),
-    updated_at: new Date()
-  }
-}
-
-const project = [
-  {
-    id: 1001,
-    name: 'project_name',
-    key: 'unichart-key',
-    project_id: 101,
-    provider_id: 1,
-    created_at: new Date(),
-    updated_at: new Date(),
-    provider: {
-      id: 1,
-      user_id: 1,
-      name: 'backlog',
-      space_key: 'UNI-CHART',
-      api_key: 'apikey1234567890',
-      created_at: new Date(),
-      updated_at: new Date()
-    }
-  }
-]
 
 beforeEach(() => {
   Model = new Provider()
@@ -50,29 +11,25 @@ beforeEach(() => {
 describe('When calling provider model "isProjectRegistered" method', () => {
   it('should return empty array if no project from db', async () => {
     prismaMock.project.findMany.mockResolvedValue([])
-    const res = await Model.isProjectRegistered(provider)
+    const res = await Model.isProjectRegistered(mockedProviderResponse)
     expect(res).toMatchObject([])
   })
 
   it('should return Project Object', async () => {
-    prismaMock.project.findMany.mockResolvedValue(project)
-    const res = await Model.isProjectRegistered(project)
-    expect(res[0]).toEqual({
-      id: 1001,
+    prismaMock.project.findMany.mockResolvedValue([mockedProjectResponse])
+    const res = await Model.isProjectRegistered(mockedProjectResponse)
+    expect(res[0]).toMatchObject({
+      id: 1,
       name: 'project_name',
       key: 'unichart-key',
-      project_id: 101,
+      project_id: 99846,
       provider_id: 1,
-      created_at: project[0].created_at,
-      updated_at: project[0].updated_at,
       provider: {
         id: 1,
         user_id: 1,
-        name: 'backlog',
+        name: 'Backlog',
         space_key: 'UNI-CHART',
-        api_key: 'apikey1234567890',
-        created_at: project[0].created_at,
-        updated_at: project[0].updated_at
+        api_key: 'apikey1234567890'
       }
     })
   })
@@ -80,26 +37,10 @@ describe('When calling provider model "isProjectRegistered" method', () => {
 
 describe('When calling provider model "add" method', () => {
   it('should return "Provider with Project" if data is valid', async () => {
-    prismaMock.provider.upsert.mockResolvedValue(provider)
-    const res = await Model.add(provider)
-    expect(res).toEqual({
-      id: 1,
-      user_id: 1,
-      name: 'backlog',
-      space_key: 'UNI-CHART',
-      api_key: 'apikey1234567890',
-      created_at: provider.created_at,
-      updated_at: provider.updated_at,
-      projects: {
-        id: 1001,
-        name: 'project_name',
-        key: 'unichart-key',
-        project_id: 101,
-        provider_id: 1,
-        created_at: provider.created_at,
-        updated_at: provider.updated_at
-      }
-    })
+    prismaMock.provider.upsert.mockResolvedValue(mockedProviderResponse)
+    const res = await Model.add(mockedProviderResponse)
+
+    expect(res).toMatchObject(mockedProviderResponse)
   })
 })
 
@@ -111,9 +52,9 @@ describe('When calling provider model "getProviders" method', () => {
   })
 
   it('should return Array of objects if it has data from DB', async () => {
-    prismaMock.provider.upsert.mockResolvedValue(provider)
-    const data = await Model.add(provider)
-    prismaMock.provider.findMany.mockResolvedValue([provider])
+    prismaMock.provider.upsert.mockResolvedValue(mockedProviderResponse)
+    const data = await Model.add(mockedProviderResponse)
+    prismaMock.provider.findMany.mockResolvedValue([mockedProviderResponse])
     const response = await Model.getProviders(data.user_id)
     expect.arrayContaining(response)
   })
@@ -126,9 +67,9 @@ describe('When calling provider model "getProviderById" method', () => {
   })
 
   it('should return an object if it has data in DB', async () => {
-    prismaMock.provider.upsert.mockResolvedValue(provider)
-    const data = await Model.add(provider)
-    prismaMock.provider.findUnique.mockResolvedValue(provider)
+    prismaMock.provider.upsert.mockResolvedValue(mockedProviderResponse)
+    const data = await Model.add(mockedProviderResponse)
+    prismaMock.provider.findUnique.mockResolvedValue(mockedProviderResponse)
     const response = await Model.getProviderById(data.id)
     expect(response).toMatchObject(data)
   })

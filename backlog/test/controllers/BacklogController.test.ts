@@ -29,8 +29,6 @@ describe('When getting project list from external backlog api', () => {
     req.query = payload
     await Controller.getList(req, res)
 
-    console.log({ test: res._getData() })
-
     expect(res.statusCode).toEqual(404)
   })
 
