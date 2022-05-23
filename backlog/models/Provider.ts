@@ -1,10 +1,10 @@
 // @ts-nocheck
+import prisma from '../utils/client'
 import { ProviderAdd } from './interfaces/Provider'
-import { Context } from '../utils/context'
 
 class Provider {
-  public async isProjectRegistered(data: ProviderAdd, ctx: Context) {
-    return await ctx.prisma.project.findMany({
+  public async isProjectRegistered(data: ProviderAdd) {
+    return await prisma.project.findMany({
       where: {
         project_id: data.project_id,
         provider: { user_id: data.user_id }
@@ -12,10 +12,10 @@ class Provider {
     })
   }
 
-  public async add(data: ProviderAdd, ctx: Context) {
+  public async add(data: ProviderAdd) {
     const { project_name, project_key, project_id, user_id, api_key, name, space_key } = data
 
-    return await ctx.prisma.provider.upsert({
+    return await prisma.provider.upsert({
       where: {
         user_id_api_key: {
           user_id,
@@ -47,8 +47,8 @@ class Provider {
     })
   }
 
-  public async getProviders(user_id: number, ctx: Context) {
-    return await ctx.prisma.provider.findMany({
+  public async getProviders(user_id: number) {
+    return await prisma.provider.findMany({
       where: {
         user_id
       },
@@ -60,8 +60,8 @@ class Provider {
     })
   }
 
-  public async getProviderById(id: number, ctx: Context) {
-    return await ctx.prisma.provider.findUnique({
+  public async getProviderById(id: number) {
+    return await prisma.provider.findUnique({
       where: {
         id: id
       },
@@ -72,4 +72,4 @@ class Provider {
   }
 }
 
-module.exports = Provider
+export default Provider

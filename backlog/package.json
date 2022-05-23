@@ -24,7 +24,7 @@
     "@types/node-validator": "^0.0.30",
     "@types/prettier": "^2.6.0",
     "@types/supertest": "^2.0.12",
-    "axios": "^0.27.1",
+    "axios": "^0.27.2",
     "axios-mock-adapter": "^1.20.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",

@@ -1,79 +1,66 @@
 require('dotenv').config()
 import ProviderController from '../../controllers/ProviderController'
 import httpMocks from 'node-mocks-http'
-import { Request, Response } from 'express'
-import { faker } from '@faker-js/faker'
-const Provider = require('../../models/Provider')
+import { Request } from 'express'
+import { TypedResponse } from '../interfaces/response'
+import Provider from '../../models/Provider'
+import { prismaMock } from '../../utils/singleton'
+import { mockedProviderResponse, mockedProjectResponse, addProjPayload } from '../const/project'
 const axios = require('axios')
 const MockAdapter = require('axios-mock-adapter')
 
 describe('When adding providers', () => {
-  interface TypedResponse extends Response {
-    statusCode: any
-    _getData: () => any
-  }
-
   let req: Request
-  let Controller: any
   let res: TypedResponse
+  let Controller: any
 
   const mockAxios = new MockAdapter(axios)
-
-  const payload = {
-    user_id: 1,
-    name: 'Backlog',
-    api_key: '123apikey123',
-    project_id: faker.datatype.number()
-  }
-
-  const payload2 = {
-    user_id: 1,
-    name: 'Backlog',
-    api_key: '123apikey123',
-    project_id: faker.datatype.number()
-  }
 
   beforeEach(() => {
     req = httpMocks.createRequest()
     res = httpMocks.createResponse()
     Controller = new ProviderController()
-    mockAxios.onGet('/api/v2/space', { params: { apiKey: payload.api_key } }).reply(200, {
-      spaceKey: 'nulab',
-      name: 'Nulab Inc.',
+    mockAxios.onGet('/api/v2/space', { params: { apiKey: addProjPayload.api_key } }).reply(200, {
+      spaceKey: 'UNI-CHART',
+      name: 'Project Name',
       ownerId: 1
     })
     mockAxios
-      .onGet(`/api/v2/projects/${payload.project_id}`, { params: { apiKey: payload.api_key } })
-      .reply(200, {
-        id: 1,
-        projectKey: 'TEST',
-        name: 'test'
+      .onGet(`/api/v2/projects/${addProjPayload.project_id}`, {
+        params: { apiKey: addProjPayload.api_key }
       })
-    mockAxios
-      .onGet(`/api/v2/projects/${payload2.project_id}`, { params: { apiKey: payload.api_key } })
       .reply(200, {
         id: 1,
-        projectKey: 'TEST',
-        name: 'test'
+        projectKey: 'unichart-key',
+        name: 'project_name'
       })
   })
 
   it('should insert provider successfully', async () => {
-    req.body = payload
+    prismaMock.project.findMany.mockResolvedValue([])
+    prismaMock.provider.upsert.mockResolvedValue(mockedProviderResponse)
+
+    req.body = addProjPayload
     await Controller.add(req, res)
     expect(res.statusCode).toEqual(200)
     expect(res._getData()).toMatchObject({
+      id: 1,
       user_id: 1,
       name: 'Backlog',
-      space_key: 'nulab',
-      api_key: '123apikey123'
+      space_key: 'UNI-CHART',
+      api_key: 'apikey1234567890'
     })
   })
 
   it('should throw an error if Project already registered', async () => {
-    req.body = payload
+    prismaMock.project.findMany.mockResolvedValue([mockedProjectResponse])
+
+    req.body = addProjPayload
     await Controller.add(req, res)
     expect(res.statusCode).toEqual(400)
+    expect(res._getData()).toMatchObject([
+      { message: 'You already registered this project: project_name' }
+    ])
   })
 
   it('should return validation errors if incorrect payload', async () => {
@@ -93,24 +80,9 @@ describe('When adding providers', () => {
       }
     ])
   })
-
-  it('should return array of objects', async () => {
-    req.body = payload
-    await Controller.add(req, res)
-    const data = res._getData()
-    req.query = { user_id: data.user_id }
-    await Controller.getProviders(req, res)
-    const result = res._getData()
-    expect.arrayContaining(result)
-  })
 })
 
 describe('When getting list of providers', () => {
-  interface TypedResponse extends Response {
-    statusCode: any
-    _getData: () => any
-  }
-
   let req: Request
   let Controller: any
   let res: TypedResponse
@@ -122,6 +94,8 @@ describe('When getting list of providers', () => {
   })
 
   it('should return an empty array if no data from DB', async () => {
+    prismaMock.provider.findMany.mockResolvedValue([])
+
     /* @ts-ignore */
     req.query = { user_id: 999999 }
     await Controller.getProviders(req, res)
@@ -137,14 +111,23 @@ describe('When getting list of providers', () => {
       { message: 'Incorrect type. Expected number.', parameter: 'user_id', value: 'test' }
     ])
   })
+
+  it('should return array of objects after adding some data', async () => {
+    prismaMock.project.findMany.mockResolvedValue([])
+    prismaMock.provider.upsert.mockResolvedValue(mockedProviderResponse)
+    req.body = addProjPayload
+    await Controller.add(req, res)
+
+    const data = res._getData()
+    req.query = { user_id: data.user_id }
+    await Controller.getProviders(req, res)
+
+    const result = res._getData()
+    expect.arrayContaining(result)
+  })
 })
 
 describe('When using getProviderById() function', () => {
-  interface TypedResponse extends Response {
-    statusCode: any
-    _getData: () => any
-  }
-
   let req: Request
   let Controller: any
   let res: TypedResponse
@@ -174,7 +157,7 @@ describe('When using getProviderById() function', () => {
 
   describe('when ID does not exist', () => {
     beforeEach(async () => {
-      jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => null)
+      jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(async () => null)
 
       req.params = { id: '11111' }
       await Controller.getProviderById(req, res)
@@ -192,29 +175,10 @@ describe('When using getProviderById() function', () => {
   })
 
   describe('when ID exists', () => {
-    const mockedResponse = {
-      id: 1,
-      user_id: 1,
-      name: 'backlog',
-      space_key: 'UNI-CHART',
-      api_key: 'apikey1234567890',
-      created_at: '2022-05-10T08:48:47.926Z',
-      updated_at: '2022-05-10T08:48:47.927Z',
-      projects: [
-        {
-          id: 1,
-          name: 'project_name',
-          key: 'unichart-key',
-          project_id: 99846,
-          provider_id: 1,
-          created_at: '2022-05-10T09:26:03.707Z',
-          updated_at: '2022-05-10T09:26:03.707Z'
-        }
-      ]
-    }
-
     beforeEach(async () => {
-      jest.spyOn(Provider.prototype, 'getProviderById').mockImplementationOnce(() => mockedResponse)
+      jest
+        .spyOn(Provider.prototype, 'getProviderById')
+        .mockImplementationOnce(async () => mockedProviderResponse)
 
       req.params = { id: '1' }
       await Controller.getProviderById(req, res)
@@ -225,7 +189,7 @@ describe('When using getProviderById() function', () => {
     })
 
     it('should return the expected body', () => {
-      expect(res._getData()).toEqual(mockedResponse)
+      expect(res._getData()).toEqual(mockedProviderResponse)
     })
   })
 })

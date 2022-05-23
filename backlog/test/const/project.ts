@@ -29,3 +29,50 @@ export const testData: IProject[] = [
     updated_at: new Date()
   }
 ]
+
+export const mockedProviderResponse = {
+  id: 1,
+  user_id: 1,
+  name: 'Backlog',
+  space_key: 'UNI-CHART',
+  api_key: 'apikey1234567890',
+  created_at: new Date(),
+  updated_at: new Date(),
+  projects: [
+    {
+      id: 1,
+      name: 'project_name',
+      key: 'unichart-key',
+      project_id: 99846,
+      provider_id: 1,
+      created_at: new Date(),
+      updated_at: new Date()
+    }
+  ]
+}
+
+export const mockedProjectResponse = {
+  id: 1,
+  name: 'project_name',
+  key: 'unichart-key',
+  project_id: 99846,
+  provider_id: 1,
+  created_at: new Date(),
+  updated_at: new Date(),
+  provider: {
+    id: 1,
+    user_id: 1,
+    name: 'Backlog',
+    space_key: 'UNI-CHART',
+    api_key: 'apikey1234567890',
+    created_at: new Date(),
+    updated_at: new Date()
+  }
+}
+
+export const addProjPayload = {
+  user_id: 1,
+  name: 'Backlog',
+  api_key: 'apikey1234567890',
+  project_id: 123
+}
