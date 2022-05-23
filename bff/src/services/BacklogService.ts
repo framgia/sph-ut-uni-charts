@@ -38,9 +38,13 @@ export default class BacklogService {
     await axios({
       url: `${URL}/projects/${id}`,
       method: 'delete'
-    }).then((response: AxiosResponse) => {
-      data = response.data
     })
+      .then((response: AxiosResponse) => {
+        data = response.data
+      })
+      .catch((error) => {
+        data = { errors: error.response.data, status: error.response.status }
+      })
 
     return data
   }

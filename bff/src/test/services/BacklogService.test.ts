@@ -2,7 +2,8 @@ import { rest } from 'msw'
 import BacklogService from '../../services/BacklogService'
 import { server } from '../../../jest.setup'
 
-import testData from '../constants/issueTestData.json'
+import issueTestData from '../constants/issueTestData.json'
+import projectTestData from '../constants/projectTestData.json'
 
 const backlogService = new BacklogService()
 
@@ -34,14 +35,65 @@ describe('Backlog Service Test Suite', () => {
     else expect(projects[0]).toHaveProperty('id')
   })
 
-  test('Test #5: deleteProjectById - if ID does not exist in the database', async () => {
-    const project: any = await backlogService.deleteProjectById('/111111')
-    expect(project).toHaveProperty('message', 'ID does not exist')
+})
+
+describe('When using deleteProjectById() function', () => {
+  let project: any
+
+  describe('if delete is successful', () => {
+    it('should return the project details', async () => {
+      server.use(
+        rest.delete('*/api/projects/*', (req, res, ctx) => {
+          return res(ctx.json(projectTestData.sampleProject))
+        })
+      )
+
+      project = await backlogService.deleteProjectById('/11')
+
+      expect(JSON.stringify(project)).toBe(JSON.stringify(projectTestData.sampleProject))
+    })
   })
 
-  test('Test #6: deleteProjectById - invalid ID, letters are not valid, should be number', async () => {
-    const project: any = await backlogService.deleteProjectById('/test')
-    expect(project).toHaveProperty('message', 'Invalid ID')
+  describe('if ID does not exist', () => {
+    beforeEach(async () => {
+      server.use(
+        rest.delete('*/api/projects/*', (req, res, ctx) => {
+          return res(ctx.status(404), ctx.json({ message: "ID does not exist" }))
+        })
+      )
+
+      project = await backlogService.deleteProjectById('/1')
+    })
+
+    it('should return the status of 404', () => {
+      expect(project.status).toBe(404)
+    })
+
+    it('should return the error messages', () => {
+      expect(project).toHaveProperty('errors')
+      expect(JSON.stringify(project.errors)).toBe(JSON.stringify({ message: "ID does not exist" }))
+    })
+  })
+
+  describe('if ID is not a number', () => {
+    beforeEach(async () => {
+      server.use(
+        rest.delete('*/api/projects/*', (req, res, ctx) => {
+          return res(ctx.status(400), ctx.json({ message: "Invalid ID" }))
+        })
+      )
+
+      project = await backlogService.deleteProjectById('/test')
+    })
+
+    it('should return the status of 400', () => {
+      expect(project.status).toBe(400)
+    })
+
+    it('should return the error messages', () => {
+      expect(project).toHaveProperty('errors')
+      expect(JSON.stringify(project.errors)).toBe(JSON.stringify({ message: "Invalid ID" }))
+    })
   })
 })
 
@@ -52,13 +104,13 @@ describe('When using getIssues() function', () => {
     it('should return expected body', async () => {
       server.use(
         rest.get('*/api/v2/issues', (req, res, ctx) => {
-          return res(ctx.json(testData.backlogServiceIssueResponse))
+          return res(ctx.json(issueTestData.backlogServiceIssueResponse))
         })
       )
 
       issues = await backlogService.getIssues('namespace', 'key', 111)
 
-      expect(JSON.stringify(issues)).toBe(JSON.stringify(testData.backlogServiceIssueResponse))
+      expect(JSON.stringify(issues)).toBe(JSON.stringify(issueTestData.backlogServiceIssueResponse))
     })
   })
 
@@ -141,14 +193,14 @@ describe('When using getMilestones() function', () => {
     it('should return expected body', async () => {
       server.use(
         rest.get('*/api/v2/projects/*', (req, res, ctx) => {
-          return res(ctx.json(testData.backlogServiceMilestoneResponse))
+          return res(ctx.json(issueTestData.backlogServiceMilestoneResponse))
         })
       )
 
       milestones = await backlogService.getMilestones('namespace', 'key', 111)
 
       expect(JSON.stringify(milestones)).toBe(
-        JSON.stringify(testData.backlogServiceMilestoneResponse)
+        JSON.stringify(issueTestData.backlogServiceMilestoneResponse)
       )
     })
   })

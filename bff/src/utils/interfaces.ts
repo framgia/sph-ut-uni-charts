@@ -1,3 +1,5 @@
+import { Response } from 'express'
+
 export interface ProviderInterface {
   user_id: any
   provider: string
@@ -34,4 +36,10 @@ export interface IssuesInterface {
 export interface MilestonesInterface {
   id: number
   name: string
+}
+
+export interface CustomTypedResponse extends Response {
+  statusCode: any
+  _getData: () => any
+  _getJSONData: () => any
 }

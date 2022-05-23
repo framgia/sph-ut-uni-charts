@@ -11,6 +11,7 @@ import testData from './constants/testData.json'
 import Router from 'next/router'
 import Cookies from 'js-cookie'
 import { logout } from '@/src/api/authApi'
+import * as bffService from '@/src/services/bffService'
 
 const mockAxios = new MockAdapter(axios)
 const URL = process.env.NEXT_PUBLIC_BFF_API
@@ -27,6 +28,9 @@ describe('When rendering home page', () => {
   beforeEach(() => {
     mockRouter.setCurrentUrl('/')
     mockAxios.onGet(`${URL}projects`).reply(200, testData.projects)
+    mockAxios
+      .onDelete(`${URL}projects/190?service=backlog`)
+      .reply(200, testData.projects[0])
 
     Cookies.get.mockReturnValueOnce(
       JSON.stringify({
@@ -81,7 +85,7 @@ describe('When rendering home page', () => {
     expect(rows).toHaveLength(3)
 
     const columns = screen.getAllByRole('columnheader')
-    expect(columns).toHaveLength(3)
+    expect(columns).toHaveLength(4)
   })
   it('should have a button to add project', async () => {
     await act(async () => render(<Home />))
@@ -166,6 +170,98 @@ describe('When rendering home page', () => {
 
       const rows = await screen.findAllByRole('project-trow')
       expect(rows).toHaveLength(2)
+    })
+  })
+
+  describe('when using delete function', () => {
+    let rows, deleteButtons, deleteProjectSpy, getProjectsSpy
+    const projectData = testData.projects[0]
+
+    beforeEach(async () => {
+      deleteProjectSpy = jest.spyOn(bffService, 'deleteProject')
+      getProjectsSpy = jest.spyOn(bffService, 'getProjects')
+
+      await act(async () => render(<Home />))
+      rows = await screen.findAllByRole('project-trow')
+
+      deleteButtons = screen.queryAllByRole('button', { name: /delete/i })
+    })
+
+    afterEach(() => {
+      deleteProjectSpy.mockClear()
+      getProjectsSpy.mockClear()
+    })
+
+    afterAll(() => {
+      deleteProjectSpy.mockRestore()
+      getProjectsSpy.mockRestore()
+    })
+
+    it('should have a delete button for each row', () => {
+      expect(deleteButtons.length).toBe(rows.length)
+    })
+
+    it('should have the delete modal hidden upon page load', async () => {
+      const deleteModal = screen.queryByRole('delete-modal')
+      expect(deleteModal).not.toBeInTheDocument()
+    })
+
+    it('should be able to open and close the delete modal', async () => {
+      userEvent.click(deleteButtons[0])
+
+      let deleteModal = await screen.findByRole('delete-modal')
+      expect(deleteModal).toBeInTheDocument()
+
+      const cancelButton = screen.getByRole('cancel-delete')
+      expect(cancelButton).toBeInTheDocument()
+
+      userEvent.click(cancelButton)
+
+      await waitFor(() => {
+        deleteModal = screen.queryByRole('heading', {
+          name: /are you sure you want to delete this project/i,
+        })
+        expect(deleteModal).not.toBeInTheDocument()
+      })
+    })
+
+    it('should call the deleteProject service', async () => {
+      userEvent.click(deleteButtons[0])
+
+      let deleteModal = await screen.findByRole('delete-modal')
+      expect(deleteModal).toBeInTheDocument()
+
+      const confirmButton = screen.getByRole('confirm-delete')
+      expect(confirmButton).toBeInTheDocument()
+
+      await act(() => {
+        userEvent.click(confirmButton)
+      })
+
+      expect(deleteProjectSpy).toHaveBeenCalledTimes(1)
+      expect(deleteProjectSpy).toHaveBeenCalledWith(
+        projectData.id,
+        projectData.provider.name.toLowerCase()
+      )
+
+      // need to add this otherwise the next test will fail to find 'project-trow'
+      await new Promise((r) => setTimeout(r, 1))
+    })
+
+    it('should call the getProjects service', async () => {
+      userEvent.click(deleteButtons[0])
+
+      let deleteModal = await screen.findByRole('delete-modal')
+      expect(deleteModal).toBeInTheDocument()
+
+      const confirmButton = screen.getByRole('confirm-delete')
+      expect(confirmButton).toBeInTheDocument()
+
+      userEvent.click(confirmButton)
+
+      await waitFor(() => {
+        expect(getProjectsSpy).toHaveBeenCalledTimes(2)
+      })
     })
   })
 

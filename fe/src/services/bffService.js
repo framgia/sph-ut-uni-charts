@@ -28,7 +28,18 @@ export const addProvider = async (payload) => {
 export const getActiveSprintData = async (project_id, provider) => {
   let data
   await axios
-    .get(`${URL}/projects/${project_id}/active-sprint-data?service=${provider}`)
+    .get(`${URL}projects/${project_id}/active-sprint-data?service=${provider}`)
+    .then((response) => {
+      data = response.data
+    })
+
+  return data
+}
+
+export const deleteProject = async (project_id, provider) => {
+  let data
+  await axios
+    .delete(`${URL}projects/${project_id}?service=${provider}`)
     .then((response) => {
       data = response.data
     })

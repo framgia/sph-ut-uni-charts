@@ -28,16 +28,20 @@ export default class ProjectController {
   async deleteProjectById(req: Request, res: Response) {
     let response
 
-    switch (req.body.service) {
+    switch (req.query.service) {
       case 'backlog':
         const result = await backlogService.deleteProjectById(req.params.id)
         response = result
         break
       default:
-        response = { message: 'Service information is not provided.' }
+        response = { status: 400, errors: { message: 'Service information is not provided.' } }
     }
 
-    res.send(response)
+    if (response?.errors) {
+      res.status(response.status).json(response.errors)
+    } else {
+      res.send(response)
+    }
   }
 
   async getActiveSprintData(req: Request, res: Response) {

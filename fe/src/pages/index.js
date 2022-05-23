@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
+import Router from 'next/router'
 import {
   Button,
   Container,
@@ -11,16 +12,20 @@ import {
   Text,
   TextInput,
 } from '@mantine/core'
-import Router from 'next/router'
 
 import Navbar from '../components/molecules/Navbar'
-import { getProjects } from '@/src/services/bffService'
+import HomePageDeleteModal from '../components/organisms/HomePageDeleteModal'
+import { deleteProject, getProjects } from '@/src/services/bffService'
 import { providersSelectFieldValues } from '@/src/utils/constants'
 import styles from '@/styles/index.module.css'
 
 const Home = () => {
   const [projects, setProjects] = useState([])
   const [page, setPage] = useState(1)
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [selectedProject, setSelectedProject] = useState({})
+
   const { provider, searchProvider } = Router.query
 
   const fetchProjects = () => {
@@ -32,6 +37,21 @@ const Home = () => {
     getProjects(params).then((response) => {
       setProjects(response)
     })
+  }
+
+  const openDeleteModal = (project) => {
+    setIsDeleteModalOpen(true)
+    setSelectedProject(project)
+  }
+
+  const deleteSingleProject = async (id, provider) => {
+    setIsDeleteModalOpen(false)
+    const response = await deleteProject(id, provider)
+
+    if (!response.message) {
+      setProjects([])
+      fetchProjects()
+    }
   }
 
   const providerOnChange = (provider) => {
@@ -108,6 +128,7 @@ const Home = () => {
               <th>Name</th>
               <th>Provider</th>
               <th>Project ID</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -121,6 +142,14 @@ const Home = () => {
                   </td>
                   <td>{project.provider.name}</td>
                   <td>{project.id}</td>
+                  <td>
+                    <Button
+                      color='red'
+                      onClick={() => openDeleteModal(project)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
                 </tr>
               )
             })}
@@ -147,6 +176,13 @@ const Home = () => {
                 return `page ${page}`
             }
           }}
+        />
+
+        <HomePageDeleteModal
+          isOpen={isDeleteModalOpen}
+          setIsDeleteModalOpen={setIsDeleteModalOpen}
+          deleteSingleProject={deleteSingleProject}
+          selectedProject={selectedProject}
         />
       </main>
     </Container>
