@@ -28,6 +28,8 @@ const Home = () => {
 
   const { provider, searchProvider } = Router.query
 
+  const [nameFilter, setNameFilter] = useState(searchProvider || '')
+
   const fetchProjects = () => {
     const params = {
       filterProvider: provider,
@@ -72,12 +74,19 @@ const Home = () => {
     }
   }
 
-  const resetFilters = () => Router.push('/')
+  const resetFilters = () => {
+    Router.push('/')
+    setNameFilter('')
+  }
 
   useEffect(() => {
     setProjects([])
     fetchProjects()
   }, [provider, searchProvider])
+
+  useEffect(() => {
+    if (searchProvider) setNameFilter(searchProvider)
+  }, [searchProvider])
 
   return (
     <Container>
@@ -102,7 +111,10 @@ const Home = () => {
             <TextInput
               placeholder='Project Name'
               label='Filter by name'
-              defaultValue={searchProvider}
+              value={nameFilter}
+              onChange={(event) => {
+                setNameFilter(event.target.value)
+              }}
               onKeyPress={providerOnSearch}
             />
             <Select
