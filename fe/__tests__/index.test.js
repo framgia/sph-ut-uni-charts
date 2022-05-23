@@ -234,7 +234,9 @@ describe('When rendering home page', () => {
       const confirmButton = screen.getByRole('confirm-delete')
       expect(confirmButton).toBeInTheDocument()
 
-      userEvent.click(confirmButton)
+      await act(() => {
+        userEvent.click(confirmButton)
+      })
 
       expect(deleteProjectSpy).toHaveBeenCalledTimes(1)
       expect(deleteProjectSpy).toHaveBeenCalledWith(
