@@ -178,16 +178,13 @@ describe('When rendering home page', () => {
     const projectData = testData.projects[0]
 
     beforeEach(async () => {
-      console.log('delete')
+      deleteProjectSpy = jest.spyOn(bffService, 'deleteProject')
+      getProjectsSpy = jest.spyOn(bffService, 'getProjects')
+
       await act(async () => render(<Home />))
       rows = await screen.findAllByRole('project-trow')
 
       deleteButtons = screen.queryAllByRole('button', { name: /delete/i })
-
-      deleteProjectSpy = jest.spyOn(bffService, 'deleteProject')
-      getProjectsSpy = jest.spyOn(bffService, 'getProjects')
-
-      userEvent.click(deleteButtons[0])
     })
 
     afterEach(() => {
@@ -204,16 +201,65 @@ describe('When rendering home page', () => {
       expect(deleteButtons.length).toBe(rows.length)
     })
 
+    it('should have the delete modal hidden upon page load', async () => {
+      const deleteModal = screen.queryByRole('delete-modal')
+      expect(deleteModal).not.toBeInTheDocument()
+    })
+
+    it('should be able to open and close the delete modal', async () => {
+      userEvent.click(deleteButtons[0])
+
+      let deleteModal = await screen.findByRole('delete-modal')
+      expect(deleteModal).toBeInTheDocument()
+
+      const cancelButton = screen.getByRole('cancel-delete')
+      expect(cancelButton).toBeInTheDocument()
+
+      userEvent.click(cancelButton)
+
+      await waitFor(() => {
+        deleteModal = screen.queryByRole('heading', {
+          name: /are you sure you want to delete this project/i,
+        })
+        expect(deleteModal).not.toBeInTheDocument()
+      })
+    })
+
     it('should call the deleteProject service', async () => {
+      userEvent.click(deleteButtons[0])
+
+      let deleteModal = await screen.findByRole('delete-modal')
+      expect(deleteModal).toBeInTheDocument()
+
+      const confirmButton = screen.getByRole('confirm-delete')
+      expect(confirmButton).toBeInTheDocument()
+
+      userEvent.click(confirmButton)
+
       expect(deleteProjectSpy).toHaveBeenCalledTimes(1)
       expect(deleteProjectSpy).toHaveBeenCalledWith(
         projectData.id,
         projectData.provider.name.toLowerCase()
       )
+
+      // need to add this otherwise the next test will fail to find 'project-trow'
+      await new Promise((r) => setTimeout(r, 1))
     })
 
     it('should call the getProjects service', async () => {
-      expect(getProjectsSpy).toHaveBeenCalledTimes(2)
+      userEvent.click(deleteButtons[0])
+
+      let deleteModal = await screen.findByRole('delete-modal')
+      expect(deleteModal).toBeInTheDocument()
+
+      const confirmButton = screen.getByRole('confirm-delete')
+      expect(confirmButton).toBeInTheDocument()
+
+      userEvent.click(confirmButton)
+
+      await waitFor(() => {
+        expect(getProjectsSpy).toHaveBeenCalledTimes(2)
+      })
     })
   })
 
@@ -221,7 +267,6 @@ describe('When rendering home page', () => {
     let selectField, resetButton, inputField
 
     beforeEach(async () => {
-      console.log('reset')
       mockAxios.onGet(`${URL}projects`).reply(200, testData.projects)
 
       await act(async () => render(<Home />))

@@ -14,6 +14,7 @@ import {
 } from '@mantine/core'
 
 import Navbar from '../components/molecules/Navbar'
+import HomePageDeleteModal from '../components/organisms/HomePageDeleteModal'
 import { deleteProject, getProjects } from '@/src/services/bffService'
 import { providersSelectFieldValues } from '@/src/utils/constants'
 import styles from '@/styles/index.module.css'
@@ -21,6 +22,10 @@ import styles from '@/styles/index.module.css'
 const Home = () => {
   const [projects, setProjects] = useState([])
   const [page, setPage] = useState(1)
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [selectedProject, setSelectedProject] = useState({})
+
   const { provider, searchProvider } = Router.query
 
   const fetchProjects = () => {
@@ -34,7 +39,13 @@ const Home = () => {
     })
   }
 
+  const openDeleteModal = (project) => {
+    setIsDeleteModalOpen(true)
+    setSelectedProject(project)
+  }
+
   const deleteSingleProject = async (id, provider) => {
+    setIsDeleteModalOpen(false)
     const response = await deleteProject(id, provider)
 
     if (!response.message) {
@@ -135,12 +146,7 @@ const Home = () => {
                   <td>
                     <Button
                       color='red'
-                      onClick={() => {
-                        deleteSingleProject(
-                          project.id,
-                          project.provider.name.toLowerCase()
-                        )
-                      }}
+                      onClick={() => openDeleteModal(project)}
                     >
                       Delete
                     </Button>
@@ -171,6 +177,13 @@ const Home = () => {
                 return `page ${page}`
             }
           }}
+        />
+
+        <HomePageDeleteModal
+          isOpen={isDeleteModalOpen}
+          setIsDeleteModalOpen={setIsDeleteModalOpen}
+          deleteSingleProject={deleteSingleProject}
+          selectedProject={selectedProject}
         />
       </main>
     </Container>
