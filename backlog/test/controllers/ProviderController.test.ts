@@ -3,6 +3,7 @@ import ProviderController from '../../controllers/ProviderController'
 import httpMocks from 'node-mocks-http'
 import { Request, Response } from 'express'
 import Provider from '../../models/Provider'
+import { prismaMock } from '../../utils/singleton'
 const axios = require('axios')
 const MockAdapter = require('axios-mock-adapter')
 
@@ -84,7 +85,8 @@ describe('When adding providers', () => {
   })
 
   it('should insert provider successfully', async () => {
-    jest.spyOn(Provider.prototype, 'add').mockImplementationOnce(async () => mockedProviderResponse)
+    prismaMock.project.findMany.mockResolvedValue([])
+    prismaMock.provider.upsert.mockResolvedValue(mockedProviderResponse)
 
     req.body = payload
     await Controller.add(req, res)
@@ -99,13 +101,14 @@ describe('When adding providers', () => {
   })
 
   it('should throw an error if Project already registered', async () => {
-    jest
-      .spyOn(Provider.prototype, 'isProjectRegistered')
-      .mockImplementationOnce(async () => [mockedProjectResponse])
+    prismaMock.project.findMany.mockResolvedValue([mockedProjectResponse])
 
     req.body = payload
     await Controller.add(req, res)
     expect(res.statusCode).toEqual(400)
+    expect(res._getData()).toMatchObject([
+      { message: 'You already registered this project: project_name' }
+    ])
   })
 
   it('should return validation errors if incorrect payload', async () => {
@@ -144,6 +147,8 @@ describe('When getting list of providers', () => {
   })
 
   it('should return an empty array if no data from DB', async () => {
+    prismaMock.provider.findMany.mockResolvedValue([])
+
     /* @ts-ignore */
     req.query = { user_id: 999999 }
     await Controller.getProviders(req, res)
@@ -161,7 +166,8 @@ describe('When getting list of providers', () => {
   })
 
   it('should return array of objects after adding some data', async () => {
-    jest.spyOn(Provider.prototype, 'add').mockImplementationOnce(async () => mockedProviderResponse)
+    prismaMock.project.findMany.mockResolvedValue([])
+    prismaMock.provider.upsert.mockResolvedValue(mockedProviderResponse)
     req.body = payload
     await Controller.add(req, res)
 
