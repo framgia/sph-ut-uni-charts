@@ -25,9 +25,13 @@ export default class BacklogService {
     await axios({
       url: `${URL}/projects/${id}`,
       method: 'get'
-    }).then((response: AxiosResponse) => {
-      data = response.data
     })
+      .then((response: AxiosResponse) => {
+        data = response.data
+      })
+      .catch((error) => {
+        data = { errors: error.response.data, status: error.response.status }
+      })
 
     return data
   }
@@ -76,9 +80,20 @@ export default class BacklogService {
       .then((response: AxiosResponse) => {
         return response.data
       })
-      .catch((error: AxiosError) => {
-        return error.message
+      .catch((error) => {
+        return { errors: error.response.data, status: error.response.status }
       })
+  }
+
+  // BACKLOG ENDPOINT
+
+  static async backlogProjects(payload: any) {
+    return await axios({
+      baseURL: URL,
+      url: '/backlog/projects',
+      method: 'get',
+      params: payload
+    })
   }
 
   // WILL CONNECT TO BACKLOG API (not microservice)
@@ -115,17 +130,6 @@ export default class BacklogService {
     return data
   }
 
-  // BACKLOG ENDPOINT
-
-  static async backlogProjects(payload: any) {
-    return await axios({
-      baseURL: URL,
-      url: '/backlog/projects',
-      method: 'get',
-      params: payload
-    })
-  }
-
   async getActiveSprintData(
     space_key: string,
     key: string,
@@ -139,9 +143,13 @@ export default class BacklogService {
       url: '/issues',
       method: 'get',
       params: { apiKey: key, 'projectId[]': project_id, 'milestoneId[]': milestone_id }
-    }).then((response: AxiosResponse) => {
-      data = response.data
     })
+      .then((response: AxiosResponse) => {
+        data = response.data
+      })
+      .catch((error) => {
+        data = { errors: error.response.data, status: error.response.status }
+      })
     return data
   }
 }
