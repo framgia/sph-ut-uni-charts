@@ -12,6 +12,7 @@ import {
   Text,
   TextInput,
 } from '@mantine/core'
+import { useDebouncedValue } from '@mantine/hooks'
 
 import Navbar from '../components/molecules/Navbar'
 import HomePageDeleteModal from '../components/organisms/HomePageDeleteModal'
@@ -27,6 +28,10 @@ const Home = () => {
   const [selectedProject, setSelectedProject] = useState({})
 
   const { provider, searchProvider } = Router.query
+
+  const [nameFilter, setNameFilter] = useState('')
+  const [debouncedNameFilter] = useDebouncedValue(nameFilter, 500)
+  const [userChangedNameFilter, setUserChangedNameFilter] = useState(false)
 
   const fetchProjects = () => {
     const params = {
@@ -61,23 +66,35 @@ const Home = () => {
     })
   }
 
-  const providerOnSearch = (event) => {
-    if (event.key === 'Enter') {
-      const value = event.target.value
+  useEffect(() => {
+    if (userChangedNameFilter) {
+      if (Router.query.searchProvider) {
+        delete Router.query.searchProvider
+      }
 
       Router.push({
         pathname: '/',
-        query: { ...Router.query, searchProvider: value },
+        query: {
+          ...Router.query,
+          ...(debouncedNameFilter && { searchProvider: debouncedNameFilter }),
+        },
       })
     }
-  }
+  }, [debouncedNameFilter])
 
-  const resetFilters = () => Router.push('/')
+  const resetFilters = () => {
+    Router.push('/')
+    setNameFilter('')
+  }
 
   useEffect(() => {
     setProjects([])
     fetchProjects()
   }, [provider, searchProvider])
+
+  useEffect(() => {
+    if (searchProvider) setNameFilter(searchProvider)
+  }, [searchProvider])
 
   return (
     <Container>
@@ -102,8 +119,11 @@ const Home = () => {
             <TextInput
               placeholder='Project Name'
               label='Filter by name'
-              defaultValue={searchProvider}
-              onKeyPress={providerOnSearch}
+              value={nameFilter}
+              onChange={(event) => {
+                setNameFilter(event.target.value)
+                setUserChangedNameFilter(true)
+              }}
             />
             <Select
               label='Filter by provider'
