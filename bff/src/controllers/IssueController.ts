@@ -15,57 +15,57 @@ class IssueController {
     let project: ProjectInterface = {} as ProjectInterface
     let provider: ProviderInterface = {} as ProviderInterface
     let status = 200
-    let error = false
 
     switch (req.query.service) {
       case 'backlog':
-        const result: unknown = await backlogService.getProjectById(req.params.id)
-        project = result as ProjectInterface
-        break
-      default:
-        response = { message: 'Service information not provided.' }
-        status = 400
-        error = true
-    }
-
-    if (error) {
-      res.status(status).json(response)
-    } else if (project.message) {
-      // if message exist, the service responded with an error
-      // check what is the response message of the service
-      switch (project.message) {
-        case 'Invalid ID':
-          res.status(400).json({ message: project.message })
+        // get the project
+        const projectResponse: any = await backlogService.getProjectById(req.params.id)
+        if (projectResponse.errors) {
+          status = projectResponse.status
+          response = projectResponse.errors
           break
-        default:
-          // default case is 'No Data Found'
-          res.status(404).json({ message: project.message })
-      }
-    } else {
-      // get the provider of the project
-      provider = await backlogService.getProviderById(project.provider_id)
-      response = provider
+        }
+        project = projectResponse as ProjectInterface
 
-      if (Object.keys(provider).length) {
+        // get the provider
+        const providerResponse: any = await backlogService.getProviderById(project.provider_id)
+        if (providerResponse.errors) {
+          status = providerResponse.status
+          response = providerResponse.errors
+          break
+        }
+        provider = providerResponse
+
         // get the milestones
-        const milestones: unknown = await backlogService.getMilestones(
+        const milestonesResponse: any = await backlogService.getMilestones(
           provider.space_key,
           provider.api_key,
           project.project_id
         )
-        const tempMilestones = milestones as Array<MilestonesInterface>
+        if (milestonesResponse.errors) {
+          status = milestonesResponse.status
+          response = milestonesResponse.errors
+          break
+        }
+        const milestones: MilestonesInterface[] = milestonesResponse
 
         let issuesList: { milestone: string; issues: IssuesInterface[] }[] = []
 
         // get issues for each milestone
-        for (const milestone of tempMilestones) {
-          const issues: unknown = await backlogService.getIssues(
+        for (const milestone of milestones) {
+          const issuesResponse: any = await backlogService.getIssues(
             provider.space_key,
             provider.api_key,
             milestone.id
           )
-          const tempIssues = issues as Array<IssuesInterface>
-          const issuesData = tempIssues.map((issue) => {
+          if (issuesResponse.errors) {
+            status = issuesResponse.status
+            response = issuesResponse.errors
+            break
+          }
+          const issues = issuesResponse as Array<IssuesInterface>
+
+          const issuesData = issues.map((issue) => {
             return {
               id: issue.id,
               actualHours: issue.actualHours || 0,
@@ -79,11 +79,15 @@ class IssueController {
         }
 
         // update response with the issues list
-        response = issuesList
-      }
+        if (status === 200) response = issuesList
 
-      res.send(response)
+        break
+      default:
+        response = { message: 'Service information not provided.' }
+        status = 400
     }
+
+    res.status(status).json(response)
   }
 }
 

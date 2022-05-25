@@ -12,17 +12,29 @@ export default class ProjectController {
 
   async getProjectById(req: Request, res: Response) {
     let response
+    let status = 200
 
-    switch (req.body.service) {
+    switch (req.query.service) {
       case 'backlog':
-        const result = await backlogService.getProjectById(req.params.id)
-        response = result
+        const result = (await backlogService.getProjectById(req.params.id)) as any
+
+        if (result.errors) {
+          status = result.status
+          response = result.errors
+        } else {
+          response = result
+        }
         break
       default:
+        status = 400
         response = { message: 'Service information not provided.' }
     }
 
-    res.send(response)
+    if (status !== 200) {
+      res.status(status).json(response)
+    } else {
+      res.send(response)
+    }
   }
 
   async deleteProjectById(req: Request, res: Response) {
@@ -45,12 +57,12 @@ export default class ProjectController {
   }
 
   async getActiveSprintData(req: Request, res: Response) {
-    const projId = req.params.id
+    let status = 200
     let response
 
     switch (req.query.service) {
       case 'backlog':
-        let dates: any[]
+        let dates: any[], proj: any, milestones: any
         let estimated = [] as any
         let actual = [] as any
 
@@ -58,9 +70,28 @@ export default class ProjectController {
         let closedET = 0
         let estimatedET = 0
 
-        const { project_id, provider_id }: any = await backlogService.getProjectById(projId)
-        const { space_key, api_key }: any = await backlogService.getProviderById(provider_id)
-        const milestones: any = await backlogService.getMilestones(space_key, api_key, project_id)
+        proj = await backlogService.getProjectById(req.params.id)
+        if (proj.errors) {
+          status = proj.status
+          response = proj.errors
+          break
+        }
+        const { project_id, provider_id } = proj
+
+        const providerResponse: any = await backlogService.getProviderById(provider_id)
+        if (providerResponse.errors) {
+          status = providerResponse.status
+          response = providerResponse.errors
+          break
+        }
+        const { space_key, api_key } = providerResponse
+
+        milestones = await backlogService.getMilestones(space_key, api_key, project_id)
+        if (milestones.errors) {
+          status = milestones.status
+          response = milestones.errors
+          break
+        }
 
         const activeSprint = milestones.find((milestone: any) => {
           const releaseDate = new Date(milestone.releaseDueDate).toLocaleDateString()
@@ -79,6 +110,12 @@ export default class ProjectController {
           project_id,
           id
         )
+
+        if (issues.errors) {
+          status = issues.status
+          response = issues.errors
+          break
+        }
 
         // Get dates in between startDate and releaseDueDate //
         for (
@@ -130,8 +167,9 @@ export default class ProjectController {
         break
       default:
         response = { message: 'Service information not provided.' }
+        status = 400
     }
 
-    res.send(response)
+    res.status(status).json(response)
   }
 }

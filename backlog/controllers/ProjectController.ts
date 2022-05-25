@@ -36,7 +36,7 @@ export default class ProjectController {
 
   async getProjectById(req: Request, res: Response) {
     if (/[a-zA-z]/.test(req.params.id)) {
-      res.send({
+      res.status(400).json({
         message: 'Invalid ID'
       })
     } else {
@@ -46,7 +46,8 @@ export default class ProjectController {
         }
       })
 
-      res.send(!result ? { message: 'No Data Found' } : result)
+      if (!result) res.status(404).json({ message: 'No Data Found' })
+      else res.send(result)
     }
   }
 

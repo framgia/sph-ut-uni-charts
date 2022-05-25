@@ -94,19 +94,36 @@ describe('When getProjectById', () => {
       })
     })
 
-    it('should respond "Invalid ID" as validation error if id is string', async () => {
-      req.params = { id: 'test' }
-      await Controller.getProjectById(req, res)
-      const data = res._getData()
-      expect(data).toHaveProperty('message', 'Invalid ID')
+    describe('when ID is invalid', () => {
+      beforeEach(async () => {
+        req.params = { id: 'test' }
+        await Controller.getProjectById(req, res)
+      })
+
+      it('should return status of 400', () => {
+        expect(res.statusCode).toBe(400)
+      })
+
+      it('should respond "Invalid ID" as validation error', () => {
+        const data = res._getJSONData()
+        expect(data).toHaveProperty('message', 'Invalid ID')
+      })
     })
 
-    it('should respond "No Data Found" if no data in DB', async () => {
-      /* @ts-ignore */
-      req.params = { id: 99999999999999 }
-      await Controller.getProjectById(req, res)
-      const data = res._getData()
-      expect(data).toHaveProperty('message', 'No Data Found')
+    describe('when project with provided ID does not exist', () => {
+      beforeEach(async () => {
+        req.params = { id: 99999999999999 }
+        await Controller.getProjectById(req, res)
+      })
+
+      it('should return status of 404', () => {
+        expect(res.statusCode).toBe(404)
+      })
+
+      it('should respond "No Data Found" as validation error', () => {
+        const data = res._getJSONData()
+        expect(data).toHaveProperty('message', 'No Data Found')
+      })
     })
 
     it('should responed project object', async () => {
