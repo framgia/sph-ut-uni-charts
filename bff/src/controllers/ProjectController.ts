@@ -1,21 +1,30 @@
+import Controller from './Controller'
 import BacklogService from '../services/BacklogService'
 import { Request, Response } from 'express'
 import { DateTime } from 'luxon'
 
 const backlogService = new BacklogService()
 
-export default class ProjectController {
+export default class ProjectController extends Controller {
   async getProjects(req: Request, res: Response) {
-    const result = await backlogService.getProjects(req.query)
-    res.send(result)
+    const user = await super.user({ email: req.header('authorization') as string })
+    req.query.user_id = user.id
+
+    try {
+      const result = await backlogService.getProjects(req.query)
+      res.send(result)
+    } catch (error) {
+      res.status(500).send(error)
+    }
   }
 
   async getProjectById(req: Request, res: Response) {
+    const user = await super.user({ email: req.header('authorization') as string })
     let response
 
     switch (req.body.service) {
       case 'backlog':
-        const result = await backlogService.getProjectById(req.params.id)
+        const result = await backlogService.getProjectById(req.params.id, { user_id: user.id })
         response = result
         break
       default:
@@ -26,11 +35,12 @@ export default class ProjectController {
   }
 
   async deleteProjectById(req: Request, res: Response) {
+    const user = await super.user({ email: req.header('authorization') as string })
     let response
 
     switch (req.query.service) {
       case 'backlog':
-        const result = await backlogService.deleteProjectById(req.params.id)
+        const result = await backlogService.deleteProjectById(req.params.id, { user_id: user.id })
         response = result
         break
       default:
@@ -45,6 +55,7 @@ export default class ProjectController {
   }
 
   async getActiveSprintData(req: Request, res: Response) {
+    const user = await super.user({ email: req.header('authorization') as string })
     const projId = req.params.id
     let response
 
@@ -58,7 +69,9 @@ export default class ProjectController {
         let closedET = 0
         let estimatedET = 0
 
-        const { project_id, provider_id }: any = await backlogService.getProjectById(projId)
+        const { project_id, provider_id }: any = await backlogService.getProjectById(projId, {
+          user_id: user.id
+        })
         const { space_key, api_key }: any = await backlogService.getProviderById(provider_id)
         const milestones: any = await backlogService.getMilestones(space_key, api_key, project_id)
 

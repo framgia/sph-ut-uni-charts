@@ -30,6 +30,7 @@ model Provider {
 
 model Project {
   id Int @id @default(autoincrement())
+  user_id Int?
   name String
   key String
   project_id Int

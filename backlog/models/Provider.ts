@@ -1,6 +1,5 @@
-// @ts-nocheck
 import prisma from '../utils/client'
-import { ProviderAdd } from './interfaces/Provider'
+import { ProviderAdd } from '../interfaces/Provider'
 
 class Provider {
   public async isProjectRegistered(data: ProviderAdd) {
@@ -60,10 +59,11 @@ class Provider {
     })
   }
 
-  public async getProviderById(id: number) {
-    return await prisma.provider.findUnique({
+  public async getProviderById(payload: { user_id: number; id: number }) {
+    return await prisma.provider.findFirst({
       where: {
-        id: id
+        id: payload.id,
+        user_id: payload.user_id
       },
       include: {
         projects: true

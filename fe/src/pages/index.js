@@ -16,7 +16,7 @@ import { useDebouncedValue } from '@mantine/hooks'
 
 import Navbar from '../components/molecules/Navbar'
 import HomePageDeleteModal from '../components/organisms/HomePageDeleteModal'
-import { deleteProject, getProjects } from '@/src/services/bffService'
+import { deleteProject, getProjects } from '@/src/api/providerApi'
 import { providersSelectFieldValues } from '@/src/utils/constants'
 import styles from '@/styles/index.module.css'
 
@@ -39,8 +39,8 @@ const Home = () => {
       searchProvider: searchProvider,
     }
 
-    getProjects(params).then((response) => {
-      setProjects(response)
+    getProjects(params).then(({ data }) => {
+      setProjects(data)
     })
   }
 

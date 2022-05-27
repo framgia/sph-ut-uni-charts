@@ -1,4 +1,4 @@
-import { IProject } from 'models/interfaces/Project'
+import { IProject } from 'interfaces/Project'
 
 export const testData: IProject[] = [
   {

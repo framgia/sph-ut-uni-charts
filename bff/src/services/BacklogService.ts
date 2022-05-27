@@ -19,12 +19,13 @@ export default class BacklogService {
     return data
   }
 
-  async getProjectById(id: String) {
+  async getProjectById(id: String, payload: { user_id: string }) {
     let data
 
     await axios({
       url: `${URL}/projects/${id}`,
-      method: 'get'
+      method: 'get',
+      params: payload
     }).then((response: AxiosResponse) => {
       data = response.data
     })
@@ -32,12 +33,13 @@ export default class BacklogService {
     return data
   }
 
-  async deleteProjectById(id: String) {
+  async deleteProjectById(id: String, payload: { user_id: string }) {
     let data
 
     await axios({
       url: `${URL}/projects/${id}`,
-      method: 'delete'
+      method: 'delete',
+      params: payload
     })
       .then((response: AxiosResponse) => {
         data = response.data

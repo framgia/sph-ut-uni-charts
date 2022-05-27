@@ -6,11 +6,13 @@ import {
   ProviderInterface,
   MilestonesInterface
 } from '../utils/interfaces'
+import Controller from './Controller'
 
 const backlogService = new BacklogService()
 
-class IssueController {
+class IssueController extends Controller {
   async getIssues(req: Request, res: Response) {
+    const user = await super.user({ email: req.header('authorization') as string })
     let response
     let project: ProjectInterface = {} as ProjectInterface
     let provider: ProviderInterface = {} as ProviderInterface
@@ -19,7 +21,9 @@ class IssueController {
 
     switch (req.query.service) {
       case 'backlog':
-        const result: unknown = await backlogService.getProjectById(req.params.id)
+        const result: unknown = await backlogService.getProjectById(req.params.id, {
+          user_id: user.id
+        })
         project = result as ProjectInterface
         break
       default:

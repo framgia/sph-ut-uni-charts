@@ -17,7 +17,7 @@ import {
   VelocityDataFormatter,
   obtainData,
 } from '@/src/utils/helpers'
-import { getIssues, getActiveSprintData } from '@/src/services/bffService'
+import { getIssues, getActiveSprintData } from '@/src/api/providerApi'
 import { useRouter } from 'next/router'
 
 const ProjectDetail = () => {
