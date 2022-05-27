@@ -13,7 +13,7 @@ describe('When getting project list from external backlog api', () => {
   let Controller: any
   const mockAxios = new MockAdapter(axios)
 
-  const payload = { apiKey: 'apikey123' }
+  const payload = { apiKey: 'apikey123', user_id: '1' }
 
   beforeEach(() => {
     req = httpMocks.createRequest()
@@ -28,8 +28,8 @@ describe('When getting project list from external backlog api', () => {
     expect(res.statusCode).toEqual(404)
   })
 
-  it('should return list of projects successfully', async () => {
-    mockAxios.onGet(`/api/v2/projects`, { params: { apiKey: payload.apiKey } }).reply(200, [
+  it('should return list of projects successfully using apiKey only', async () => {
+    mockAxios.onGet(`/api/v2/projects`, { params: payload }).reply(200, [
       {
         id: 1,
         projectKey: 'unichart-key',
@@ -50,8 +50,10 @@ describe('When getting project list from external backlog api', () => {
     ])
   })
 
-  it('should return list of projects successfully', async () => {
-    prismaMock.provider.findUnique.mockResolvedValue({
+  it('should return list of projects successfully using providerId', async () => {
+    /* @ts-ignore */
+    req.query = { providerId: 1, user_id: 1 }
+    prismaMock.provider.findFirst.mockResolvedValue({
       id: 1,
       user_id: 1,
       name: 'backlog',
@@ -60,16 +62,16 @@ describe('When getting project list from external backlog api', () => {
       created_at: new Date(),
       updated_at: new Date()
     })
-    mockAxios.onGet(`/api/v2/projects`, { params: { apiKey: 'apikey1234567890' } }).reply(200, [
-      {
-        id: 1,
-        projectKey: 'unichart-key',
-        name: 'project_name'
-      }
-    ])
+    mockAxios
+      .onGet(`/api/v2/projects`, { params: { ...req.query, apiKey: 'apikey1234567890' } })
+      .reply(200, [
+        {
+          id: 1,
+          projectKey: 'unichart-key',
+          name: 'project_name'
+        }
+      ])
 
-    /* @ts-ignore */
-    req.query = { providerId: 1 }
     await Controller.getList(req, res)
 
     expect(res.statusCode).toEqual(200)

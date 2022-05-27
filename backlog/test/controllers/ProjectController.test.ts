@@ -127,7 +127,7 @@ describe('When getProjectById', () => {
     })
 
     it('should responed project object', async () => {
-      prismaMock.project.findUnique.mockResolvedValue(mockedProjectResponse)
+      prismaMock.project.findFirst.mockResolvedValue(mockedProjectResponse)
 
       /* @ts-ignore */
       req.params = { id: 999 }
@@ -204,7 +204,7 @@ describe('When calling deleteProjectById function', () => {
 
   describe('if delete is successful', () => {
     beforeEach(async () => {
-      prismaMock.project.findUnique.mockResolvedValueOnce(testData[0])
+      prismaMock.project.findFirst.mockResolvedValueOnce(testData[0])
       prismaMock.project.delete.mockResolvedValueOnce(testData[0])
       req.params = { id: 1 }
 
