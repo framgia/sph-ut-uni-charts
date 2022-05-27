@@ -1,113 +1,154 @@
+import axios from 'axios'
 import { Request } from 'express'
-import { rest } from 'msw'
 import ProjectController from '../../controllers/ProjectController'
 import httpMocks from 'node-mocks-http'
-import BacklogService from '../../services/BacklogService'
-import { server } from '../../../jest.setup'
 import { CustomTypedResponse } from '../../utils/interfaces'
-import testData from '../constants/projectTestData.json'
+import projectTestData from '../constants/projectTestData.json'
 
-const backlogService = new BacklogService()
 const projectController = new ProjectController()
 
-describe('Project Controller Test Suite', () => {
-  test('Test #1: getProjectById - if ID exist in the database', async () => {
-    const projects: any = await backlogService.getProjects()
+jest.mock('axios')
 
-    if (!projects.length) {
-      expect(projects).toStrictEqual([])
-    } else {
-      const request = httpMocks.createRequest({
+describe('When calling getProjectsById() function', () => {
+  let request, response: CustomTypedResponse
+
+  describe('if ID exist in the database', () => {
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        Promise.resolve({ data: projectTestData.sampleProject })
+      )
+
+      request = httpMocks.createRequest({
         method: 'GET',
         url: '/projects/:id',
         params: {
-          id: `${projects[0].id}`
+          id: 1
         },
-        body: {
+        query: {
           service: 'backlog'
         }
       })
 
-      const response = httpMocks.createResponse()
+      response = httpMocks.createResponse()
       await projectController.getProjectById(request, response)
+    })
+
+    it('should return status of 200', () => {
+      expect(response.statusCode).toBe(200)
+    })
+
+    it('should return project details', () => {
       const data = response._getData()
-      expect(data).toHaveProperty('id')
-    }
+      expect(JSON.stringify(data)).toBe(JSON.stringify(projectTestData.sampleProject))
+    })
   })
 
-  test('Test #2: getProjectById - if ID does not exist in the database', async () => {
-    const request = httpMocks.createRequest({
-      method: 'GET',
-      url: '/projects/:id',
-      params: {
-        id: '111111'
-      },
-      body: {
-        service: 'backlog'
-      }
+  describe('if ID does not exist in the database', () => {
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        Promise.reject({ response: { data: { message: 'No Data Found' }, status: 404 } })
+      )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects/:id',
+        params: {
+          id: '111111'
+        },
+        query: {
+          service: 'backlog'
+        }
+      })
+
+      response = httpMocks.createResponse()
+      await projectController.getProjectById(request, response)
     })
 
-    const response = httpMocks.createResponse()
-    await projectController.getProjectById(request, response)
-    const data = response._getData()
-    expect(data).toHaveProperty('message', 'No Data Found')
+    it('should return status 404', () => {
+      expect(response.statusCode).toBe(404)
+    })
+
+    it('should respond "No Data Found" as validation error', () => {
+      const data = response._getJSONData()
+      expect(data).toHaveProperty('message', 'No Data Found')
+    })
   })
 
-  test('Test #3: getProjectById - invalid ID, letters are not valid', async () => {
-    const request = httpMocks.createRequest({
-      method: 'GET',
-      url: '/projects/:id',
-      params: {
-        id: 'test'
-      },
-      body: {
-        service: 'backlog'
-      }
+  describe('if ID is invalid', () => {
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        Promise.reject({ response: { data: { message: 'Invalid ID' }, status: 400 } })
+      )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects/:id',
+        params: {
+          id: 'test'
+        },
+        query: {
+          service: 'backlog'
+        }
+      })
+
+      response = httpMocks.createResponse()
+      await projectController.getProjectById(request, response)
     })
 
-    const response = httpMocks.createResponse()
-    await projectController.getProjectById(request, response)
-    const data = response._getData()
-    expect(data).toHaveProperty('message', 'Invalid ID')
+    it('should return status 400', () => {
+      expect(response.statusCode).toBe(400)
+    })
+
+    it('should respond "No Data Found" as validation error', () => {
+      const data = response._getJSONData()
+      expect(data).toHaveProperty('message', 'Invalid ID')
+    })
   })
+})
 
-  test('Test #4: getProjects - either array of objects or empty array', async () => {
-    const request = httpMocks.createRequest({
-      method: 'GET',
-      url: '/projects'
+describe('When calling getProjects() function', () => {
+  let request: Request, response: CustomTypedResponse
+  describe('when fetching is successful', () => {
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        Promise.resolve({ data: [projectTestData.sampleProject] })
+      )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects'
+      })
+      response = httpMocks.createResponse()
+      await projectController.getProjects(request, response)
     })
 
-    const response = httpMocks.createResponse()
-    await projectController.getProjects(request, response)
-    const data = response._getData()
-    if (!data.length) expect(data).toStrictEqual([])
-    else expect(data[0]).toHaveProperty('id')
+    it('should return status of 200', () => {
+      expect(response.statusCode).toBe(200)
+    })
+
+    it('should return the expected body', () => {
+      const data = response._getData()
+      expect(data[0]).toHaveProperty('id')
+    })
   })
 })
 
 describe('When calling deleteProjectById() function', () => {
-  let request: Request
-  let response: CustomTypedResponse
-
-  beforeEach(() => {
-    request = httpMocks.createRequest({
-      method: 'DELETE',
-      url: '/projects/:id'
-    })
-    request.query = { service: 'backlog' }
-
-    response = httpMocks.createResponse()
-  })
+  let request: Request, response: CustomTypedResponse
 
   describe('if ID does not exist in the database', () => {
-    beforeEach(async () => {
-      server.use(
-        rest.delete('*/api/projects/:id', (req, res, ctx) => {
-          return res(ctx.status(404), ctx.json({ message: 'ID does not exist' }))
-        })
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        Promise.reject({ response: { data: { message: 'ID does not exist' }, status: 404 } })
       )
 
-      request.params = { id: '1' }
+      request = httpMocks.createRequest({
+        method: 'DELETE',
+        url: '/projects/:id',
+        query: { service: 'backlog' },
+        params: { id: '1' }
+      })
+      response = httpMocks.createResponse()
 
       await projectController.deleteProjectById(request, response)
     })
@@ -123,8 +164,18 @@ describe('When calling deleteProjectById() function', () => {
   })
 
   describe('if invalid ID, letters are not valid, should be number', () => {
-    beforeEach(async () => {
-      request.params = { id: 'test' }
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        Promise.reject({ response: { data: { message: 'Invalid ID' }, status: 400 } })
+      )
+
+      request = httpMocks.createRequest({
+        method: 'DELETE',
+        url: '/projects/:id',
+        query: { service: 'backlog' },
+        params: { id: 'test' }
+      })
+      response = httpMocks.createResponse()
 
       await projectController.deleteProjectById(request, response)
     })
@@ -140,14 +191,18 @@ describe('When calling deleteProjectById() function', () => {
   })
 
   describe('if valid ID', () => {
-    beforeEach(async () => {
-      server.use(
-        rest.delete('*/api/projects/:id', (req, res, ctx) => {
-          return res(ctx.status(200), ctx.json(testData.sampleProject))
-        })
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        Promise.resolve({ data: projectTestData.sampleProject })
       )
 
-      request.params = { id: '1' }
+      request = httpMocks.createRequest({
+        method: 'DELETE',
+        url: '/projects/:id',
+        query: { service: 'backlog' },
+        params: { id: 1 }
+      })
+      response = httpMocks.createResponse()
 
       await projectController.deleteProjectById(request, response)
     })
@@ -159,7 +214,7 @@ describe('When calling deleteProjectById() function', () => {
     it('should return deleted project details', () => {
       const data = response._getData()
 
-      expect(JSON.stringify(data)).toBe(JSON.stringify(testData.sampleProject))
+      expect(JSON.stringify(data)).toBe(JSON.stringify(projectTestData.sampleProject))
     })
   })
 })

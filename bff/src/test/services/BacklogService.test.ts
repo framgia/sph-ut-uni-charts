@@ -7,34 +7,72 @@ import projectTestData from '../constants/projectTestData.json'
 
 const backlogService = new BacklogService()
 
-describe('Backlog Service Test Suite', () => {
-  test('Test #1: getProjectById - if ID exist in the database', async () => {
-    const projects: any = await backlogService.getProjects()
+describe('When using getProjectById() function', () => {
+  let project: any
 
-    if (!projects.length) {
-      expect(projects).toStrictEqual([])
-    } else {
-      const project: any = await backlogService.getProjectById(`/${projects[0].id}`)
+  describe('if ID exist in the database', () => {
+    beforeEach(async () => {
+      server.use(
+        rest.get('*/api/projects/*', (req, res, ctx) => {
+          return res(ctx.json(projectTestData.sampleProject))
+        })
+      )
+
+      project = await backlogService.getProjectById('/1')
+    })
+
+    it('should return expected body', () => {
       expect(project).toHaveProperty('id')
-    }
+    })
   })
 
-  test('Test #2: getProjectById - if ID does not exist in the database', async () => {
-    const project: any = await backlogService.getProjectById('/111111')
-    expect(project).toHaveProperty('message', 'No Data Found')
+  describe('if ID does not exist in the database', () => {
+    beforeEach(async () => {
+      server.use(
+        rest.get('*/api/projects/*', (req, res, ctx) => {
+          return res(ctx.status(404), ctx.json({ message: 'No Data Found' }))
+        })
+      )
+
+      project = await backlogService.getProjectById('/1')
+    })
+
+    it('should return status of 404', () => {
+      expect(project.status).toBe(404)
+    })
+
+    it("should have 'No Data Found' as error message", () => {
+      expect(project.errors).toHaveProperty('message', 'No Data Found')
+    })
   })
 
-  test('Test #3: getProjectById - invalid ID, letters are not valid', async () => {
-    const project: any = await backlogService.getProjectById('/test')
-    expect(project).toHaveProperty('message', 'Invalid ID')
-  })
+  describe('if invalid ID, non numeric is invalid', () => {
+    beforeEach(async () => {
+      server.use(
+        rest.get('*/api/projects/*', (req, res, ctx) => {
+          return res(ctx.status(400), ctx.json({ message: 'Invalid ID' }))
+        })
+      )
 
+      project = await backlogService.getProjectById('/1')
+    })
+
+    it('should return status of 400', () => {
+      expect(project.status).toBe(400)
+    })
+
+    it("should have 'No Data Found' as error message", () => {
+      expect(project.errors).toHaveProperty('message', 'Invalid ID')
+    })
+  })
+})
+
+describe('Backlog Service Test Suite', () => {
   test('Test #4: getProjects - fetch all projects', async () => {
     const projects: any = await backlogService.getProjects()
     if (!projects.length) expect(projects).toStrictEqual([])
     else expect(projects[0]).toHaveProperty('id')
   })
-
 })
 
 describe('When using deleteProjectById() function', () => {
@@ -58,7 +96,7 @@ describe('When using deleteProjectById() function', () => {
     beforeEach(async () => {
       server.use(
         rest.delete('*/api/projects/*', (req, res, ctx) => {
-          return res(ctx.status(404), ctx.json({ message: "ID does not exist" }))
+          return res(ctx.status(404), ctx.json({ message: 'ID does not exist' }))
         })
       )
 
@@ -71,7 +109,7 @@ describe('When using deleteProjectById() function', () => {
 
     it('should return the error messages', () => {
       expect(project).toHaveProperty('errors')
-      expect(JSON.stringify(project.errors)).toBe(JSON.stringify({ message: "ID does not exist" }))
+      expect(JSON.stringify(project.errors)).toBe(JSON.stringify({ message: 'ID does not exist' }))
     })
   })
 
@@ -79,7 +117,7 @@ describe('When using deleteProjectById() function', () => {
     beforeEach(async () => {
       server.use(
         rest.delete('*/api/projects/*', (req, res, ctx) => {
-          return res(ctx.status(400), ctx.json({ message: "Invalid ID" }))
+          return res(ctx.status(400), ctx.json({ message: 'Invalid ID' }))
         })
       )
 
@@ -92,7 +130,7 @@ describe('When using deleteProjectById() function', () => {
 
     it('should return the error messages', () => {
       expect(project).toHaveProperty('errors')
-      expect(JSON.stringify(project.errors)).toBe(JSON.stringify({ message: "Invalid ID" }))
+      expect(JSON.stringify(project.errors)).toBe(JSON.stringify({ message: 'Invalid ID' }))
     })
   })
 })
