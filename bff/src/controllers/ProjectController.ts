@@ -107,15 +107,29 @@ export default class ProjectController extends Controller {
           status = milestones.status
           response = milestones.errors
           break
+        } else if (!milestones.length) {
+          status = 404
+          response = { message: 'No milestone found' }
+          break
         }
 
-        const activeSprint = milestones?.find((milestone: any) => {
+        // reverse the milestones since it starts from latest first [sprint 4, sprint 3,...]
+        // if there are multiple unfinished sprint, calling .find() will always return the latest sprint
+        milestones.reverse()
+
+        const activeSprint = milestones.find((milestone: any) => {
           const releaseDate = DateTime.fromISO(milestone.releaseDueDate).toLocaleString()
           const dateNow = DateTime.now().toLocaleString()
           if (releaseDate >= dateNow) {
             return milestone
           }
         })
+
+        if (!activeSprint) {
+          status = 404
+          response = { message: 'No active sprint found' }
+          break
+        }
 
         const { startDate, releaseDueDate, id } = activeSprint
         // Get day before startDate //
@@ -130,6 +144,10 @@ export default class ProjectController extends Controller {
         if (issues.errors) {
           status = issues.status
           response = issues.errors
+          break
+        } else if (!issues.length) {
+          status = 404
+          response = { message: 'No issues found' }
           break
         }
 

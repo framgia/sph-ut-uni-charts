@@ -1,15 +1,24 @@
 import { render, screen } from '@testing-library/react'
 import ProjectDetail from '@/src/pages/projects/ProjectDetail'
 import { developersList } from '@/src/utils/dummyData'
+import * as bffService from '@/src/services/bffService'
 
-describe('Project Detail', () => {
+describe('When rendering detail page', () => {
   beforeAll(() => {
     jest.spyOn(require('next/router'), 'useRouter').mockImplementation(() => {
       return { query: { id: 3 } }
     })
   })
 
-  it('has velocity chart and text for velocity', () => {
+  it('should have page header', () => {
+    render(<ProjectDetail />)
+
+    // TODO: make project name dynamic
+    const header = screen.getByRole('heading', { name: /project name detail/i })
+    expect(header).toBeInTheDocument()
+  })
+
+  it('should have velocity chart and text for velocity', () => {
     render(<ProjectDetail />)
 
     const velocityChart = screen.getByRole('velocity-chart')
@@ -19,17 +28,32 @@ describe('Project Detail', () => {
     expect(velocity).toBeInTheDocument()
   })
 
-  it('has burn down chart and select field to choose the sprint', () => {
-    render(<ProjectDetail />)
+  describe('when rendering burn down chart', () => {
+    let getSprintDataSpy
 
-    const burnDownChart = screen.getByRole('burn-down-chart')
-    expect(burnDownChart).toBeInTheDocument()
+    beforeEach(() => {
+      getSprintDataSpy = jest.spyOn(bffService, 'getActiveSprintData')
+      render(<ProjectDetail />)
+    })
+
+    afterEach(() => {
+      getSprintDataSpy.mockRestore()
+    })
+
+    it('should have a burn down chart', () => {
+      const burnDownChart = screen.getByRole('burn-down-chart')
+      expect(burnDownChart).toBeInTheDocument()
+    })
+
+    it('should call getActiveSprintData() once', () => {
+      expect(getSprintDataSpy).toHaveBeenCalledTimes(1)
+    })
 
     // temporarily commented out since it is commented out in the page
     /*const selectField = screen.getByRole('textbox', {
-      name: /selected sprint/i,
-    })
-    expect(selectField).toBeInTheDocument()*/
+          name: /selected sprint/i,
+        })
+        expect(selectField).toBeInTheDocument()*/
   })
 
   // temporarily commented out since it is commented out in the page
@@ -86,7 +110,7 @@ describe('Project Detail', () => {
     expect(burnUpChart).toBeInTheDocument()
   })*/
 
-  it('has developer list', () => {
+  it('should have developer list', () => {
     render(<ProjectDetail />)
 
     const header = screen.getByRole('heading', { name: /developers/i })
@@ -101,5 +125,14 @@ describe('Project Detail', () => {
 
     const columns = screen.getAllByRole('columnheader')
     expect(columns).toHaveLength(2)
+  })
+
+  it('should have a button to redirect to home page', () => {
+    render(<ProjectDetail />)
+
+    const redirectButton = screen.getByRole('link', {
+      name: /back to home/i,
+    })
+    expect(redirectButton).toBeInTheDocument()
   })
 })

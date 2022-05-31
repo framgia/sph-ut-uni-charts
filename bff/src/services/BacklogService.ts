@@ -112,7 +112,11 @@ export default class BacklogService {
         data = response.data
       })
       .catch((error) => {
-        data = { errors: error.response.data, status: error.response.status }
+        if (error.response.status === 404) {
+          data = { errors: [{ message: 'Incorrect namespace' }], status: 404 }
+        } else {
+          data = { errors: error.response.data, status: error.response.status }
+        }
       })
     return data
   }
@@ -150,7 +154,11 @@ export default class BacklogService {
         data = response.data
       })
       .catch((error) => {
-        data = { errors: error.response.data, status: error.response.status }
+        if (error.response.status === 404) {
+          data = { errors: [{ message: 'Incorrect namespace' }], status: 404 }
+        } else {
+          data = { errors: error.response.data, status: error.response.status }
+        }
       })
     return data
   }

@@ -138,7 +138,7 @@ describe('When using deleteProjectById() function', () => {
 describe('When using getIssues() function', () => {
   let issues: any
 
-  describe('if it has correct namespace, project ID and key', () => {
+  describe('if it has correct namespace, and key', () => {
     it('should return expected body', async () => {
       server.use(
         rest.get('*/api/v2/issues', (req, res, ctx) => {
@@ -153,13 +153,15 @@ describe('When using getIssues() function', () => {
   })
 
   describe('if it has incorrect key', () => {
-    const errors = [
-      {
-        message: 'Authentication failure.',
-        code: 11,
-        moreInfo: ''
-      }
-    ]
+    const errors = {
+      errors: [
+        {
+          message: 'Authentication failure.',
+          code: 11,
+          moreInfo: ''
+        }
+      ]
+    }
 
     beforeEach(async () => {
       server.use(
@@ -174,28 +176,6 @@ describe('When using getIssues() function', () => {
     it('should return status of 401', () => {
       expect(issues.status).toBe(401)
       expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
-    })
-
-    it('should return expected error message', () => {
-      expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
-    })
-  })
-
-  describe('if it has incorrect project ID', () => {
-    const errors = [{ message: 'No such project. (key:111)', code: 6, moreInfo: '' }]
-
-    beforeEach(async () => {
-      server.use(
-        rest.get('*/api/v2/issues', (req, res, ctx) => {
-          return res(ctx.json(errors), ctx.status(404))
-        })
-      )
-
-      issues = await backlogService.getIssues('namespace', 'key', 111)
-    })
-
-    it('should return status of 404', () => {
-      expect(issues.status).toBe(404)
     })
 
     it('should return expected error message', () => {
@@ -218,8 +198,8 @@ describe('When using getIssues() function', () => {
       expect(issues.status).toBe(404)
     })
 
-    it('should not return an error message', () => {
-      expect(issues).toHaveProperty('errors', '')
+    it('should return `Incorrect namespace` as the error message', () => {
+      expect(issues).toHaveProperty('errors', [{ message: 'Incorrect namespace' }])
     })
   })
 })
@@ -310,6 +290,91 @@ describe('When using getMilestones() function', () => {
 
     it('should not return an error message', () => {
       expect(milestones).toHaveProperty('errors', '')
+    })
+  })
+})
+
+describe('When using getActiveSprintData() function', () => {
+  let issues: any
+
+  describe('if it has correct namespace, project ID and key', () => {
+    it('should return expected body', async () => {
+      server.use(
+        rest.get('*/api/v2/issues*', (req, res, ctx) => {
+          return res(ctx.json(issueTestData.backlogServiceMilestoneResponse))
+        })
+      )
+
+      issues = await backlogService.getActiveSprintData('namespace', 'apikey', 111, 111)
+
+      expect(JSON.stringify(issues)).toBe(
+        JSON.stringify(issueTestData.backlogServiceMilestoneResponse)
+      )
+    })
+  })
+
+  describe('if there are no issues', () => {
+    it('should return expected body', async () => {
+      server.use(
+        rest.get('*/api/v2/issues*', (req, res, ctx) => {
+          return res(ctx.json([]))
+        })
+      )
+
+      issues = await backlogService.getActiveSprintData('namespace', 'apikey', 111, 111)
+
+      expect(JSON.stringify(issues)).toBe(JSON.stringify([]))
+    })
+  })
+
+  describe('if it has incorrect key', () => {
+    const errors = {
+      errors: [
+        {
+          message: 'Authentication failure.',
+          code: 11,
+          moreInfo: ''
+        }
+      ]
+    }
+
+    beforeAll(async () => {
+      server.use(
+        rest.get('*/api/v2/issues*', (req, res, ctx) => {
+          return res(ctx.json(errors), ctx.status(401))
+        })
+      )
+
+      issues = await backlogService.getActiveSprintData('namespace', 'apikey', 111, 111)
+    })
+
+    it('should return status of 401', () => {
+      expect(issues.status).toBe(401)
+    })
+
+    it('should return expected error message', () => {
+      expect(JSON.stringify(issues.errors)).toBe(JSON.stringify(errors))
+    })
+  })
+
+  describe('if it has incorrect namespace', () => {
+    const errors = [{ message: 'Incorrect namespace' }]
+    beforeAll(async () => {
+      server.use(
+        rest.get('*/api/v2/issues*', (req, res, ctx) => {
+          return res(ctx.status(404))
+        })
+      )
+
+      issues = await backlogService.getActiveSprintData('namespace', 'apikey', 111, 111)
+    })
+
+    it('should return status of 404', () => {
+      expect(issues.status).toBe(404)
+    })
+
+    it('should not return an error message', () => {
+      expect(issues).toHaveProperty('errors', errors)
     })
   })
 })

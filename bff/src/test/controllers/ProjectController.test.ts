@@ -1,13 +1,9 @@
 import axios from 'axios'
 import { Request } from 'express'
-import { rest } from 'msw'
 import httpMocks from 'node-mocks-http'
 import ProjectController from '../../controllers/ProjectController'
 import { CustomTypedResponse } from '../../utils/interfaces'
 import projectTestData from '../constants/projectTestData.json'
-import testData from '../constants/activeSprintData.json'
-import BacklogService from '../../services/BacklogService'
-import { server } from '../../../jest.setup'
 
 const projectController = new ProjectController()
 
@@ -200,48 +196,16 @@ describe('When calling deleteProjectById() function', () => {
   })
 })
 
-describe('Get Burndown chart data', () => {
-  describe('When ID is not found or invalid', () => {
-    it('Should return error if project_id is not found', async () => {
-      const request = httpMocks.createRequest({
-        method: 'GET',
-        url: '/projects/:id/active-sprint-data',
-        params: {
-          id: '00000'
-        },
-        query: {
-          service: 'backlog'
-        }
-      })
+describe('When calling getActiveSprintData() function', () => {
+  let request, response: CustomTypedResponse
+  const sampleMilestoneWithActiveSprint = JSON.parse(
+    JSON.stringify(projectTestData.sampleMilestone)
+  )
+  sampleMilestoneWithActiveSprint[0].releaseDueDate = new Date().toISOString()
 
-      const response = httpMocks.createResponse()
-      await projectController.getActiveSprintData(request, response)
-      const data = response._getData()
-      expect(data).toHaveProperty('message', 'No Data Found')
-    })
-
-    it('Should return error if ID is invalid', async () => {
-      const request = httpMocks.createRequest({
-        method: 'GET',
-        url: '/projects/:id/active-sprint-data',
-        params: {
-          id: 'test'
-        },
-        query: {
-          service: 'backlog'
-        }
-      })
-
-      const response = httpMocks.createResponse()
-      await projectController.getActiveSprintData(request, response)
-      const data = response._getData()
-      expect(data).toHaveProperty('message', 'Invalid ID')
-    })
-  })
-
-  describe('When service is not provided when making the request', () => {
-    it('Should return error when no service is provided', async () => {
-      const request = httpMocks.createRequest({
+  describe('if no services is provided', () => {
+    beforeAll(async () => {
+      request = httpMocks.createRequest({
         method: 'GET',
         url: '/projects/:id/active-sprint-data',
         params: {
@@ -249,36 +213,27 @@ describe('Get Burndown chart data', () => {
         }
       })
 
-      const response = httpMocks.createResponse()
+      response = httpMocks.createResponse()
       await projectController.getActiveSprintData(request, response)
-      const data = response._getData()
+    })
+
+    it('should return status of 400', () => {
+      expect(response.statusCode).toBe(400)
+    })
+
+    it('should return "Service information not provided." as error message', () => {
+      const data = response._getJSONData()
       expect(data).toHaveProperty('message', 'Service information not provided.')
     })
   })
 
-  describe('When service and ID is valid', () => {
-    beforeEach(() => {
-      server.use(
-        rest.get('*/api/projects/:id', (req, res, ctx) => {
-          return res(ctx.status(200), ctx.json(testData.projectsResponse))
-        }),
-
-        rest.get('*/api/providers/:id', (req, res, ctx) => {
-          return res(ctx.status(200), ctx.json(testData.providersResponse))
-        }),
-
-        rest.get('*/api/v2/projects/*', (req, res, ctx) => {
-          return res(ctx.status(200), ctx.json(testData.milestonesResponse))
-        }),
-
-        rest.get('*/api/v2/issues', (req, res, ctx) => {
-          return res(ctx.json(testData.issuesResponse))
-        })
+  describe('if getting project returned an error', () => {
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        // project
+        Promise.reject({ response: { data: { message: 'Invalid ID' }, status: 400 } })
       )
-    })
-
-    it('Should return active sprint dates, estimated sprint data and actual sprint data', async () => {
-      const request = httpMocks.createRequest({
+      request = httpMocks.createRequest({
         method: 'GET',
         url: '/projects/:id/active-sprint-data',
         params: {
@@ -289,21 +244,341 @@ describe('Get Burndown chart data', () => {
         }
       })
 
-      const response = httpMocks.createResponse()
+      response = httpMocks.createResponse()
       await projectController.getActiveSprintData(request, response)
-      const res = response._getData()
+    })
 
-      expect(res).toHaveProperty('dates')
-      expect(res).toHaveProperty('data')
-      expect(res).toBeTruthy()
+    it('should return the expected status', () => {
+      expect(response.statusCode).toBe(400)
+    })
 
-      // Number of dates in x-axis of burn-down chart is 6
-      // Similar with backlog's burn-down chart
-      expect(res.dates).toHaveLength(6)
-      expect(res.data).toHaveProperty('estimated')
-      expect(res.data).toHaveProperty('actual')
-      expect(res.data.estimated.length).toBeGreaterThan(0)
-      expect(res.data.actual.length).toBeGreaterThan(0)
+    it('should return expected body', () => {
+      const data = response._getJSONData()
+      expect(data).toHaveProperty('message', 'Invalid ID')
+    })
+  })
+
+  describe('if getting provider returned an error', () => {
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        // project
+        Promise.resolve({ data: projectTestData.sampleProject })
+      )
+      ;(axios.get as any).mockResolvedValueOnce(
+        // provider
+        Promise.reject({ response: { data: { message: 'Invalid ID' }, status: 400 } })
+      )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects/:id/active-sprint-data',
+        params: {
+          id: '1'
+        },
+        query: {
+          service: 'backlog'
+        }
+      })
+
+      response = httpMocks.createResponse()
+      await projectController.getActiveSprintData(request, response)
+    })
+
+    it('should return the expected status', () => {
+      expect(response.statusCode).toBe(400)
+    })
+
+    it('should return expected body', () => {
+      const data = response._getJSONData()
+      expect(data).toHaveProperty('message', 'Invalid ID')
+    })
+  })
+
+  describe('if getting milestones returned an error', () => {
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        // project
+        Promise.resolve({ data: projectTestData.sampleProject })
+      )
+      ;(axios.get as any)
+        .mockResolvedValueOnce(
+          // provider
+          Promise.resolve({ data: projectTestData.sampleProvider })
+        )
+        .mockResolvedValueOnce(
+          // milestones
+          Promise.reject({
+            response: { data: { message: projectTestData.sampleError }, status: 400 }
+          })
+        )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects/:id/active-sprint-data',
+        params: {
+          id: '1'
+        },
+        query: {
+          service: 'backlog'
+        }
+      })
+
+      response = httpMocks.createResponse()
+      await projectController.getActiveSprintData(request, response)
+    })
+
+    it('should return the expected status', () => {
+      expect(response.statusCode).toBe(400)
+    })
+
+    it('should return expected body', () => {
+      const data = response._getJSONData()
+      expect(data).toHaveProperty('message', projectTestData.sampleError)
+    })
+  })
+
+  describe('if there are no milestones', () => {
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        // project
+        Promise.resolve({ data: projectTestData.sampleProject })
+      )
+      ;(axios.get as any)
+        .mockResolvedValueOnce(
+          // provider
+          Promise.resolve({ data: projectTestData.sampleProvider })
+        )
+        .mockResolvedValueOnce(
+          // milestones
+          Promise.resolve({ data: [] })
+        )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects/:id/active-sprint-data',
+        params: {
+          id: '1'
+        },
+        query: {
+          service: 'backlog'
+        }
+      })
+
+      response = httpMocks.createResponse()
+      await projectController.getActiveSprintData(request, response)
+    })
+
+    it('should return the expected status', () => {
+      expect(response.statusCode).toBe(404)
+    })
+
+    it('should return expected body', () => {
+      const data = response._getJSONData()
+      expect(data).toHaveProperty('message', 'No milestone found')
+    })
+  })
+
+  describe('if there is no active sprint', () => {
+    beforeAll(async () => {
+      ;(axios as any).mockResolvedValueOnce(
+        // project
+        Promise.resolve({ data: projectTestData.sampleProject })
+      )
+      ;(axios.get as any)
+        .mockResolvedValueOnce(
+          // provider
+          Promise.resolve({ data: projectTestData.sampleProvider })
+        )
+        .mockResolvedValueOnce(
+          // milestones
+          Promise.resolve({ data: projectTestData.sampleMilestone })
+        )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects/:id/active-sprint-data',
+        params: {
+          id: '1'
+        },
+        query: {
+          service: 'backlog'
+        }
+      })
+
+      response = httpMocks.createResponse()
+      await projectController.getActiveSprintData(request, response)
+    })
+
+    it('should return status of 404', () => {
+      expect(response.statusCode).toBe(404)
+    })
+
+    it('should return expected body', () => {
+      const data = response._getJSONData()
+      expect(data).toHaveProperty('message', 'No active sprint found')
+    })
+  })
+
+  describe('if getting issues returned an error', () => {
+    beforeAll(async () => {
+      ;(axios as any)
+        .mockResolvedValueOnce(
+          // project
+          Promise.resolve({ data: projectTestData.sampleProject })
+        )
+        .mockResolvedValueOnce(
+          // issues
+          Promise.reject({
+            response: { data: { message: projectTestData.sampleError }, status: 400 }
+          })
+        )
+      ;(axios.get as any)
+        .mockResolvedValueOnce(
+          // provider
+          Promise.resolve({ data: projectTestData.sampleProvider })
+        )
+        .mockResolvedValueOnce(
+          // milestones
+          Promise.resolve({ data: sampleMilestoneWithActiveSprint })
+        )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects/:id/active-sprint-data',
+        params: {
+          id: '1'
+        },
+        query: {
+          service: 'backlog'
+        }
+      })
+
+      response = httpMocks.createResponse()
+      await projectController.getActiveSprintData(request, response)
+    })
+
+    it('should return the expected status', () => {
+      expect(response.statusCode).toBe(400)
+    })
+
+    it('should return expected body', () => {
+      const data = response._getJSONData()
+      expect(data).toHaveProperty('message', projectTestData.sampleError)
+    })
+  })
+
+  describe('if there are no issues', () => {
+    beforeAll(async () => {
+      ;(axios as any)
+        .mockResolvedValueOnce(
+          // project
+          Promise.resolve({ data: projectTestData.sampleProject })
+        )
+        .mockResolvedValueOnce(
+          // issues
+          Promise.resolve({ data: [] })
+        )
+      ;(axios.get as any)
+        .mockResolvedValueOnce(
+          // provider
+          Promise.resolve({ data: projectTestData.sampleProvider })
+        )
+        .mockResolvedValueOnce(
+          // milestones
+          Promise.resolve({ data: sampleMilestoneWithActiveSprint })
+        )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects/:id/active-sprint-data',
+        params: {
+          id: '1'
+        },
+        query: {
+          service: 'backlog'
+        }
+      })
+
+      response = httpMocks.createResponse()
+      await projectController.getActiveSprintData(request, response)
+    })
+
+    it('should return stauts of 404', () => {
+      expect(response.statusCode).toBe(404)
+    })
+
+    it('should return expected body', () => {
+      const data = response._getJSONData()
+      expect(data).toHaveProperty('message', 'No issues found')
+    })
+  })
+
+  describe('if there is project, provider, milestones, active sprint and issues', () => {
+    // need to modify the expected response because the date is dynamically set to the current date
+    // as we see in line 227
+    const expectedResponse = projectTestData.sampleGetActiveSprintData
+
+    const date1 = new Date('5/27/2022').getTime()
+    const date2 = new Date().getTime()
+    const diffTime = Math.abs(date2 - date1)
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+    const timeArray = []
+    const datesArray = []
+
+    for (let i = 0; i < diffDays; i++) {
+      timeArray.push(0)
+      const result = new Date(date1)
+      result.setDate(result.getDate() + i + 1)
+      datesArray.push(result.toLocaleDateString())
+    }
+
+    expectedResponse.data.actual.push.apply(expectedResponse.data.actual, timeArray)
+    expectedResponse.data.estimated.push.apply(expectedResponse.data.estimated, timeArray)
+    expectedResponse.dates.push.apply(expectedResponse.dates, datesArray)
+
+    beforeAll(async () => {
+      ;(axios as any)
+        .mockResolvedValueOnce(
+          // project
+          Promise.resolve({ data: projectTestData.sampleProject })
+        )
+        .mockResolvedValueOnce(
+          // issues
+          Promise.resolve({ data: projectTestData.sampleIssues })
+        )
+      ;(axios.get as any)
+        .mockResolvedValueOnce(
+          // provider
+          Promise.resolve({ data: projectTestData.sampleProvider })
+        )
+        .mockResolvedValueOnce(
+          // milestones
+          Promise.resolve({ data: sampleMilestoneWithActiveSprint })
+        )
+
+      request = httpMocks.createRequest({
+        method: 'GET',
+        url: '/projects/:id/active-sprint-data',
+        params: {
+          id: '1'
+        },
+        query: {
+          service: 'backlog'
+        }
+      })
+
+      response = httpMocks.createResponse()
+      await projectController.getActiveSprintData(request, response)
+    })
+
+    it('should return status of 200', () => {
+      expect(response.statusCode).toBe(200)
+    })
+
+    it('should return expected body', () => {
+      const data = response._getJSONData()
+      expect(JSON.stringify(data)).toBe(JSON.stringify(expectedResponse))
     })
   })
 })
