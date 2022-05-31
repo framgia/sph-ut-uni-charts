@@ -44,7 +44,7 @@ function AddProject() {
 
   const formProject = useForm({
     initialValues: {
-      project_id: '',
+      project_id: 0,
     },
 
     validate: {
