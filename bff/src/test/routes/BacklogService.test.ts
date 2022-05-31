@@ -10,14 +10,6 @@ const backlogService = new BacklogService()
 describe('When using getProjectById() function', () => {
   let project: any
 
-  beforeEach(() => {
-    server.use(
-      rest.get('*/users/', (req, res, ctx) => {
-        return res(ctx.status(200), ctx.json({ user_id: 1 }))
-      })
-    )
-  })
-
   describe('if ID exist in the database', () => {
     beforeEach(async () => {
       server.use(
