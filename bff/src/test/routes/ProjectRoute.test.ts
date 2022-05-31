@@ -12,6 +12,14 @@ app.use('/', ProjectRoute)
 describe('When deleting through /projects/:id route', () => {
   let result: request.Response
 
+  beforeEach(async () => {
+    server.use(
+      rest.get('*/users/', (req, res, ctx) => {
+        return res(ctx.status(200), ctx.json({ id: 1 }))
+      })
+    )
+  })
+
   describe('if ID does not exist in the database', () => {
     beforeEach(async () => {
       server.use(

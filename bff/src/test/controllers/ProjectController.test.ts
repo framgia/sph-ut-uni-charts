@@ -1,21 +1,40 @@
+require('dotenv').config()
 import axios from 'axios'
+import { rest } from 'msw'
 import { Request } from 'express'
 import ProjectController from '../../controllers/ProjectController'
 import httpMocks from 'node-mocks-http'
 import { CustomTypedResponse } from '../../utils/interfaces'
 import projectTestData from '../constants/projectTestData.json'
+import { server } from '../../../jest.setup'
 
 const projectController = new ProjectController()
 
 jest.mock('axios')
+
+// beforeEach(() => {
+//   server.use(
+//     rest.get('*/users/', (req, res, ctx) => {
+//       return res(ctx.status(200), ctx.json({ id: 1 }))
+//     })
+//   )
+// })
 
 describe('When calling getProjectsById() function', () => {
   let request, response: CustomTypedResponse
 
   describe('if ID exist in the database', () => {
     beforeAll(async () => {
-      ;(axios as any).mockResolvedValueOnce(
-        Promise.resolve({ data: projectTestData.sampleProject })
+      // ;(axios as any).mockResolvedValueOnce(
+      //   Promise.resolve({ data: projectTestData.sampleProject })
+      // )
+      server.use(
+        rest.get('*/users/', (req, res, ctx) => {
+          return res(ctx.status(200), ctx.json({ id: 1 }))
+        }),
+        rest.get('*/projects/*', (req, res, ctx) => {
+          return res(ctx.status(200), ctx.json({ data: projectTestData.sampleProject }))
+        })
       )
 
       request = httpMocks.createRequest({

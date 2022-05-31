@@ -29,6 +29,10 @@ describe('When using getIssues() function', () => {
 
       rest.get('*/api/projects/:id', (req, res, ctx) => {
         return res(ctx.status(200), ctx.json(testData.projectsResponse))
+      }),
+
+      rest.get('*/users/', (req, res, ctx) => {
+        return res(ctx.status(200), ctx.json({ id: 1 }))
       })
     )
   })

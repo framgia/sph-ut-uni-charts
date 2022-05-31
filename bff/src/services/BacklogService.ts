@@ -19,7 +19,7 @@ export default class BacklogService {
     return data
   }
 
-  async getProjectById(id: String, payload: { user_id: string }) {
+  async getProjectById(id: String, payload: { user_id: number }) {
     let data
 
     await axios({
@@ -37,7 +37,7 @@ export default class BacklogService {
     return data
   }
 
-  async deleteProjectById(id: String, payload: { user_id: string }) {
+  async deleteProjectById(id: String, payload: { user_id: number }) {
     let data
 
     await axios({
