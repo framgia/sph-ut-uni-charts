@@ -5,6 +5,7 @@ class Provider {
   public async isProjectRegistered(data: ProviderAdd) {
     return await prisma.project.findMany({
       where: {
+        user_id: data.user_id,
         project_id: data.project_id,
         provider: { user_id: data.user_id }
       }
@@ -26,7 +27,8 @@ class Provider {
           create: {
             name: project_name,
             key: project_key,
-            project_id: project_id
+            project_id: project_id,
+            user_id
           }
         }
       },
@@ -39,7 +41,8 @@ class Provider {
           create: {
             name: project_name,
             key: project_key,
-            project_id: project_id
+            project_id: project_id,
+            user_id
           }
         }
       }
