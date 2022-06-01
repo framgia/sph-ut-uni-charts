@@ -3,7 +3,7 @@ import httpMocks from 'node-mocks-http'
 import ProjectController from '../../controllers/ProjectController'
 import { Request, Response } from 'express'
 import { prismaMock } from '../../utils/singleton'
-import { IProjectData } from 'models/interfaces/Project'
+import { IProjectData } from 'interfaces/Project'
 import { testData, mockedProjectResponse } from '../const/project'
 import { Request } from 'express'
 import { TypedResponse } from '../interfaces/response'
@@ -127,7 +127,7 @@ describe('When getProjectById', () => {
     })
 
     it('should responed project object', async () => {
-      prismaMock.project.findUnique.mockResolvedValue(mockedProjectResponse)
+      prismaMock.project.findFirst.mockResolvedValue(mockedProjectResponse)
 
       /* @ts-ignore */
       req.params = { id: 999 }
@@ -204,7 +204,7 @@ describe('When calling deleteProjectById function', () => {
 
   describe('if delete is successful', () => {
     beforeEach(async () => {
-      prismaMock.project.findUnique.mockResolvedValueOnce(testData[0])
+      prismaMock.project.findFirst.mockResolvedValueOnce(testData[0])
       prismaMock.project.delete.mockResolvedValueOnce(testData[0])
       req.params = { id: 1 }
 

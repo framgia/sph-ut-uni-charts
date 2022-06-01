@@ -6,6 +6,7 @@ import { Container, Text } from '@mantine/core'
 import Router from 'next/router'
 import Cookies from 'js-cookie'
 import { login } from '@/src/api/authApi'
+import { baseAuthApi } from '@/src/api/base'
 
 const Login = (props) => {
   const handleLogin = async (params) => {
@@ -19,6 +20,7 @@ const Login = (props) => {
 
     await login(payload)
 
+    baseAuthApi.defaults.headers.Authorization = payload.email
     Cookies.set('user_signed', JSON.stringify({ ...payload }))
     Router.push('/')
   }

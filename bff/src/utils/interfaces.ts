@@ -43,3 +43,7 @@ export interface CustomTypedResponse extends Response {
   _getData: () => any
   _getJSONData: () => any
 }
+
+export type getUserInterface {
+  email: string
+}

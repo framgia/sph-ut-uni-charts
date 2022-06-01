@@ -18,7 +18,7 @@ describe('When using getProjectById() function', () => {
         })
       )
 
-      project = await backlogService.getProjectById('/1')
+      project = await backlogService.getProjectById('/1', { user_id: 1 })
     })
 
     it('should return expected body', () => {
@@ -34,7 +34,7 @@ describe('When using getProjectById() function', () => {
         })
       )
 
-      project = await backlogService.getProjectById('/1')
+      project = await backlogService.getProjectById('/1', { user_id: 1 })
     })
 
     it('should return status of 404', () => {
@@ -54,7 +54,7 @@ describe('When using getProjectById() function', () => {
         })
       )
 
-      project = await backlogService.getProjectById('/1')
+      project = await backlogService.getProjectById('/1', { user_id: 1 })
     })
 
     it('should return status of 400', () => {
@@ -86,7 +86,7 @@ describe('When using deleteProjectById() function', () => {
         })
       )
 
-      project = await backlogService.deleteProjectById('/11')
+      project = await backlogService.deleteProjectById('/11', { user_id: 1 })
 
       expect(JSON.stringify(project)).toBe(JSON.stringify(projectTestData.sampleProject))
     })
@@ -100,7 +100,7 @@ describe('When using deleteProjectById() function', () => {
         })
       )
 
-      project = await backlogService.deleteProjectById('/1')
+      project = await backlogService.deleteProjectById('/1', { user_id: 1 })
     })
 
     it('should return the status of 404', () => {
@@ -121,7 +121,7 @@ describe('When using deleteProjectById() function', () => {
         })
       )
 
-      project = await backlogService.deleteProjectById('/test')
+      project = await backlogService.deleteProjectById('/test', { user_id: 1 })
     })
 
     it('should return the status of 400', () => {

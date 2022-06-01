@@ -2,6 +2,7 @@ import Provider from '../models/Provider'
 import Validation from '../validations/ProviderValidation'
 import BacklogService from '../services/BacklogService'
 import { Request, Response } from 'express'
+import { InputRequest } from '../interfaces/Provider'
 
 const Service = new BacklogService()
 const ProviderModel = new Provider()
@@ -13,7 +14,7 @@ class ProviderController {
     if (errors) return res.status(422).send(errors)
 
     if (payload.id) {
-      const provider = await ProviderModel.getProviderById(Number(payload.id))
+      const provider = await ProviderModel.getProviderById(payload)
       payload = { ...payload, ...provider }
     }
 
@@ -48,11 +49,15 @@ class ProviderController {
     return res.send(providers)
   }
 
-  async getProviderById(req: Request, res: Response) {
+  async getProviderById(req: InputRequest, res: Response) {
     if (/[^0-9]/.test(req.params.id)) {
       res.status(400).json({ message: 'Invalid ID' })
     } else {
-      const provider = await ProviderModel.getProviderById(Number(req.params.id))
+      const payload = {
+        id: Number(req.params.id),
+        user_id: req.query.user_id
+      }
+      const provider = await ProviderModel.getProviderById(payload)
 
       if (!provider) {
         res.status(404).json({ message: 'No Provider Found' })

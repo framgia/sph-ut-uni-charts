@@ -1,5 +1,6 @@
 require('dotenv').config()
 import axios, { AxiosResponse } from 'axios'
+import { getUserInterface } from '../utils/interfaces'
 
 const URL = process.env.ACCOUNT_API_SERVICE
 
@@ -31,6 +32,16 @@ export default class AccountService {
       params: {
         email: email
       }
+    }).then((response: AxiosResponse) => {
+      return response.data
+    })
+  }
+
+  static async user(payload: getUserInterface) {
+    return axios({
+      url: `${URL}/users/`,
+      method: 'get',
+      params: payload
     }).then((response: AxiosResponse) => {
       return response.data
     })

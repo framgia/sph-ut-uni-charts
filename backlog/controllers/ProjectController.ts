@@ -1,19 +1,19 @@
 import prisma from '../utils/client'
-import { Request, Response } from 'express'
-
+import { Response } from 'express'
+import { InputRequest, GetProjectsInput } from '../interfaces/Project'
 export default class ProjectController {
-  async getProjects(req: Request, res: Response) {
-    const filterProvider: any = req.query?.filterProvider
-    const searchProvider: any = req.query?.searchProvider
+  async getProjects(req: { query: GetProjectsInput }, res: Response) {
+    const { filterProvider, searchProvider, user_id } = req.query
 
     let result = await prisma.project.findMany({
       where: {
+        user_id,
         ...(filterProvider
           ? {
               provider: {
                 OR: {
                   name: {
-                    equals: String(filterProvider),
+                    equals: filterProvider,
                     mode: 'insensitive'
                   }
                 }
@@ -26,22 +26,22 @@ export default class ProjectController {
 
     if (searchProvider) {
       result = result.filter(
-        (data) =>
-          data.name.toLocaleLowerCase().indexOf(String(searchProvider.toLocaleLowerCase())) > -1
+        (data) => data.name.toLocaleLowerCase().indexOf(searchProvider.toLocaleLowerCase()) > -1
       )
     }
 
     res.status(200).json(result)
   }
 
-  async getProjectById(req: Request, res: Response) {
+  async getProjectById(req: InputRequest, res: Response) {
     if (/[a-zA-z]/.test(req.params.id)) {
       res.status(400).json({
         message: 'Invalid ID'
       })
     } else {
-      const result = await prisma.project.findUnique({
+      const result = await prisma.project.findFirst({
         where: {
+          user_id: { equals: req.query.user_id },
           id: Number(req.params.id)
         }
       })
@@ -51,12 +51,13 @@ export default class ProjectController {
     }
   }
 
-  async deleteProjectById(req: Request, res: Response) {
+  async deleteProjectById(req: InputRequest, res: Response) {
     if (/[a-zA-z]/.test(req.params.id)) {
       res.status(400).json({ message: 'Invalid ID' })
     } else {
-      const project = await prisma.project.findUnique({
+      const project = await prisma.project.findFirst({
         where: {
+          user_id: req.query.user_id,
           id: Number(req.params.id)
         }
       })

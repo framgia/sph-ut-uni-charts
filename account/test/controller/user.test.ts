@@ -23,6 +23,42 @@ beforeEach(() => {
   next = null
 })
 
+describe('When fetching user details', () => {
+  it('should return user info if input is valid', async () => {
+    prismaMock.user.findFirst.mockResolvedValue({
+      id: 1,
+      email: 'test@gmail.com',
+      token_id: 'tokenid',
+      google_id: 'googleid',
+      created_at: new Date(),
+      updated_at: new Date()
+    })
+    req.query = { email: 'test@gmail.com' }
+    await UserController.index(req, res)
+    expect(res.statusCode).toBe(200)
+    expect(res._getData()).toMatchObject({
+      id: 1,
+      email: 'test@gmail.com'
+    })
+  })
+
+  it('should return user info if input is valid', async () => {
+    req.query = { email: 123 }
+    await UserController.index(req, res)
+    expect(res.statusCode).toBe(422)
+    expect(res._getJSONData()).toMatchObject([
+      { message: 'Incorrect type. Expected string.', parameter: 'email', value: 123 }
+    ])
+  })
+
+  it('should have 404 response if no data from DB', async () => {
+    req.query = { email: 'test@gmail.com' }
+    await UserController.index(req, res)
+    expect(res.statusCode).toBe(404)
+    expect(res._getJSONData()).toMatchObject({ message: 'Not found' })
+  })
+})
+
 describe('UserController.signIn', () => {
   beforeEach(() => {
     req.body = {
@@ -37,7 +73,7 @@ describe('UserController.signIn', () => {
   })
 
   it('should return a response contains status 200 with a message [success case]', async () => {
-    await UserController.signIn(req, res, next)
+    await UserController.signIn(req, res)
     expect(res.statusCode).toBe(200)
     expect(res._isEndCalled()).toBeTruthy()
     expect(res._getJSONData()).toMatchObject({
@@ -51,7 +87,7 @@ describe('UserController.signIn', () => {
       google_id: null
     }
 
-    await UserController.signIn(req, res, next)
+    await UserController.signIn(req, res)
 
     expect(res.statusCode).toBe(422)
     expect(res._isEndCalled()).toBeTruthy()
@@ -81,7 +117,7 @@ testIfTokenIsSpecified('UserController.checkStatus and signOut', () => {
 
   it('should return a response contains status 200 with a body object [success case]', async () => {
     prismaMock.user.findFirst.mockResolvedValue(userMock)
-    await UserController.checkStatus(req, res, next)
+    await UserController.checkStatus(req, res)
 
     expect(res.statusCode).toBe(200)
     expect(res._isEndCalled()).toBeTruthy()
@@ -106,7 +142,7 @@ testIfTokenIsSpecified('UserController.checkStatus and signOut', () => {
 
   it('should return a response contains status 200 with a body object [success case]', async () => {
     prismaMock.user.findFirst.mockResolvedValue(userMock)
-    await UserController.checkStatus(req, res, next)
+    await UserController.checkStatus(req, res)
 
     expect(res.statusCode).toBe(200)
     expect(res._isEndCalled()).toBeTruthy()

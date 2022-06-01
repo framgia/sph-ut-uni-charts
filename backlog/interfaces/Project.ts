@@ -14,3 +14,14 @@ export interface IProjectData {
   project_id: number
   provider_id: number
 }
+
+export interface InputRequest {
+  query: { user_id: number }
+  params: { id: string }
+}
+
+export interface GetProjectsInput {
+  filterProvider?: string
+  searchProvider?: string
+  user_id: number
+}

@@ -1,11 +1,11 @@
-// @ts-nocheck
 import prisma from '../utils/client'
-import { ProviderAdd } from './interfaces/Provider'
+import { ProviderAdd } from '../interfaces/Provider'
 
 class Provider {
   public async isProjectRegistered(data: ProviderAdd) {
     return await prisma.project.findMany({
       where: {
+        user_id: data.user_id,
         project_id: data.project_id,
         provider: { user_id: data.user_id }
       }
@@ -27,7 +27,8 @@ class Provider {
           create: {
             name: project_name,
             key: project_key,
-            project_id: project_id
+            project_id: project_id,
+            user_id
           }
         }
       },
@@ -40,7 +41,8 @@ class Provider {
           create: {
             name: project_name,
             key: project_key,
-            project_id: project_id
+            project_id: project_id,
+            user_id
           }
         }
       }
@@ -60,10 +62,11 @@ class Provider {
     })
   }
 
-  public async getProviderById(id: number) {
-    return await prisma.provider.findUnique({
+  public async getProviderById(payload: { user_id: number; id: number }) {
+    return await prisma.provider.findFirst({
       where: {
-        id: id
+        id: payload.id,
+        user_id: payload.user_id
       },
       include: {
         projects: true

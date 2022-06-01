@@ -4,7 +4,7 @@ import {
   getProviders,
   addProvider,
   getBacklogProjects,
-} from '@/src/services/bffService'
+} from '@/src/api/providerApi'
 import { useForm } from '@mantine/form'
 import FullPageSpinner from '@/src/components/molecules/FullPageSpinner'
 import { PageTitle, FormProvider } from '@/src/pages/projects/components'

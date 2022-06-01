@@ -1,22 +1,33 @@
+import Controller from './Controller'
 import BacklogService from '../services/BacklogService'
 import { Request, Response } from 'express'
 import { DateTime } from 'luxon'
 
 const backlogService = new BacklogService()
 
-export default class ProjectController {
+export default class ProjectController extends Controller {
   async getProjects(req: Request, res: Response) {
-    const result = await backlogService.getProjects(req.query)
-    res.send(result)
+    const user = await super.user({ email: req.header('authorization') as string })
+    req.query.user_id = user.id
+
+    try {
+      const result = await backlogService.getProjects(req.query)
+      res.send(result)
+    } catch (error) {
+      res.status(500).send(error)
+    }
   }
 
   async getProjectById(req: Request, res: Response) {
+    const user = await super.user({ email: req.header('authorization') as string })
     let response
     let status = 200
 
     switch (req.query.service) {
       case 'backlog':
-        const result = (await backlogService.getProjectById(req.params.id)) as any
+        const result = (await backlogService.getProjectById(req.params.id, {
+          user_id: user.id
+        })) as any
 
         if (result.errors) {
           status = result.status
@@ -38,11 +49,12 @@ export default class ProjectController {
   }
 
   async deleteProjectById(req: Request, res: Response) {
+    const user = await super.user({ email: req.header('authorization') as string })
     let response
 
     switch (req.query.service) {
       case 'backlog':
-        const result = await backlogService.deleteProjectById(req.params.id)
+        const result = await backlogService.deleteProjectById(req.params.id, { user_id: user.id })
         response = result
         break
       default:
@@ -57,6 +69,8 @@ export default class ProjectController {
   }
 
   async getActiveSprintData(req: Request, res: Response) {
+    const user = await super.user({ email: req.header('authorization') as string })
+    const projId = req.params.id
     let status = 200
     let response
 
@@ -70,7 +84,9 @@ export default class ProjectController {
         let closedET = 0
         let estimatedET = 0
 
-        proj = await backlogService.getProjectById(req.params.id)
+        proj = await backlogService.getProjectById(req.params.id, {
+          user_id: user.id
+        })
         if (proj.errors) {
           status = proj.status
           response = proj.errors

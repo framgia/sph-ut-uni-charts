@@ -6,7 +6,41 @@ import UserValidation from '../validations/UserValdiation'
 import User from '../models/User'
 
 class UserController extends Controller {
-  public static signIn = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  public static index = async (req: Request, res: Response): Promise<void> => {
+    type iParam = { email: string }
+    const payload = req.query as iParam
+    const validationErrors = UserValidation.show(payload)
+
+    if (validationErrors) {
+      res.status(422).json(validationErrors)
+      return
+    }
+
+    try {
+      const result = await new User().model.findFirst({
+        where: {
+          email: payload.email
+        },
+        select: {
+          id: true,
+          email: true
+        }
+      })
+
+      if (result) {
+        res.send(result)
+      } else {
+        res.status(404).json({ message: 'Not found' })
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: 'an internal server error occured',
+        details: error
+      })
+    }
+  }
+
+  public static signIn = async (req: Request, res: Response): Promise<void> => {
     const user = new User()
     const userPayload = req.body
     const validationErrors = UserValidation.signIn(userPayload)
@@ -38,11 +72,7 @@ class UserController extends Controller {
     }
   }
 
-  public static checkStatus = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  public static checkStatus = async (req: Request, res: Response): Promise<void> => {
     type checkStatusInputParameter = { email: string }
 
     const userPayload = req.query

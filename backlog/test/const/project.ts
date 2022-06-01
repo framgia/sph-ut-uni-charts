@@ -1,4 +1,4 @@
-import { IProject } from 'models/interfaces/Project'
+import { IProject } from 'interfaces/Project'
 
 export const testData: IProject[] = [
   {
@@ -41,6 +41,7 @@ export const mockedProviderResponse = {
   projects: [
     {
       id: 1,
+      user_id: 1,
       name: 'project_name',
       key: 'unichart-key',
       project_id: 99846,
@@ -53,6 +54,7 @@ export const mockedProviderResponse = {
 
 export const mockedProjectResponse = {
   id: 1,
+  user_id: 1,
   name: 'project_name',
   key: 'unichart-key',
   project_id: 99846,

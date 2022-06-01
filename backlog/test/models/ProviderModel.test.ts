@@ -69,7 +69,7 @@ describe('When calling provider model "getProviderById" method', () => {
   it('should return an object if it has data in DB', async () => {
     prismaMock.provider.upsert.mockResolvedValue(mockedProviderResponse)
     const data = await Model.add(mockedProviderResponse)
-    prismaMock.provider.findUnique.mockResolvedValue(mockedProviderResponse)
+    prismaMock.provider.findFirst.mockResolvedValue(mockedProviderResponse)
     const response = await Model.getProviderById(data.id)
     expect(response).toMatchObject(data)
   })
