@@ -1,21 +1,12 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import ProjectDetail from '@/src/pages/projects/ProjectDetail'
-import { developersList, sprintSelectFields } from '@/src/utils/dummyData'
+import { developersList } from '@/src/utils/dummyData'
 
 describe('Project Detail', () => {
   beforeAll(() => {
     jest.spyOn(require('next/router'), 'useRouter').mockImplementation(() => {
       return { query: { id: 3 } }
     })
-  })
-
-  it('has page header', () => {
-    render(<ProjectDetail />)
-
-    // TODO: make project name dynamic
-    const header = screen.getByRole('heading', { name: /project name detail/i })
-    expect(header).toBeInTheDocument()
   })
 
   it('has velocity chart and text for velocity', () => {
@@ -110,14 +101,5 @@ describe('Project Detail', () => {
 
     const columns = screen.getAllByRole('columnheader')
     expect(columns).toHaveLength(2)
-  })
-
-  it('has button to redirect to home page', () => {
-    render(<ProjectDetail />)
-
-    const redirectButton = screen.getByRole('link', {
-      name: /back to home/i,
-    })
-    expect(redirectButton).toBeInTheDocument()
   })
 })

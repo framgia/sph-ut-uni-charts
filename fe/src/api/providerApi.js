@@ -45,7 +45,7 @@ export const getActiveSprintData = async (project_id, service) => {
 export const deleteProject = async (project_id, service) => {
   return await baseAuthApi.request({
     method: 'DELETE',
-    url: `projects/${project_id}`,
+    url: `/projects/${project_id}`,
     params: { service },
   })
 }

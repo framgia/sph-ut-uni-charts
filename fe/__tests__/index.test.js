@@ -1,7 +1,11 @@
 require('dotenv').config()
-import axios from 'axios'
-import { fireEvent, render, waitFor } from '@testing-library/react'
-import { screen } from '@testing-library/dom'
+import {
+  fireEvent,
+  render,
+  waitFor,
+  screen,
+  cleanup,
+} from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
 import userEvent from '@testing-library/user-event'
 import MockAdapter from 'axios-mock-adapter'
@@ -12,11 +16,19 @@ import testData from './constants/testData.json'
 import Router from 'next/router'
 import Cookies from 'js-cookie'
 import { logout } from '@/src/api/authApi'
-import * as bffService from '@/src/services/bffService'
+import * as bffService from '@/src/api/providerApi'
 import Main from '@/src/templates/Main'
+import { baseAuthApi } from '@/src/api/base'
 
-const mockAxios = new MockAdapter(axios)
-const URL = process.env.NEXT_PUBLIC_BFF_API
+const mockAxios = new MockAdapter(baseAuthApi, {
+  onNoMatch: 'throwException',
+})
+
+beforeAll(() => {
+  mockAxios.reset()
+})
+
+afterEach(cleanup)
 
 jest.mock('next/router', () => require('next-router-mock'))
 jest.mock('@/src/api/authApi')
@@ -29,9 +41,9 @@ jest.mock('js-cookie', () => ({
 describe('When rendering home page', () => {
   beforeEach(() => {
     mockRouter.setCurrentUrl('/')
-    mockAxios.onGet(`${URL}projects`).reply(200, testData.projects)
+    mockAxios.onGet('/projects').reply(200, testData.projects)
     mockAxios
-      .onDelete(`${URL}projects/190?service=backlog`)
+      .onDelete('/projects/190', 'backlog')
       .reply(200, testData.projects[0])
 
     Cookies.get.mockReturnValueOnce(
@@ -108,7 +120,7 @@ describe('When rendering home page', () => {
     let searchField
 
     beforeEach(async () => {
-      mockAxios.onGet(`${URL}projects`).reply(200, [testData.projects[0]])
+      mockAxios.onGet('/projects').reply(200, [testData.projects[0]])
 
       await act(async () => render(<Home />))
 
@@ -137,7 +149,7 @@ describe('When rendering home page', () => {
     let selectField
 
     beforeEach(async () => {
-      mockAxios.onGet(`${URL}projects`).reply(200, testData.projects.slice(1))
+      mockAxios.onGet('/projects').reply(200, testData.projects.slice(1))
 
       await act(async () => render(<Home />))
 
@@ -268,7 +280,7 @@ describe('When rendering home page', () => {
       userEvent.click(confirmButton)
 
       await waitFor(() => {
-        expect(getProjectsSpy).toHaveBeenCalledTimes(2)
+        expect(getProjectsSpy).toHaveBeenCalledTimes(1)
       })
     })
   })
@@ -277,17 +289,13 @@ describe('When rendering home page', () => {
     let selectField, resetButton, inputField
 
     beforeEach(async () => {
-      mockAxios.onGet(`${URL}projects`).reply(200, testData.projects)
+      mockAxios.onGet('/projects').reply(200, testData.projects)
 
       await act(async () => render(<Home />))
 
-      selectField = screen.getByRole('textbox', {
-        name: /filter by provider/i,
-      })
-      resetButton = screen.getByRole('button', { name: /reset filters/i })
-      inputField = screen.getByRole('textbox', {
-        name: /filter by name/i,
-      })
+      selectField = await screen.getByPlaceholderText(/provider/i)
+      resetButton = await screen.getByTestId('reset-btn')
+      inputField = await screen.getByPlaceholderText(/project name/i)
     })
 
     it('should display the reset button', async () => {

@@ -122,8 +122,8 @@ const Home = () => {
           />
         </Group>
         <Button
-          className={styles['reset-filters-button']}
-          compact
+          data-testid='reset-btn'
+          sx={{ alignSelf: 'flex-end' }}
           onClick={resetFilters}
         >
           Reset filters
