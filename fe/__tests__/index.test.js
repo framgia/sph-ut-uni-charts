@@ -1,6 +1,7 @@
 require('dotenv').config()
 import axios from 'axios'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
+import { screen } from '@testing-library/dom'
 import { act } from 'react-dom/test-utils'
 import userEvent from '@testing-library/user-event'
 import MockAdapter from 'axios-mock-adapter'
@@ -12,6 +13,7 @@ import Router from 'next/router'
 import Cookies from 'js-cookie'
 import { logout } from '@/src/api/authApi'
 import * as bffService from '@/src/services/bffService'
+import Main from '@/src/templates/Main'
 
 const mockAxios = new MockAdapter(axios)
 const URL = process.env.NEXT_PUBLIC_BFF_API
@@ -47,10 +49,16 @@ describe('When rendering home page', () => {
     let logoutButton, routerSpy
 
     beforeEach(async () => {
-      await act(async () => render(<Home />))
+      await act(async () =>
+        render(
+          <Main>
+            <Home />
+          </Main>
+        )
+      )
 
       routerSpy = jest.spyOn(Router, 'push')
-      logoutButton = screen.getByRole('button', { name: /logout/i })
+      logoutButton = screen.getByTestId('logout-btn')
       logout.mockImplementation(() => Promise.resolve())
     })
 

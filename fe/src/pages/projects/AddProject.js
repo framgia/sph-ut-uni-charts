@@ -7,22 +7,12 @@ import {
 } from '@/src/api/providerApi'
 import { useForm } from '@mantine/form'
 import FullPageSpinner from '@/src/components/molecules/FullPageSpinner'
-import { PageTitle, FormProvider } from '@/src/pages/projects/components'
-import {
-  Container,
-  Group,
-  Box,
-  Select,
-  Title,
-  Text,
-  Button,
-  Notification,
-} from '@mantine/core'
-import { Check, X } from 'tabler-icons-react'
+import { FormProvider } from '@/src/pages/projects/components'
+import { showNotification } from '@mantine/notifications'
+import { Group, Box, Select, Title, Text, Button } from '@mantine/core'
 
 function AddProject() {
   const [loading, setLoading] = useState(false)
-  const [notif, setNotif] = useState(null)
   const [showProviderFields, setshowProviderFields] = useState(false)
 
   const [providers, setProviders] = useState([])
@@ -116,21 +106,14 @@ function AddProject() {
 
     try {
       await addProvider(payload)
-      setNotif({
-        icon: <Check size={18} />,
+      showNotification({
         color: 'teal',
-        title: 'Successful',
-        content: 'Provider added successfully',
+        message: 'Provider added successfully',
       })
       resetForm()
     } catch (error) {
       error?.response?.data?.map(({ message }) =>
-        setNotif({
-          icon: <X size={18} />,
-          color: 'red',
-          title: 'Error',
-          content: message,
-        })
+        showNotification({ color: 'red', message })
       )
     } finally {
       setLoading(false)
@@ -142,64 +125,51 @@ function AddProject() {
   }, [])
 
   return (
-    <div>
+    <>
       {loading && <FullPageSpinner />}
-      {notif && (
-        <Notification
-          icon={notif.icon}
-          color={notif.color}
-          title={notif.title}
-          onClose={() => setNotif(null)}
-        >
-          {notif.content}
-        </Notification>
-      )}
 
-      <Container fluid color='blue'>
-        <PageTitle pageTitle='ADD PROJECT' />
-        <Box sx={{ maxWidth: 600 }} mx='auto'>
-          <div className={styles.card}>
-            <div className={styles.selectProvider}>
+      <Box sx={{ width: '50%' }}>
+        <div className={styles.card}>
+          <div className={styles.selectProvider}>
+            <Text color='blue'>
+              <Title order={3}>Select Provider</Title>
+            </Text>
+            <Select
+              placeholder='Select a Provider'
+              data={providers}
+              onChange={handleChangeProvider}
+              size='lg'
+            />
+          </div>
+          {showProviderFields && (
+            <FormProvider
+              formProvider={formProvider}
+              handleConnectProvider={handleConnectProvider}
+            />
+          )}
+
+          {projects.length ? (
+            <form onSubmit={formProject.onSubmit(handleAddProvider)}>
               <Text color='blue'>
-                <Title order={3}>Select Provider</Title>
+                <Title order={3}>Select Project</Title>
               </Text>
               <Select
-                placeholder='Select a Provider'
-                data={providers}
-                onChange={handleChangeProvider}
+                placeholder='Select a Project'
+                data={projects}
                 size='lg'
+                {...formProject.getInputProps('project_id')}
               />
-            </div>
-            {showProviderFields && (
-              <FormProvider
-                formProvider={formProvider}
-                handleConnectProvider={handleConnectProvider}
-              />
-            )}
 
-            {projects.length ? (
-              <form onSubmit={formProject.onSubmit(handleAddProvider)}>
-                <Text color='blue'>
-                  <Title order={3}>Select Project</Title>
-                </Text>
-                <Select
-                  placeholder='Select a Project'
-                  data={projects}
-                  size='lg'
-                  {...formProject.getInputProps('project_id')}
-                />
-
-                <Group position='right' mt='lg'>
-                  <Button size='lg' type='submit'>
-                    Add Project
-                  </Button>
-                </Group>
-              </form>
-            ) : null}
-          </div>
-        </Box>
-      </Container>
-    </div>
+              <Group position='right' mt='lg'>
+                <Button size='lg' type='submit'>
+                  Add Project
+                </Button>
+              </Group>
+            </form>
+          ) : null}
+        </div>
+      </Box>
+    </>
   )
 }
 

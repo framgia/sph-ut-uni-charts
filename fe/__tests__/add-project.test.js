@@ -1,10 +1,6 @@
 require('dotenv').config()
-import {
-  render,
-  screen,
-  fireEvent,
-  waitForElementToBeRemoved,
-} from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { act } from 'react-dom/test-utils'
 import userEvent from '@testing-library/user-event'
 import AddProject from '@/src/pages/projects/AddProject'
 const axios = require('axios')
@@ -34,7 +30,7 @@ describe('When adding a project', () => {
         name: 'Dokodemo-English',
       },
     ])
-    render(<AddProject />)
+    await act(async () => render(<AddProject />))
   })
 
   it('should have a header and a select "Provider Dropdown"', () => {
