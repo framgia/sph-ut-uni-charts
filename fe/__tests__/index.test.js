@@ -61,7 +61,7 @@ describe('When rendering home page', () => {
     let logoutButton, routerSpy
 
     beforeEach(async () => {
-      await act(async () =>
+      await act(() =>
         render(
           <Main>
             <Home />
@@ -277,10 +277,10 @@ describe('When rendering home page', () => {
       const confirmButton = screen.getByRole('confirm-delete')
       expect(confirmButton).toBeInTheDocument()
 
-      userEvent.click(confirmButton)
+      await act(() => userEvent.click(confirmButton))
 
       await waitFor(() => {
-        expect(getProjectsSpy).toHaveBeenCalledTimes(1)
+        expect(getProjectsSpy).toHaveBeenCalledTimes(2)
       })
     })
   })
