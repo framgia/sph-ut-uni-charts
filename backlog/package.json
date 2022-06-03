@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "test": "NODE_ENV=test jest -i --forceExit --runInBand",
+    "test": "NODE_ENV=test jest -i --forceExit --runInBand --watchAll",
     "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
     "start": "NODE_PATH=./dist node dist/index.js",
     "dev": "nodemon index.ts"
