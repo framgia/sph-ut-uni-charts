@@ -25,8 +25,7 @@ export const VelocityDataFormatter = async (rawData) => {
   const labels = []
   const tempData = await rawData
 
-  tempData.reverse()
-  tempData.forEach((item) => {
+  tempData.data.forEach((item) => {
     let commitment = 0
     let completed = 0
 
@@ -47,7 +46,7 @@ export const VelocityDataFormatter = async (rawData) => {
 export const obtainData = async (rawData) => {
   const tempData = await rawData
 
-  const { dates, data } = tempData
+  const { dates, data } = tempData.data
 
   return { dates, data }
 }

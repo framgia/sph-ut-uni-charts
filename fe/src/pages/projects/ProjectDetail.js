@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Container, Group, Table, Text, Title, Box } from '@mantine/core'
 
 import styles from '@/styles/project-detail.module.css'
-import { Chart, PageTitle } from './components'
+import { Chart } from './components'
 import { developersList, velocityChartData } from '@/src/utils/dummyData'
 import {
   ChartDataFormatter,

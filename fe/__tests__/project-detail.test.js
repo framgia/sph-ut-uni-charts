@@ -1,21 +1,13 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import ProjectDetail from '@/src/pages/projects/ProjectDetail'
 import { developersList } from '@/src/utils/dummyData'
-import * as bffService from '@/src/services/bffService'
+import * as providerApi from '@/src/api/providerApi'
 
 describe('When rendering detail page', () => {
   beforeAll(() => {
     jest.spyOn(require('next/router'), 'useRouter').mockImplementation(() => {
       return { query: { id: 3 } }
     })
-  })
-
-  it('should have page header', () => {
-    render(<ProjectDetail />)
-
-    // TODO: make project name dynamic
-    const header = screen.getByRole('heading', { name: /project name detail/i })
-    expect(header).toBeInTheDocument()
   })
 
   it('should have velocity chart and text for velocity', () => {
@@ -31,9 +23,9 @@ describe('When rendering detail page', () => {
   describe('when rendering burn down chart', () => {
     let getSprintDataSpy
 
-    beforeEach(() => {
-      getSprintDataSpy = jest.spyOn(bffService, 'getActiveSprintData')
-      render(<ProjectDetail />)
+    beforeEach(async () => {
+      getSprintDataSpy = jest.spyOn(providerApi, 'getActiveSprintData')
+      await act(() => render(<ProjectDetail />))
     })
 
     afterEach(() => {
@@ -125,14 +117,5 @@ describe('When rendering detail page', () => {
 
     const columns = screen.getAllByRole('columnheader')
     expect(columns).toHaveLength(2)
-  })
-
-  it('should have a button to redirect to home page', () => {
-    render(<ProjectDetail />)
-
-    const redirectButton = screen.getByRole('link', {
-      name: /back to home/i,
-    })
-    expect(redirectButton).toBeInTheDocument()
   })
 })
