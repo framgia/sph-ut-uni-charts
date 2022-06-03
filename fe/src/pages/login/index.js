@@ -1,7 +1,6 @@
 import React from 'react'
 import { GoogleLogin } from 'react-google-login'
-import Head from 'next/head'
-import { Container, Text } from '@mantine/core'
+import { Center } from '@mantine/core'
 
 import Router from 'next/router'
 import Cookies from 'js-cookie'
@@ -26,25 +25,15 @@ const Login = (props) => {
   }
 
   return (
-    <Container>
-      <Head>
-        <title>Login</title>
-      </Head>
-
-      <main>
-        <Text color='blue'>
-          <h1>Welcome to Uni Chart!</h1>
-        </Text>
-
-        <GoogleLogin
-          clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
-          buttonText='Sign in with Google'
-          onSuccess={handleLogin}
-          onFailure={handleLogin}
-          cookiePolicy={'single_host_origin'}
-        />
-      </main>
-    </Container>
+    <Center sx={{ height: '80vh' }}>
+      <GoogleLogin
+        clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+        buttonText='Sign in with Google'
+        onSuccess={handleLogin}
+        onFailure={handleLogin}
+        cookiePolicy={'single_host_origin'}
+      />
+    </Center>
   )
 }
 

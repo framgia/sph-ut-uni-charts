@@ -1,13 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-  Button,
-  Container,
-  Group,
-  Select,
-  Table,
-  Text,
-  Title,
-} from '@mantine/core'
+import { Container, Group, Table, Text, Title, Box } from '@mantine/core'
 
 import styles from '@/styles/project-detail.module.css'
 import { Chart, PageTitle } from './components'
@@ -73,12 +65,8 @@ const ProjectDetail = () => {
   // const burnUpChartDataSet = ChartDataFormatter(burnUpChartData)
 
   return (
-    <div>
-      <Container fluid color='blue'>
-        <PageTitle pageTitle='Project Name Detail' />
-        <Button component='a' href='/'>
-          {'< Back to home'}
-        </Button>
+    <>
+      <Box sx={{ width: '80%' }}>
         <Group position='center'>
           {/* <div role='burn-up-chart' className={styles['burn-up-chart']}>
             <Chart
@@ -121,7 +109,7 @@ const ProjectDetail = () => {
           </div>
         </Group>
 
-        <Container py='lg'>
+        <Container fluid>
           <Text color='blue'>
             <Title order={4}>Developers</Title>
           </Text>
@@ -144,8 +132,8 @@ const ProjectDetail = () => {
             </tbody>
           </Table>
         </Container>
-      </Container>
-    </div>
+      </Box>
+    </>
   )
 }
 

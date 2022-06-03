@@ -1,28 +1,31 @@
 require('dotenv').config()
-import {
-  render,
-  screen,
-  fireEvent,
-  waitForElementToBeRemoved,
-} from '@testing-library/react'
+import { render, screen, fireEvent, cleanup } from '@testing-library/react'
+import { act } from 'react-dom/test-utils'
 import userEvent from '@testing-library/user-event'
 import AddProject from '@/src/pages/projects/AddProject'
-const axios = require('axios')
+import { baseAuthApi } from '@/src/api/base'
 const MockAdapter = require('axios-mock-adapter')
 
-const mockAxios = new MockAdapter(axios)
-const URL = process.env.NEXT_PUBLIC_BFF_API
+const mockAxios = new MockAdapter(baseAuthApi, {
+  onNoMatch: 'throwException',
+})
+
+beforeAll(() => {
+  mockAxios.reset()
+})
+
+afterEach(cleanup)
 
 describe('When adding a project', () => {
   beforeEach(async () => {
-    mockAxios.onGet(`${URL}providers/`).reply(200, [
+    mockAxios.onGet('/providers/').reply(200, [
       {
         id: 33,
         name: 'Backlog',
         space_key: 'framgiaph',
       },
     ])
-    mockAxios.onGet(`${URL}backlog/projects`).reply(200, [
+    mockAxios.onGet('/backlog/projects').reply(200, [
       {
         id: 18616,
         projectKey: 'FRAMGIAPH_BOOKSHELF',
@@ -34,14 +37,12 @@ describe('When adding a project', () => {
         name: 'Dokodemo-English',
       },
     ])
-    render(<AddProject />)
+    await act(async () => render(<AddProject />))
   })
 
   it('should have a header and a select "Provider Dropdown"', () => {
-    const header = screen.getByRole('heading', { name: /ADD PROJECT/i })
     const providerDropdown = screen.getByPlaceholderText(/select a provider/i)
 
-    expect(header).toBeInTheDocument()
     expect(providerDropdown).toBeInTheDocument()
   })
 
@@ -78,7 +79,7 @@ describe('When adding a project', () => {
       })
 
       it('should show success notification when adding project if "enter new provider" is selected', async () => {
-        mockAxios.onGet(`${URL}providers/add`).reply(200, {
+        mockAxios.onGet('/providers/add').reply(200, {
           name: 'Backlog',
           space_key: 'framgiaph',
           api_key: 'apikey123',

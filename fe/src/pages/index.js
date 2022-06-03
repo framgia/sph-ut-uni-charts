@@ -1,20 +1,16 @@
 import { useState, useEffect } from 'react'
-import Head from 'next/head'
 import Link from 'next/link'
 import Router from 'next/router'
 import {
   Button,
-  Container,
   Group,
   Pagination,
   Select,
   Table,
-  Text,
   TextInput,
 } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 
-import Navbar from '../components/molecules/Navbar'
 import HomePageDeleteModal from '../components/organisms/HomePageDeleteModal'
 import { deleteProject, getProjects } from '@/src/api/providerApi'
 import { providersSelectFieldValues } from '@/src/utils/constants'
@@ -97,115 +93,102 @@ const Home = () => {
   }, [searchProvider])
 
   return (
-    <Container>
-      <Head>
-        <title>Uni Chart</title>
-      </Head>
-
-      <main>
-        <Navbar />
-
-        <Text color='blue'>
-          <h1>Welcome to Uni Chart!</h1>
-        </Text>
-        <Button
-          onClick={() => (location.href = '/add-project')}
-          className={styles['add-button']}
-        >
-          Add project
-        </Button>
-        <Group className={styles['group-wrapper']} key={searchProvider}>
-          <Group grow className={styles.group}>
-            <TextInput
-              placeholder='Project Name'
-              label='Filter by name'
-              value={nameFilter}
-              onChange={(event) => {
-                setNameFilter(event.target.value)
-                setUserChangedNameFilter(true)
-              }}
-            />
-            <Select
-              label='Filter by provider'
-              placeholder='Provider'
-              data={providersSelectFieldValues}
-              value={provider}
-              onChange={providerOnChange}
-              key={provider}
-            />
-          </Group>
-          <Button
-            className={styles['reset-filters-button']}
-            compact
-            onClick={resetFilters}
-          >
-            Reset filters
-          </Button>
+    <>
+      <Button
+        onClick={() => (location.href = '/add-project')}
+        className={styles['add-button']}
+        my={10}
+      >
+        Add project
+      </Button>
+      <Group className={styles['group-wrapper']} key={searchProvider}>
+        <Group grow className={styles.group}>
+          <TextInput
+            placeholder='Project Name'
+            label='Filter by name'
+            value={nameFilter}
+            onChange={(event) => {
+              setNameFilter(event.target.value)
+              setUserChangedNameFilter(true)
+            }}
+          />
+          <Select
+            label='Filter by provider'
+            placeholder='Provider'
+            data={providersSelectFieldValues}
+            value={provider}
+            onChange={providerOnChange}
+            key={provider}
+          />
         </Group>
-        <Table striped>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Provider</th>
-              <th>Project ID</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects.map((project) => {
-              return (
-                <tr key={project.id} role='project-trow'>
-                  <td>
-                    <Link href={`/project-detail/${project.id}`}>
-                      {project.name}
-                    </Link>
-                  </td>
-                  <td>{project.provider.name}</td>
-                  <td>{project.id}</td>
-                  <td>
-                    <Button
-                      color='red'
-                      onClick={() => openDeleteModal(project)}
-                    >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </Table>
-        <Pagination
-          page={page}
-          onChange={setPage}
-          total={10}
-          className={styles.pagination}
-          getItemAriaLabel={(page) => {
-            switch (page) {
-              case 'dots':
-                return 'dots'
-              case 'prev':
-                return 'previous page'
-              case 'next':
-                return 'next page'
-              case 'first':
-                return 'first page'
-              case 'last':
-                return 'last page'
-              default:
-                return `page ${page}`
-            }
-          }}
-        />
+        <Button
+          data-testid='reset-btn'
+          sx={{ alignSelf: 'flex-end' }}
+          onClick={resetFilters}
+        >
+          Reset filters
+        </Button>
+      </Group>
+      <Table striped>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Provider</th>
+            <th>Project ID</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {projects.map((project) => {
+            return (
+              <tr key={project.id} role='project-trow'>
+                <td>
+                  <Link href={`/project-detail/${project.id}`}>
+                    {project.name}
+                  </Link>
+                </td>
+                <td>{project.provider.name}</td>
+                <td>{project.id}</td>
+                <td>
+                  <Button color='red' onClick={() => openDeleteModal(project)}>
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </Table>
+      <Pagination
+        page={page}
+        onChange={setPage}
+        total={10}
+        className={styles.pagination}
+        getItemAriaLabel={(page) => {
+          switch (page) {
+            case 'dots':
+              return 'dots'
+            case 'prev':
+              return 'previous page'
+            case 'next':
+              return 'next page'
+            case 'first':
+              return 'first page'
+            case 'last':
+              return 'last page'
+            default:
+              return `page ${page}`
+          }
+        }}
+      />
 
-        <HomePageDeleteModal
-          isOpen={isDeleteModalOpen}
-          setIsDeleteModalOpen={setIsDeleteModalOpen}
-          deleteSingleProject={deleteSingleProject}
-          selectedProject={selectedProject}
-        />
-      </main>
-    </Container>
+      <HomePageDeleteModal
+        isOpen={isDeleteModalOpen}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        deleteSingleProject={deleteSingleProject}
+        selectedProject={selectedProject}
+      />
+    </>
   )
 }
 
