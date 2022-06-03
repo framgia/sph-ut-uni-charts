@@ -16,7 +16,7 @@ import testData from './constants/testData.json'
 import Router from 'next/router'
 import Cookies from 'js-cookie'
 import { logout } from '@/src/api/authApi'
-import * as bffService from '@/src/api/providerApi'
+import * as providerApi from '@/src/api/providerApi'
 import Main from '@/src/templates/Main'
 import { baseAuthApi } from '@/src/api/base'
 
@@ -198,8 +198,8 @@ describe('When rendering home page', () => {
     const projectData = testData.projects[0]
 
     beforeEach(async () => {
-      deleteProjectSpy = jest.spyOn(bffService, 'deleteProject')
-      getProjectsSpy = jest.spyOn(bffService, 'getProjects')
+      deleteProjectSpy = jest.spyOn(providerApi, 'deleteProject')
+      getProjectsSpy = jest.spyOn(providerApi, 'getProjects')
 
       await act(async () => render(<Home />))
       rows = await screen.findAllByRole('project-trow')

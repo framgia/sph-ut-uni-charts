@@ -6,7 +6,7 @@ export default class Controller {
     try {
       return await AccountService.user(payload)
     } catch (error) {
-      return null
+      return { errors: { message: 'Unauthorized access' }, status: 403 }
     }
   }
 }

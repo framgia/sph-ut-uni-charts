@@ -9,8 +9,8 @@ export default class ProjectController extends Controller {
   async getProjects(req: Request, res: Response) {
     const user = await super.user({ email: req.header('authorization') as string })
 
-    if (!user) {
-      res.status(403).json({ message: 'Unauthorized access' })
+    if (user.errors) {
+      res.status(user.status).json(user.errors)
     } else {
       req.query.user_id = user.id
 
@@ -28,9 +28,9 @@ export default class ProjectController extends Controller {
     let status = 200
 
     const user = await super.user({ email: req.header('authorization') as string })
-    if (!user) {
-      response = { message: 'Unauthorized access' }
-      status = 403
+    if (user.errors) {
+      response = user.errors
+      status = user.status
     }
 
     if (status === 200) {
@@ -65,9 +65,9 @@ export default class ProjectController extends Controller {
     let status = 200
 
     const user = await super.user({ email: req.header('authorization') as string })
-    if (!user) {
-      response = { message: 'Unauthorized access' }
-      status = 403
+    if (user.errors) {
+      response = user.errors
+      status = user.status
     }
 
     if (status === 200) {
@@ -98,9 +98,9 @@ export default class ProjectController extends Controller {
     let response
 
     const user = await super.user({ email: req.header('authorization') as string })
-    if (!user) {
-      status = 403
-      response = { message: 'Unauthorized access' }
+    if (user.errors) {
+      status = user.status
+      response = user.errors
     }
 
     const projId = req.params.id
