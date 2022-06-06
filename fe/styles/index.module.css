@@ -19,3 +19,56 @@
 .pagination {
   padding-top: 1em;
 }
+
+.disable {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.main-container {
+  margin: 0 10%;
+}
+
+.pagination-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin: 1em 0 2em 0;
+}
+
+.fade-in {
+  animation: fadeIn 1s linear;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.fade-in.none {
+  display: none;
+}
+
+.table-thead tr th:nth-child(1) {
+  width: 30%;
+}
+
+.table-thead tr th:nth-child(2) {
+  width: 40%;
+}
+
+.table-thead tr th:nth-child(3) {
+  width: 10%;
+}
+
+.table-thead tr th:nth-child(4) {
+  width: 20%;
+}
+
+.main-container {
+  padding-bottom: 0px !important;
+}

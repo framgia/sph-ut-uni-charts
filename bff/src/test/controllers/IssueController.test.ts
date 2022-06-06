@@ -59,7 +59,7 @@ describe('When using getIssues() function', () => {
     })
 
     it('should return the expected body', () => {
-      const data = response._getJSONData()
+      const data = response._getData()
 
       const formattedIssue = [
         {
@@ -381,7 +381,7 @@ describe('When using getIssues() function', () => {
       })
 
       it('should return expected body', () => {
-        const data = response._getJSONData()
+        const data = response._getData()
 
         expect(JSON.stringify(data)).toBe(JSON.stringify(expectedResponse))
       })
@@ -415,7 +415,7 @@ describe('When using getIssues() function', () => {
       })
 
       it('should return expected body', () => {
-        const data = response._getJSONData()
+        const data = response._getData()
 
         expect(JSON.stringify(data)).toBe(JSON.stringify([]))
       })

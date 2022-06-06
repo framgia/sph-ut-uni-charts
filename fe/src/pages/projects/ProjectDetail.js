@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Container, Group, Table, Text, Title, Box } from '@mantine/core'
 
 import styles from '@/styles/project-detail.module.css'
-import { Chart, PageTitle } from './components'
+import { Chart } from './components'
 import { developersList, velocityChartData } from '@/src/utils/dummyData'
 import {
   ChartDataFormatter,
@@ -11,6 +11,7 @@ import {
 } from '@/src/utils/helpers'
 import { getIssues, getActiveSprintData } from '@/src/api/providerApi'
 import { useRouter } from 'next/router'
+import { showNotification } from '@mantine/notifications'
 
 const ProjectDetail = () => {
   const router = useRouter()
@@ -29,12 +30,13 @@ const ProjectDetail = () => {
     if (query) {
       const issues = getIssues(Number(router.query.id), 'backlog')
       setVelocityResponse(issues)
-      const activeSprint = getActiveSprintData(
-        Number(router.query.id),
-        'backlog'
-      )
-
-      setSprintData(activeSprint)
+      getActiveSprintData(Number(router.query.id), 'backlog')
+        .then((data) => {
+          setSprintData(data)
+        })
+        .catch(({ response }) => {
+          showNotification({ color: 'red', message: response.data.message })
+        })
     }
   }, [query])
 
