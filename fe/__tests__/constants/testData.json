@@ -1,60 +1,213 @@
 {
-  "projects": [
-    {
-      "id": 190,
-      "name": "Backlog",
-      "key": "backlog66_",
-      "project_id": 551,
-      "provider_id": 186,
-      "created_at": "2022-05-13T06:46:50.470Z",
-      "updated_at": "2022-05-13T06:46:50.470Z",
-      "provider": {
-        "id": 186,
+  "emptyProjects": {
+    "page": 1,
+    "per_page": 10,
+    "prev_page": null,
+    "next_page": null,
+    "total": 0,
+    "total_pages": 1,
+    "data": []
+  },
+  "projects": {
+    "page": 1,
+    "per_page": 10,
+    "prev_page": null,
+    "next_page": 2,
+    "total": 52,
+    "total_pages": 6,
+    "data": [
+      {
+        "id": 38,
         "user_id": 1,
-        "name": "Backlog",
-        "space_key": "nulab",
-        "api_key": "123apikey123",
-        "created_at": "2022-05-18T03:03:32.273Z",
-        "updated_at": "2022-05-18T03:03:32.275Z"
+        "name": "proj01_asan",
+        "key": "proj1_key",
+        "project_id": 333123,
+        "provider_id": 3,
+        "created_at": "2022-05-23T07:39:15.027Z",
+        "updated_at": "2022-05-23T07:39:15.027Z",
+        "provider": {
+          "id": 3,
+          "user_id": 1,
+          "name": "asana",
+          "space_key": "asdf",
+          "api_key": "vv",
+          "created_at": "2022-05-23T07:38:08.304Z",
+          "updated_at": "2022-05-23T09:20:13.396Z"
+        }
+      },
+      {
+        "id": 37,
+        "user_id": 1,
+        "name": "proj01_asan",
+        "key": "proj1_key",
+        "project_id": 333123,
+        "provider_id": 3,
+        "created_at": "2022-05-23T07:39:15.027Z",
+        "updated_at": "2022-05-23T07:39:15.027Z",
+        "provider": {
+          "id": 3,
+          "user_id": 1,
+          "name": "asana",
+          "space_key": "asdf",
+          "api_key": "vv",
+          "created_at": "2022-05-23T07:38:08.304Z",
+          "updated_at": "2022-05-23T09:20:13.396Z"
+        }
+      },
+      {
+        "id": 3,
+        "user_id": 1,
+        "name": "proj01_back",
+        "key": "proj3_key",
+        "project_id": 123,
+        "provider_id": 1,
+        "created_at": "2022-05-23T07:39:15.027Z",
+        "updated_at": "2022-05-23T07:39:15.027Z",
+        "provider": {
+          "id": 1,
+          "user_id": 1,
+          "name": "backlog",
+          "space_key": "asdf",
+          "api_key": "asdf",
+          "created_at": "2022-05-23T07:38:08.304Z",
+          "updated_at": "2022-05-23T07:37:45.955Z"
+        }
+      },
+      {
+        "id": 20,
+        "user_id": 1,
+        "name": "proj01_jira",
+        "key": "proj1_key",
+        "project_id": 3311,
+        "provider_id": 4,
+        "created_at": "2022-05-23T07:39:15.027Z",
+        "updated_at": "2022-05-23T07:39:15.027Z",
+        "provider": {
+          "id": 4,
+          "user_id": 1,
+          "name": "notion",
+          "space_key": "asdf",
+          "api_key": "fvb",
+          "created_at": "2022-05-23T07:38:08.304Z",
+          "updated_at": "2022-05-23T09:20:13.396Z"
+        }
+      },
+      {
+        "id": 13,
+        "user_id": 1,
+        "name": "proj01_trell",
+        "key": "proj1_key",
+        "project_id": 3311,
+        "provider_id": 2,
+        "created_at": "2022-05-23T07:39:15.027Z",
+        "updated_at": "2022-05-23T07:39:15.027Z",
+        "provider": {
+          "id": 2,
+          "user_id": 1,
+          "name": "trello",
+          "space_key": "asdf",
+          "api_key": "sdf",
+          "created_at": "2022-05-23T07:38:08.304Z",
+          "updated_at": "2022-05-23T09:19:54.818Z"
+        }
+      },
+      {
+        "id": 39,
+        "user_id": 1,
+        "name": "proj02_asan",
+        "key": "proj1_key",
+        "project_id": 333123,
+        "provider_id": 3,
+        "created_at": "2022-05-23T07:39:15.027Z",
+        "updated_at": "2022-05-23T07:39:15.027Z",
+        "provider": {
+          "id": 3,
+          "user_id": 1,
+          "name": "asana",
+          "space_key": "asdf",
+          "api_key": "vv",
+          "created_at": "2022-05-23T07:38:08.304Z",
+          "updated_at": "2022-05-23T09:20:13.396Z"
+        }
+      },
+      {
+        "id": 2,
+        "user_id": 1,
+        "name": "proj02_back",
+        "key": "proj2_key",
+        "project_id": 54312,
+        "provider_id": 1,
+        "created_at": "2022-05-23T07:39:15.027Z",
+        "updated_at": "2022-05-23T07:39:15.027Z",
+        "provider": {
+          "id": 1,
+          "user_id": 1,
+          "name": "backlog",
+          "space_key": "asdf",
+          "api_key": "asdf",
+          "created_at": "2022-05-23T07:38:08.304Z",
+          "updated_at": "2022-05-23T07:37:45.955Z"
+        }
+      },
+      {
+        "id": 4,
+        "user_id": 1,
+        "name": "proj02_back",
+        "key": "proj4_key",
+        "project_id": 333,
+        "provider_id": 1,
+        "created_at": "2022-05-23T07:39:15.027Z",
+        "updated_at": "2022-05-23T07:39:15.027Z",
+        "provider": {
+          "id": 1,
+          "user_id": 1,
+          "name": "backlog",
+          "space_key": "asdf",
+          "api_key": "asdf",
+          "created_at": "2022-05-23T07:38:08.304Z",
+          "updated_at": "2022-05-23T07:37:45.955Z"
+        }
+      },
+      {
+        "id": 21,
+        "user_id": 1,
+        "name": "proj02_jira",
+        "key": "proj1_key",
+        "project_id": 3311,
+        "provider_id": 4,
+        "created_at": "2022-05-23T07:39:15.027Z",
+        "updated_at": "2022-05-23T07:39:15.027Z",
+        "provider": {
+          "id": 4,
+          "user_id": 1,
+          "name": "notion",
+          "space_key": "asdf",
+          "api_key": "fvb",
+          "created_at": "2022-05-23T07:38:08.304Z",
+          "updated_at": "2022-05-23T09:20:13.396Z"
+        }
+      },
+      {
+        "id": 14,
+        "user_id": 1,
+        "name": "proj02_trell",
+        "key": "proj1_key",
+        "project_id": 3311,
+        "provider_id": 2,
+        "created_at": "2022-05-23T07:39:15.027Z",
+        "updated_at": "2022-05-23T07:39:15.027Z",
+        "provider": {
+          "id": 2,
+          "user_id": 1,
+          "name": "trello",
+          "space_key": "asdf",
+          "api_key": "sdf",
+          "created_at": "2022-05-23T07:38:08.304Z",
+          "updated_at": "2022-05-23T09:19:54.818Z"
+        }
       }
-    },
-    {
-      "id": 191,
-      "name": "Mailtrap",
-      "key": "mailtrap_621",
-      "project_id": 771,
-      "provider_id": 187,
-      "created_at": "2022-05-13T06:46:50.470Z",
-      "updated_at": "2022-05-13T06:47:06.028Z",
-      "provider": {
-        "id": 187,
-        "user_id": 0,
-        "name": "Mailtrap",
-        "space_key": "m_sp",
-        "api_key": "mailtrap51",
-        "created_at": "2022-05-18T02:58:52.108Z",
-        "updated_at": "2022-05-18T02:59:07.051Z"
-      }
-    },
-    {
-      "id": 192,
-      "name": "Trello",
-      "key": "trello_7712",
-      "project_id": 6224,
-      "provider_id": 188,
-      "created_at": "2022-05-13T06:46:50.470Z",
-      "updated_at": "2022-05-13T06:47:20.292Z",
-      "provider": {
-        "id": 188,
-        "user_id": 0,
-        "name": "Trello",
-        "space_key": "t_sp",
-        "api_key": "trello666",
-        "created_at": "2022-05-18T02:58:52.108Z",
-        "updated_at": "2022-05-18T02:59:20.735Z"
-      }
-    }
-  ],
+    ]
+  },
   "logoutPayload": {
     "email": "john.doe@company.com",
     "token_id": "eyJhbGciO"

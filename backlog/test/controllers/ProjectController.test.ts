@@ -5,152 +5,134 @@ import { Request, Response } from 'express'
 import { prismaMock } from '../../utils/singleton'
 import { IProjectData } from 'interfaces/Project'
 import { testData, mockedProjectResponse } from '../const/project'
+import { IProject } from '../../models/interfaces/Project'
 import { Request } from 'express'
 import { TypedResponse } from '../interfaces/response'
 
-describe('When getProjectById', () => {
-  let req: Request
-  let res: TypedResponse
-  let Controller: any
+let req: Request
+let res: TypedResponse
+let Controller: any
+const totalTestData = 40
 
-  beforeEach(() => {
-    req = httpMocks.createRequest()
-    res = httpMocks.createResponse()
-    Controller = new ProjectController()
+beforeEach(() => {
+  req = httpMocks.createRequest()
+  res = httpMocks.createResponse()
+  Controller = new ProjectController()
+})
+
+describe('When calling getProjects function', () => {
+  describe('when fetching projects is successful', () => {
+    beforeEach(async () => {
+      prismaMock.project.findMany.mockResolvedValue(
+        [...Array(totalTestData)].map(() => testData[0])
+      )
+
+      const { getProjects } = new ProjectController()
+      req.body = { providerFitler: 'Backlog' }
+      await getProjects(req, res)
+    })
+
+    it('should return status 200', () => {
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('should return the expected array length of three datas', () => {
+      expect(res._getJSONData().total).toBe(totalTestData)
+    })
+
+    it('should have a correct body structure properties', () => {
+      expect(Array.isArray(res._getJSONData().data)).toBeTruthy()
+      res._getJSONData().data.forEach((data: IProject) => {
+        expect(data).toMatchObject({
+          id: expect.any(Number),
+          name: expect.any(String),
+          key: expect.any(String),
+          project_id: expect.any(Number),
+          provider_id: expect.any(Number)
+        })
+      })
+    })
   })
 
-  describe('When calling getProjects function', () => {
-    let payload: IProjectData[]
-
+  describe('when using pagination', () => {
     beforeEach(async () => {
-      payload = testData.map(({ created_at, updated_at, ...rest }) => rest)
+      prismaMock.project.findMany.mockResolvedValue(
+        [...Array(totalTestData)].map(() => testData[0])
+      )
     })
 
-    describe('when fetching projects is successful', () => {
+    describe('when fetching body object', () => {
       beforeEach(async () => {
-        prismaMock.project.findMany.mockResolvedValue(testData)
-
         const { getProjects } = new ProjectController()
         await getProjects(req, res)
       })
 
-      it('should return status 200', () => {
-        expect(res.statusCode).toBe(200)
+      it('should have a correct body structure properties', async () => {
+        expect(res._getJSONData()).toMatchObject({
+          page: expect.any(Number),
+          per_page: expect.any(Number),
+          prev_page: expect.toBeNullOr(Number),
+          next_page: expect.toBeNullOr(Number),
+          total: expect.any(Number),
+          total_pages: expect.any(Number),
+          data: expect.any(Array)
+        })
       })
 
-      it('should return the expected body object', () => {
-        expect(res._getJSONData()).toMatchObject(payload)
-      })
-
-      it('should return the expected array length of three datas', () => {
-        const data = res._getJSONData()
-        expect(data.length).toBe(3)
-      })
-    })
-
-    describe('when fetching projects with provider filter argument', () => {
-      beforeEach(async () => {
-        prismaMock.project.findMany.mockResolvedValue([testData[0]])
-
-        const { getProjects } = new ProjectController()
-        req.body = { providerFitler: 'Backlog' }
-        await getProjects(req, res)
-      })
-
-      it('should have an argument "providerFitler"', () => {
-        expect(req.body.providerFitler).not.toBe(undefined)
-      })
-
-      it('should return the expected body object', () => {
-        expect(res._getJSONData()).toMatchObject([payload[0]])
-      })
-
-      it('should return the expected array length of one datas out of three', () => {
-        const data = res._getJSONData()
-        expect(data.length).toBe(1)
+      it('should return the correct pagination properties value', async () => {
+        expect(res._getJSONData()).toMatchObject({
+          page: 1,
+          per_page: 10,
+          prev_page: null,
+          next_page: 2,
+          total: totalTestData,
+          total_pages: totalTestData / 10
+        })
       })
     })
 
-    describe('when fetching projects with search argument', () => {
-      beforeEach(async () => {
-        prismaMock.project.findMany.mockResolvedValue(testData.filter((d, i) => i !== 1))
+    it('should return the same page value specified in the query-page', async () => {
+      const selectedPage = 2
+      const { getProjects } = new ProjectController()
+      await getProjects({ ...req, query: { page: selectedPage } }, res)
 
-        const { getProjects } = new ProjectController()
-        req.body = { searchProvider: 'lo' }
-        await getProjects(req, res)
-      })
-
-      it('should have an argument "searchProvider"', () => {
-        expect(req.body.searchProvider).not.toBeNull()
-      })
-
-      it('should return the expected body object', () => {
-        expect(res._getJSONData()).toMatchObject(payload.filter((d, i) => i !== 1))
-      })
-
-      it('should return the expected array length of two datas out of three', () => {
-        const data = res._getJSONData()
-        expect(data.length).toBe(2)
-      })
+      expect(res._getJSONData().page).toBe(selectedPage)
+      expect(res._getJSONData().prev_page).toBe(1)
+      expect(res._getJSONData().next_page).toBe(3)
     })
+  })
+})
 
-    describe('when ID is invalid', () => {
-      beforeEach(async () => {
-        req.params = { id: 'test' }
-        await Controller.getProjectById(req, res)
-      })
-
-      it('should return status of 400', () => {
-        expect(res.statusCode).toBe(400)
-      })
-
-      it('should respond "Invalid ID" as validation error', () => {
-        const data = res._getJSONData()
-        expect(data).toHaveProperty('message', 'Invalid ID')
-      })
-    })
-
-    describe('when project with provided ID does not exist', () => {
-      beforeEach(async () => {
-        req.params = { id: 99999999999999 }
-        await Controller.getProjectById(req, res)
-      })
-
-      it('should return status of 404', () => {
-        expect(res.statusCode).toBe(404)
-      })
-
-      it('should respond "No Data Found" as validation error', () => {
-        const data = res._getJSONData()
-        expect(data).toHaveProperty('message', 'No Data Found')
-      })
-    })
-
-    it('should responed project object', async () => {
-      prismaMock.project.findFirst.mockResolvedValue(mockedProjectResponse)
-
-      /* @ts-ignore */
-      req.params = { id: 999 }
+describe('When calling "getProjectById" function', () => {
+  describe('when ID is invalid', () => {
+    beforeEach(async () => {
+      req.params = { id: 'test' }
       await Controller.getProjectById(req, res)
-      const data = res._getData()
-
-      expect(data).toMatchObject(mockedProjectResponse)
     })
 
-    it('should fetch array of objects', async () => {
-      prismaMock.project.findMany.mockResolvedValue([mockedProjectResponse])
+    it('should return status of 400', () => {
+      expect(res.statusCode).toBe(400)
+    })
 
-      await Controller.getProjects(req, res)
+    it('should respond "Invalid ID" as validation error', () => {
       const data = res._getJSONData()
-      expect(data).toMatchObject([
-        {
-          id: 1,
-          key: 'unichart-key',
-          name: 'project_name',
-          project_id: 99846,
-          provider_id: 1
-        }
-      ])
+      expect(data).toHaveProperty('message', 'Invalid ID')
+    })
+  })
+
+  describe('when project with provided ID does not exist', () => {
+    beforeEach(async () => {
+      req.params = { id: 99999999999999 }
+      await Controller.getProjectById(req, res)
+    })
+
+    it('should return status of 404', () => {
+      expect(res.statusCode).toBe(404)
+    })
+
+    it('should respond "No Data Found" as validation error', () => {
+      const data = res._getJSONData()
+      expect(data).toHaveProperty('message', 'No Data Found')
     })
   })
 })

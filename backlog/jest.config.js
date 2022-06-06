@@ -8,5 +8,5 @@ module.exports = {
   testRegex: '(/__test__/.*|(\\.|/)(test|spec))\\.[jt]sx?$',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   collectCoverageFrom: ['./**/*.js', './**/*.ts'],
-  setupFilesAfterEnv: ['./utils/singleton.ts']
+  setupFilesAfterEnv: ['./utils/singleton.ts', './test/utils/customMatcher.ts']
 }

@@ -23,5 +23,6 @@ export interface InputRequest {
 export interface GetProjectsInput {
   filterProvider?: string
   searchProvider?: string
+  page?: number
   user_id: number
 }
