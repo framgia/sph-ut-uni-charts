@@ -92,9 +92,4 @@ const TableList = ({ list = [], loading }) => {
   )
 }
 
-TableList.defaultProps = {
-  isLoading: true,
-  list: [],
-}
-
 export default TableList
