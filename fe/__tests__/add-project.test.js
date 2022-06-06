@@ -4,6 +4,8 @@ import { act } from 'react-dom/test-utils'
 import userEvent from '@testing-library/user-event'
 import AddProject from '@/src/pages/projects/AddProject'
 import { baseAuthApi } from '@/src/api/base'
+import mockRouter from 'next-router-mock'
+import Main from '@/src/templates/Main'
 const MockAdapter = require('axios-mock-adapter')
 
 const mockAxios = new MockAdapter(baseAuthApi, {
@@ -11,10 +13,12 @@ const mockAxios = new MockAdapter(baseAuthApi, {
 })
 
 beforeAll(() => {
+  mockRouter.setCurrentUrl('/add-project')
   mockAxios.reset()
 })
 
 afterEach(cleanup)
+jest.mock('next/router', () => require('next-router-mock'))
 
 describe('When adding a project', () => {
   beforeEach(async () => {
@@ -37,7 +41,13 @@ describe('When adding a project', () => {
         name: 'Dokodemo-English',
       },
     ])
-    await act(async () => render(<AddProject />))
+    await act(async () =>
+      render(
+        <Main>
+          <AddProject />
+        </Main>
+      )
+    )
   })
 
   it('should have a header and a select "Provider Dropdown"', () => {
@@ -47,8 +57,13 @@ describe('When adding a project', () => {
   })
 
   describe('When clicking the providers dropdown', () => {
-    beforeEach(() => {
-      userEvent.click(screen.getByPlaceholderText(/select a provider/i))
+    beforeEach(async () => {
+      await act(
+        async () =>
+          await userEvent.click(
+            screen.getByPlaceholderText(/select a provider/i)
+          )
+      )
     })
 
     it('should have initial values under "Provider Dropdown" after fetch provider api call', async () => {
@@ -61,19 +76,19 @@ describe('When adding a project', () => {
         const addProvider = await screen.findByRole('option', {
           name: /add new provider/i,
         })
-        userEvent.click(addProvider)
+        await act(() => userEvent.click(addProvider))
 
         const connectButton = await screen.findByRole('button', {
           name: /connect provider/i,
         })
-        userEvent.click(connectButton)
+        await act(() => fireEvent.click(connectButton))
       })
 
       it('should show "Error Invalid API Key" if api key is invalid', async () => {
         const connectButton = await screen.findByRole('button', {
           name: /connect provider/i,
         })
-        userEvent.click(connectButton)
+        await act(() => fireEvent.click(connectButton))
         const apikeyError = await screen.findByText('API key is required')
         expect(apikeyError).toBeInTheDocument()
       })
@@ -94,13 +109,15 @@ describe('When adding a project', () => {
         expect(apiKeyInput).toBeInTheDocument()
         expect(connectButton).toBeInTheDocument()
 
-        fireEvent.change(apiKeyInput, { target: { value: 'apikey123' } })
-        userEvent.click(connectButton)
+        await act(() =>
+          fireEvent.change(apiKeyInput, { target: { value: 'apikey123' } })
+        )
+        await act(async () => await fireEvent.click(connectButton))
 
         const projectDropdown = await screen.findByPlaceholderText(
           /select a project/i
         )
-        userEvent.click(projectDropdown)
+        await act(async () => await userEvent.click(projectDropdown))
 
         const projects = await screen.findByRole('option', {
           name: /FramgiaPH BookShelf/i,
@@ -113,21 +130,23 @@ describe('When adding a project', () => {
         })
         expect(projectOption).toBeInTheDocument()
 
-        userEvent.click(projectOption)
-        userEvent.click(projectDropdown)
-        userEvent.click(
-          screen.getByRole('option', {
-            name: /framgiaPH bookshelf/i,
-          })
+        await act(() => userEvent.click(projectOption))
+        await act(async () => await userEvent.click(projectDropdown))
+        await act(() =>
+          userEvent.click(
+            screen.getByRole('option', {
+              name: /framgiaPH bookshelf/i,
+            })
+          )
         )
 
         const addProjectButton = await screen.findByRole('button', {
           name: /add project/i,
         })
         expect(addProjectButton).toBeInTheDocument()
-        userEvent.click(addProjectButton)
+        await act(() => fireEvent.click(addProjectButton))
 
-        const toast = screen.getByRole('presentation')
+        const toast = document.querySelector('div[dir="ltr"]')
         expect(toast).toBeInTheDocument()
       })
     })
