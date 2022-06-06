@@ -75,14 +75,6 @@ describe('When using getProjectById() function', () => {
   })
 })
 
-describe('Backlog Service Test Suite', () => {
-  test('Test #4: getProjects - fetch all projects', async () => {
-    const projects: any = await backlogService.getProjects()
-    if (!projects.length) expect(projects).toStrictEqual([])
-    else expect(projects[0]).toHaveProperty('id')
-  })
-})
-
 describe('When using deleteProjectById() function', () => {
   let project: any
 

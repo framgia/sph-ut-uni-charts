@@ -5,6 +5,8 @@ import { Affiliate } from 'tabler-icons-react'
 import { NotificationsProvider } from '@mantine/notifications'
 import Logout from '@/src/components/molecules/Logout'
 
+import styles from '@/styles/index.module.css'
+
 const myTheme = {
   fontFamily: 'sans-serif, Open Sans',
 }
@@ -14,6 +16,9 @@ const Main = ({ children }) => (
     <NotificationsProvider position='bottom-right' zIndex={2077}>
       <AppShell
         padding='md'
+        styles={() => ({
+          main: { margin: '0 10%' },
+        })}
         header={
           <Header
             height={60}

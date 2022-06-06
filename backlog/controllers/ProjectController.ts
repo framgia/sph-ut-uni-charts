@@ -1,36 +1,16 @@
-import prisma from '../utils/client'
 import { Response } from 'express'
+
 import { InputRequest, GetProjectsInput } from '../interfaces/Project'
+import Project from '../models/Project'
+import Paginator from '../utils/Paginator'
+import prisma from '../utils/client'
+
 export default class ProjectController {
   async getProjects(req: { query: GetProjectsInput }, res: Response) {
-    const { filterProvider, searchProvider, user_id } = req.query
+    const result = await Project.projectsWithParams(req.query)
+    const { page = 1 } = req.query
 
-    let result = await prisma.project.findMany({
-      where: {
-        user_id,
-        ...(filterProvider
-          ? {
-              provider: {
-                OR: {
-                  name: {
-                    equals: filterProvider,
-                    mode: 'insensitive'
-                  }
-                }
-              }
-            }
-          : {})
-      },
-      include: { provider: true }
-    })
-
-    if (searchProvider) {
-      result = result.filter(
-        (data) => data.name.toLocaleLowerCase().indexOf(searchProvider.toLocaleLowerCase()) > -1
-      )
-    }
-
-    res.status(200).json(result)
+    res.status(200).json(Paginator(result, page, 10))
   }
 
   async getProjectById(req: InputRequest, res: Response) {
