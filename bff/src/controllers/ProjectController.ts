@@ -2,117 +2,81 @@ import Controller from './Controller'
 import BacklogService from '../services/BacklogService'
 import { Request, Response } from 'express'
 import { DateTime } from 'luxon'
-
+import { errorWithCustomMessage } from '../utils/helpers'
 const backlogService = new BacklogService()
 
 export default class ProjectController extends Controller {
   async getProjects(req: Request, res: Response) {
-    const user = await super.user({ email: req.header('authorization') as string })
+    try {
+      const user = await super.user({ email: req.header('authorization') as string })
 
-    if (user.errors) {
-      res.status(user.status).json(user.errors)
-    } else {
       req.query.user_id = user.id
 
-      try {
-        const result = await backlogService.getProjects(req.query)
-        res.send(result)
-      } catch (error) {
-        res.status(500).send(error)
-      }
+      const result = await backlogService.getProjects(req.query)
+      res.send(result)
+    } catch (error: any) {
+      const response = JSON.parse(error.message)
+      res.status(response.status || 500).json(response.errors || error)
     }
   }
 
   async getProjectById(req: Request, res: Response) {
     let response
-    let status = 200
+    try {
+      const user = await super.user({ email: req.header('authorization') as string })
 
-    const user = await super.user({ email: req.header('authorization') as string })
-    if (user.errors) {
-      response = user.errors
-      status = user.status
-    }
-
-    if (status === 200) {
       switch (req.query.service) {
         case 'backlog':
-          const result = (await backlogService.getProjectById(req.params.id, {
+          response = await backlogService.getProjectById(req.params.id, {
             user_id: user.id
-          })) as any
+          })
 
-          if (result.errors) {
-            status = result.status
-            response = result.errors
-          } else {
-            response = result
-          }
           break
         default:
-          status = 400
-          response = { message: 'Service information not provided.' }
+          errorWithCustomMessage(400, { message: 'Service information not provided.' })
       }
-    }
-
-    if (status !== 200) {
-      res.status(status).json(response)
-    } else {
       res.send(response)
+    } catch (error: any) {
+      const response = JSON.parse(error.message)
+      res.status(response.status || 500).json(response.errors || error)
     }
   }
 
   async deleteProjectById(req: Request, res: Response) {
     let response
-    let status = 200
+    try {
+      const user = await super.user({ email: req.header('authorization') as string })
 
-    const user = await super.user({ email: req.header('authorization') as string })
-    if (user.errors) {
-      response = user.errors
-      status = user.status
-    }
-
-    if (status === 200) {
       switch (req.query.service) {
         case 'backlog':
-          const result = (await backlogService.deleteProjectById(req.params.id, {
+          response = (await backlogService.deleteProjectById(req.params.id, {
             user_id: user.id
-          })) as unknown as any
+          })) as any
 
-          if (result.errors) {
-            status = result.status
-            response = result.errors
-          } else {
-            response = result
-          }
           break
         default:
-          response = { message: 'Service information is not provided.' }
-          status = 400
+          errorWithCustomMessage(400, { message: 'Service information is not provided.' })
       }
-    }
 
-    res.status(status).json(response)
+      res.send(response)
+    } catch (error: any) {
+      const response = JSON.parse(error.message)
+      res.status(response.status || 500).json(response.errors || error)
+    }
   }
 
   async getActiveSprintData(req: Request, res: Response) {
-    let status = 200
     let response
 
-    const user = await super.user({ email: req.header('authorization') as string })
-    if (user.errors) {
-      status = user.status
-      response = user.errors
-    }
+    try {
+      const user = await super.user({ email: req.header('authorization') as string })
 
-    const projId = req.params.id
-    if (!projId) {
-      response = { message: 'Project ID is not provided' }
-      status = 400
-    }
+      const projId = req.params.id
+      if (!projId) errorWithCustomMessage(400, { message: 'Project ID is not provided' })
 
-    if (status === 200) {
       switch (req.query.service) {
         case 'backlog':
-          let dates: any[], proj: any, milestones: any
+          let dates: any[], milestones: any
           let estimated = [] as any
           let actual = [] as any
 
@@ -120,33 +84,15 @@ export default class ProjectController extends Controller {
           let closedET = 0
           let estimatedET = 0
 
-          proj = await backlogService.getProjectById(projId, {
+          const { project_id, provider_id } = (await backlogService.getProjectById(projId, {
             user_id: user.id
-          })
-          if (proj.errors) {
-            status = proj.status
-            response = proj.errors
-            break
-          }
-          const { project_id, provider_id } = proj
+          })) as any
 
-          const providerResponse: any = await backlogService.getProviderById(provider_id)
-          if (providerResponse.errors) {
-            status = providerResponse.status
-            response = providerResponse.errors
-            break
-          }
-          const { space_key, api_key } = providerResponse
+          const { space_key, api_key } = (await backlogService.getProviderById(provider_id)) as any
 
           milestones = await backlogService.getMilestones(space_key, api_key, project_id)
-          if (milestones.errors) {
-            status = milestones.status
-            response = milestones.errors
-            break
-          } else if (!milestones.length) {
-            status = 404
-            response = { message: 'No milestone found' }
-            break
+          if (!milestones.length) {
+            errorWithCustomMessage(404, { message: 'No milestone found' })
           }
 
           // reverse the milestones since it starts from latest first [sprint 4, sprint 3,...]
@@ -154,17 +100,16 @@ export default class ProjectController extends Controller {
           milestones.reverse()
 
           const activeSprint = milestones.find((milestone: any) => {
-            const releaseDate = DateTime.fromISO(milestone.releaseDueDate).toLocaleString()
-            const dateNow = DateTime.now().toLocaleString()
+            const releaseDate = DateTime.fromISO(milestone.releaseDueDate).toMillis()
+            const dateNow = DateTime.now().startOf('day').toMillis()
+
             if (releaseDate >= dateNow) {
               return milestone
             }
           })
 
           if (!activeSprint) {
-            status = 404
-            response = { message: 'No active sprint found' }
-            break
+            errorWithCustomMessage(404, { message: 'No active sprint found' })
           }
 
           const { startDate, releaseDueDate, id } = activeSprint
@@ -176,16 +121,7 @@ export default class ProjectController extends Controller {
             project_id,
             id
           )
-
-          if (issues.errors) {
-            status = issues.status
-            response = issues.errors
-            break
-          } else if (!issues.length) {
-            status = 404
-            response = { message: 'No issues found' }
-            break
-          }
+          if (!issues.length) errorWithCustomMessage(404, { message: 'No issues found' })
 
           // Get dates in between startDate and releaseDueDate //
           for (
@@ -236,11 +172,13 @@ export default class ProjectController extends Controller {
 
           break
         default:
-          response = { message: 'Service information not provided.' }
-          status = 400
+          errorWithCustomMessage(400, { message: 'Service information not provided.' })
       }
-    }
 
-    res.status(status).json(response)
+      res.send(response)
+    } catch (error: any) {
+      const response = JSON.parse(error.message)
+      res.status(response.status || 500).json(response.errors || error)
+    }
   }
 }

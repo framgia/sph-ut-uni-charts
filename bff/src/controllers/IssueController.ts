@@ -6,92 +6,72 @@ import {
   ProviderInterface,
   MilestonesInterface
 } from '../utils/interfaces'
+import { errorWithCustomMessage } from '../utils/helpers'
 import Controller from './Controller'
 
 const backlogService = new BacklogService()
 
 class IssueController extends Controller {
   async getIssues(req: Request, res: Response) {
-    const user = await super.user({ email: req.header('authorization') as string })
-    let response
-    let project: ProjectInterface = {} as ProjectInterface
-    let provider: ProviderInterface = {} as ProviderInterface
-    let status = 200
+    try {
+      let response
+      const user = await super.user({ email: req.header('authorization') as string })
 
-    switch (req.query.service) {
-      case 'backlog':
-        // get the project
-        const projectResponse: any = await backlogService.getProjectById(req.params.id, {
-          user_id: user.id
-        })
-        if (projectResponse.errors) {
-          status = projectResponse.status
-          response = projectResponse.errors
-          break
-        }
-        project = projectResponse as ProjectInterface
+      switch (req.query.service) {
+        case 'backlog':
+          // get the project
+          const project: ProjectInterface = (await backlogService.getProjectById(req.params.id, {
+            user_id: user.id
+          })) as any
 
-        // get the provider
-        const providerResponse: any = await backlogService.getProviderById(project.provider_id)
-        if (providerResponse.errors) {
-          status = providerResponse.status
-          response = providerResponse.errors
-          break
-        }
-        provider = providerResponse
+          // get the provider
+          const provider: ProviderInterface = await backlogService.getProviderById(
+            project.provider_id
+          )
 
-        // get the milestones
-        const milestonesResponse: any = await backlogService.getMilestones(
-          provider.space_key,
-          provider.api_key,
-          project.project_id
-        )
-        if (milestonesResponse.errors) {
-          status = milestonesResponse.status
-          response = milestonesResponse.errors
-          break
-        }
-        const milestones: MilestonesInterface[] = milestonesResponse
-
-        let issuesList: { milestone: string; issues: IssuesInterface[] }[] = []
-
-        // get issues for each milestone
-        for (const milestone of milestones) {
-          const issuesResponse: any = await backlogService.getIssues(
+          // get the milestones
+          const milestones: MilestonesInterface[] = (await backlogService.getMilestones(
             provider.space_key,
             provider.api_key,
-            milestone.id
-          )
-          if (issuesResponse.errors) {
-            status = issuesResponse.status
-            response = issuesResponse.errors
-            break
+            project.project_id
+          )) as any
+
+          let issuesList: { milestone: string; issues: IssuesInterface[] }[] = []
+
+          // get issues for each milestone
+          for (const milestone of milestones) {
+            const issues: IssuesInterface[] = (await backlogService.getIssues(
+              provider.space_key,
+              provider.api_key,
+              milestone.id
+            )) as any
+
+            const issuesData = issues.map((issue) => {
+              return {
+                id: issue.id,
+                actualHours: issue.actualHours || 0,
+                estimatedHours: issue.estimatedHours || 0,
+                currentStatus: issue.status?.name || 'Open'
+              }
+            })
+
+            // add the issues of each milestone to the list
+            issuesList.push({ milestone: milestone.name, issues: issuesData })
           }
-          const issues = issuesResponse as Array<IssuesInterface>
 
-          const issuesData = issues.map((issue) => {
-            return {
-              id: issue.id,
-              actualHours: issue.actualHours || 0,
-              estimatedHours: issue.estimatedHours || 0,
-              currentStatus: issue.status?.name || 'Open'
-            }
-          })
+          // update response with the issues list
+          response = issuesList
 
-          // add the issues of each milestone to the list
-          issuesList.push({ milestone: milestone.name, issues: issuesData })
-        }
+          break
+        default:
+          errorWithCustomMessage(400, { message: 'Service information not provided.' })
+      }
 
-        // update response with the issues list
-        if (status === 200) response = issuesList
-
-        break
-      default:
-        response = { message: 'Service information not provided.' }
-        status = 400
+      res.send(response)
+    } catch (error: any) {
+      const response = JSON.parse(error.message)
+      res.status(response.status).json(response.errors)
     }
-
-    res.status(status).json(response)
   }
 }
 

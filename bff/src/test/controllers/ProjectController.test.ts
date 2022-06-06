@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Request } from 'express'
+import { DateTime } from 'luxon'
 import httpMocks from 'node-mocks-http'
 import ProjectController from '../../controllers/ProjectController'
 import { CustomTypedResponse } from '../../utils/interfaces'
@@ -327,7 +328,7 @@ describe('When calling deleteProjectById() function', () => {
     })
 
     it('should return deleted project details', () => {
-      const data = response._getJSONData()
+      const data = response._getData()
 
       expect(JSON.stringify(data)).toBe(JSON.stringify(projectTestData.sampleProject))
     })
@@ -339,7 +340,7 @@ describe('When calling getActiveSprintData() function', () => {
   const sampleMilestoneWithActiveSprint = JSON.parse(
     JSON.stringify(projectTestData.sampleMilestone)
   )
-  sampleMilestoneWithActiveSprint[0].releaseDueDate = new Date().toISOString()
+  sampleMilestoneWithActiveSprint[0].releaseDueDate = DateTime.local().endOf('day').toUTC().toISO()
 
   describe('if no user found', () => {
     beforeAll(async () => {
@@ -805,7 +806,7 @@ describe('When calling getActiveSprintData() function', () => {
     })
 
     it('should return expected body', () => {
-      const data = response._getJSONData()
+      const data = response._getData()
       expect(JSON.stringify(data)).toBe(JSON.stringify(expectedResponse))
     })
   })

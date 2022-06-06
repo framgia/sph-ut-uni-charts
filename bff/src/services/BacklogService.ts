@@ -1,6 +1,6 @@
 require('dotenv').config()
-import axios, { AxiosResponse, AxiosError } from 'axios'
-
+import axios, { AxiosResponse } from 'axios'
+import { errorWithCustomMessage } from '../utils/helpers'
 const URL = process.env.BACKLOG_API_SERVICE
 
 export default class BacklogService {
@@ -13,9 +13,13 @@ export default class BacklogService {
       url: `${URL}/projects`,
       method: 'get',
       params
-    }).then((response: AxiosResponse) => {
-      data = response.data
     })
+      .then((response: AxiosResponse) => {
+        data = response.data
+      })
+      .catch((error) => {
+        errorWithCustomMessage(error.response.status, error.response.data)
+      })
     return data
   }
 
@@ -31,7 +35,7 @@ export default class BacklogService {
         data = response.data
       })
       .catch((error) => {
-        data = { errors: error.response.data, status: error.response.status }
+        errorWithCustomMessage(error.response.status, error.response.data)
       })
 
     return data
@@ -49,7 +53,7 @@ export default class BacklogService {
         data = response.data
       })
       .catch((error) => {
-        data = { errors: error.response.data, status: error.response.status }
+        errorWithCustomMessage(error.response.status, error.response.data)
       })
 
     return data
@@ -83,7 +87,7 @@ export default class BacklogService {
         return response.data
       })
       .catch((error) => {
-        return { errors: error.response.data, status: error.response.status }
+        errorWithCustomMessage(error.response.status, error.response.data)
       })
   }
 
@@ -113,9 +117,9 @@ export default class BacklogService {
       })
       .catch((error) => {
         if (error.response.status === 404) {
-          data = { errors: [{ message: 'Incorrect namespace' }], status: 404 }
+          errorWithCustomMessage(404, [{ message: 'Incorrect namespace' }])
         } else {
-          data = { errors: error.response.data, status: error.response.status }
+          errorWithCustomMessage(error.response.status, error.response.data)
         }
       })
     return data
@@ -131,7 +135,7 @@ export default class BacklogService {
         data = response.data
       })
       .catch((error) => {
-        data = { errors: error.response.data, status: error.response.status }
+        errorWithCustomMessage(error.response.status, error.response.data)
       })
     return data
   }
@@ -155,9 +159,9 @@ export default class BacklogService {
       })
       .catch((error) => {
         if (error.response.status === 404) {
-          data = { errors: [{ message: 'Incorrect namespace' }], status: 404 }
+          errorWithCustomMessage(404, [{ message: 'Incorrect namespace' }])
         } else {
-          data = { errors: error.response.data, status: error.response.status }
+          errorWithCustomMessage(error.response.status, error.response.data)
         }
       })
     return data
