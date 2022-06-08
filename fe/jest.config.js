@@ -23,6 +23,7 @@ const customJestConfig = {
   moduleNameMapper: {
     // Handle module aliases (this will be automatically configured for you soon)
     '^@/src/(.*)$': '<rootDir>/src/$1',
+    '^@/__tests__/(.*)$': '<rootDir>/__tests__/$1',
 
     '^@/pages/(.*)$': '<rootDir>/pages/$1',
   },
