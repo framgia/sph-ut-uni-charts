@@ -21,3 +21,7 @@
 .velocity-chart-velocity {
   text-align: right;
 }
+
+.developer {
+  cursor: pointer;
+}

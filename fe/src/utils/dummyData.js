@@ -110,10 +110,10 @@ export const burnUpChartData = {
 }
 
 export const developersList = [
-  { name: 'Usada Pekora', position: 'Team Lead' },
-  { name: 'Sakura Miko', position: 'Sub Team Lead' },
-  { name: 'Ninomae Inanis', position: 'Q.A.' },
-  { name: 'Nakiri Ayame', position: 'Developer' },
-  { name: 'Tokoyami Towa', position: 'Developer' },
-  { name: 'Gawr Gura', position: 'Developer' },
+  { name: 'Usada Pekora', position: 'Team Lead', id: 1 },
+  { name: 'Sakura Miko', position: 'Sub Team Lead', id: 2 },
+  { name: 'Ninomae Inanis', position: 'Q.A.', id: 3 },
+  { name: 'Nakiri Ayame', position: 'Developer', id: 4 },
+  { name: 'Tokoyami Towa', position: 'Developer', id: 5 },
+  { name: 'Gawr Gura', position: 'Developer', id: 6 },
 ]

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Container, Group, Table, Text, Title, Box } from '@mantine/core'
 
 import styles from '@/styles/project-detail.module.css'
+import PageTitle from '@/src/components/molecules/PageTitle'
 import { Chart } from './components'
 import { developersList, velocityChartData } from '@/src/utils/dummyData'
 import {
@@ -10,7 +11,7 @@ import {
   obtainData,
 } from '@/src/utils/helpers'
 import { getIssues, getActiveSprintData } from '@/src/api/providerApi'
-import { useRouter } from 'next/router'
+import Router, { useRouter } from 'next/router'
 import { showNotification } from '@mantine/notifications'
 
 const ProjectDetail = () => {
@@ -28,9 +29,9 @@ const ProjectDetail = () => {
 
   useEffect(() => {
     if (query) {
-      const issues = getIssues(Number(router.query.id), 'backlog')
+      const issues = getIssues(Number(query), 'backlog')
       setVelocityResponse(issues)
-      getActiveSprintData(Number(router.query.id), 'backlog')
+      getActiveSprintData(Number(query), 'backlog')
         .then((data) => {
           setSprintData(data)
         })
@@ -65,6 +66,10 @@ const ProjectDetail = () => {
 
   const burnDownChartDataSet = ChartDataFormatter(formattedSprint?.data)
   // const burnUpChartDataSet = ChartDataFormatter(burnUpChartData)
+
+  const redirectToDeveloperDetail = (id) => {
+    Router.push(`/developer-detail/${id}?project_id=${query}`)
+  }
 
   return (
     <>
@@ -125,7 +130,11 @@ const ProjectDetail = () => {
             <tbody>
               {developersList.map((developer) => {
                 return (
-                  <tr key={`${developer.name}_${developer.position}`}>
+                  <tr
+                    className={styles.developer}
+                    key={`${developer.name}_${developer.position}`}
+                    onClick={() => redirectToDeveloperDetail(developer.id)}
+                  >
                     <td>{developer.name}</td>
                     <td>{developer.position}</td>
                   </tr>
