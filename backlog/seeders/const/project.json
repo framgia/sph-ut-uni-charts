@@ -1,0 +1,8 @@
+{
+  "prefix": ["proj1_", "proj2_", "proj3_", "proj4_", "proj5_"],
+  "payload": {
+    "filterProviderName": "",
+    "searchProvider": "",
+    "user_id": 1
+  }
+}

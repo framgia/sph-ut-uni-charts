@@ -8,6 +8,11 @@ import { testData, mockedProjectResponse } from '../const/project'
 import { IProject } from '../../models/interfaces/Project'
 import { Request } from 'express'
 import { TypedResponse } from '../interfaces/response'
+import ProviderSeeder from '../../seeders/ProviderSeeder'
+import ProjectSeeder from '../../seeders/ProjectSeeder'
+
+const providerSeeder = new ProviderSeeder()
+const projectSeeder = new ProjectSeeder()
 
 let req: Request
 let res: TypedResponse
@@ -36,10 +41,6 @@ describe('When calling getProjects function', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    it('should return the expected array length of three datas', () => {
-      expect(res._getJSONData().total).toBe(totalTestData)
-    })
-
     it('should have a correct body structure properties', () => {
       expect(Array.isArray(res._getJSONData().data)).toBeTruthy()
       res._getJSONData().data.forEach((data: IProject) => {
@@ -55,10 +56,14 @@ describe('When calling getProjects function', () => {
   })
 
   describe('when using pagination', () => {
-    beforeEach(async () => {
-      prismaMock.project.findMany.mockResolvedValue(
-        [...Array(totalTestData)].map(() => testData[0])
-      )
+    beforeAll(async () => {
+      await providerSeeder.run()
+      await projectSeeder.run()
+    })
+
+    afterAll(async () => {
+      await projectSeeder.undoChanges()
+      await providerSeeder.undoChanges()
     })
 
     describe('when fetching body object', () => {
@@ -76,17 +81,6 @@ describe('When calling getProjects function', () => {
           total: expect.any(Number),
           total_pages: expect.any(Number),
           data: expect.any(Array)
-        })
-      })
-
-      it('should return the correct pagination properties value', async () => {
-        expect(res._getJSONData()).toMatchObject({
-          page: 1,
-          per_page: 10,
-          prev_page: null,
-          next_page: 2,
-          total: totalTestData,
-          total_pages: totalTestData / 10
         })
       })
     })

@@ -1,0 +1,34 @@
+{
+  "data": [
+    {
+      "user_id": 1,
+      "name": "Backlog",
+      "space_key": "backlog_spa",
+      "api_key": "backlog_api"
+    },
+    {
+      "user_id": 1,
+      "name": "Trello",
+      "space_key": "trello_spa",
+      "api_key": "trello_api"
+    },
+    {
+      "user_id": 1,
+      "name": "Asana",
+      "space_key": "Asana_spa",
+      "api_key": "Asana_api"
+    },
+    {
+      "user_id": 1,
+      "name": "Notion",
+      "space_key": "Notion_spa",
+      "api_key": "Notion_api"
+    },
+    {
+      "user_id": 1,
+      "name": "Jira",
+      "space_key": "Jira_spa",
+      "api_key": "Jira_api"
+    }
+  ]
+}

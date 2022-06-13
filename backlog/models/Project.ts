@@ -1,6 +1,8 @@
 // @ts-nocheck
 import { GetProjectsInput } from '../interfaces/Project'
-import prisma from '../utils/client'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 class Project {
   public static projectsWithParams = async (params: GetProjectsInput) => {
@@ -23,6 +25,7 @@ class Project {
         ...(filterProviderName
           ? {
               provider: {
+                user_id,
                 OR: {
                   name: {
                     equals: String(filterProviderName),
