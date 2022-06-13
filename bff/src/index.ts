@@ -6,6 +6,7 @@ import ProviderRoutes from './routes/ProviderRoute'
 import ProjectRoutes from './routes/ProjectRoute'
 import BacklogRoutes from './routes/BacklogRoute'
 import IssueRoutes from './routes/IssueRoute'
+import DeveloperRoutes from './routes/DeveloperRoute'
 
 const app = express()
 const PORT = process.env.PORT
@@ -31,5 +32,6 @@ app.use('/api/projects', ProjectRoutes)
 app.use('/api/backlog', BacklogRoutes)
 app.use('/api/account', AccountRoute)
 app.use('/api/issues', IssueRoutes)
+app.use('/api/developer', DeveloperRoutes)
 
 export default app

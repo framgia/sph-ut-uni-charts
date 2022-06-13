@@ -211,5 +211,11 @@
   "logoutPayload": {
     "email": "john.doe@company.com",
     "token_id": "eyJhbGciO"
+  },
+  "developerInfo": {
+    "closedOnTimePercentage": 66.67,
+    "movedIssuePercentage": 75,
+    "name": "name",
+    "velocity": 5
   }
 }

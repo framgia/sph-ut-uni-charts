@@ -57,3 +57,19 @@ export const getProjects = async (params) => {
     params,
   })
 }
+
+export const getDeveloperInfo = async (project_id, service, developer_id) => {
+  return await baseAuthApi.request({
+    method: 'GET',
+    url: `/developer/${developer_id}`,
+    params: { project_id, service },
+  })
+}
+
+export const getDeveloperIcon = async (project_id, service, developer_id) => {
+  return await baseAuthApi.request({
+    method: 'GET',
+    url: `/developer/${developer_id}/icon`,
+    params: { project_id, service },
+  })
+}

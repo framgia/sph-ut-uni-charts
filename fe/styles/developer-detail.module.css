@@ -1,0 +1,43 @@
+.back {
+  height: 100%;
+  width: 20px;
+}
+
+.innerBack {
+  width: 0;
+  height: 0;
+  margin-top: 30px;
+  border-top: 50px solid transparent;
+  border-bottom: 50px solid transparent;
+  border-right: 20px solid #4d83db;
+}
+.card-group {
+  width: 80%;
+}
+
+.card {
+  width: 90%;
+}
+
+.name {
+  color: blue;
+  line-height: 1.5em;
+}
+
+.position {
+  color: blue;
+  line-height: 1.5em;
+  padding-bottom: 1em;
+}
+
+/* .back {
+  width: 100%;
+} */
+
+.name-and-position {
+  align-self: flex-start;
+}
+
+.card-header {
+  padding-bottom: 1.5em;
+}

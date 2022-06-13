@@ -1,7 +1,11 @@
 import { act, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import ProjectDetail from '@/src/pages/projects/ProjectDetail'
 import { developersList } from '@/src/utils/dummyData'
 import * as providerApi from '@/src/api/providerApi'
+import Router from 'next/router'
+
+jest.mock('next/router', () => require('next-router-mock'))
 
 describe('When rendering detail page', () => {
   beforeAll(() => {
@@ -102,20 +106,37 @@ describe('When rendering detail page', () => {
     expect(burnUpChart).toBeInTheDocument()
   })*/
 
-  it('should have developer list', () => {
-    render(<ProjectDetail />)
+  describe('when clicking a developer in developers list', () => {
+    let rows, routerSpy
 
-    const header = screen.getByRole('heading', { name: /developers/i })
-    expect(header).toBeInTheDocument()
+    beforeEach(async () => {
+      render(<ProjectDetail />)
 
-    const table = screen.getByRole('table')
-    expect(table).toBeInTheDocument()
+      routerSpy = jest.spyOn(Router, 'push')
+      rows = screen.getAllByRole('row')
+    })
 
-    // includes the table header
-    const rows = screen.getAllByRole('row')
-    expect(rows).toHaveLength(developersList.length + 1)
+    it('should display the developer list', () => {
+      const header = screen.getByRole('heading', { name: /developers/i })
+      expect(header).toBeInTheDocument()
 
-    const columns = screen.getAllByRole('columnheader')
-    expect(columns).toHaveLength(2)
+      const table = screen.getByRole('table')
+      expect(table).toBeInTheDocument()
+
+      // includes the table header
+      expect(rows).toHaveLength(developersList.length + 1)
+
+      const columns = screen.getAllByRole('columnheader')
+      expect(columns).toHaveLength(2)
+    })
+
+    it('should redirect to developer detail page on click', () => {
+      userEvent.click(rows[1])
+
+      expect(routerSpy).toHaveBeenCalledTimes(1)
+      expect(routerSpy).toHaveBeenCalledWith(
+        '/developer-detail/312892?project_id=3'
+      )
+    })
   })
 })
