@@ -3,9 +3,26 @@ import userEvent from '@testing-library/user-event'
 import { act } from 'react-dom/test-utils'
 import Router from 'next/router'
 import mockRouter from 'next-router-mock'
+import { getDeveloperInfo, getDeveloperIcon } from '@/src/api/providerApi'
+import * as providerApi from '@/src/api/providerApi'
+import testData from './constants/testData.json'
 
 import DeveloperDetail from '@/src/pages/DeveloperDetail'
 jest.mock('next/router', () => require('next-router-mock'))
+jest.mock('@/src/api/providerApi')
+
+beforeEach(() => {
+  getDeveloperInfo.mockImplementation(() => {
+    return Promise.resolve().then(() => {
+      return { data: testData.developerInfo }
+    })
+  })
+  getDeveloperIcon.mockImplementation(() => {
+    return Promise.resolve().then(() => {
+      return { data: 'data:image/png;base64,iVBOR' }
+    })
+  })
+})
 
 describe('When rendering developer detail page', () => {
   describe('when using go back button', () => {
@@ -63,8 +80,31 @@ describe('When rendering developer detail page', () => {
   })
 
   describe('when rendering the developer details', () => {
+    let getDeveloperInfoSpy, getDeveloperIconSpy, routerSpy
+
     beforeEach(async () => {
+      getDeveloperInfoSpy = jest.spyOn(providerApi, 'getDeveloperInfo')
+      getDeveloperIconSpy = jest.spyOn(providerApi, 'getDeveloperIcon')
+
+      routerSpy = jest
+        .spyOn(require('next/router'), 'useRouter')
+        .mockImplementation(() => {
+          return { query: { id: 3, project_id: 1 } }
+        })
+
       await act(async () => render(<DeveloperDetail />))
+    })
+
+    afterEach(() => {
+      getDeveloperInfoSpy.mockClear()
+      getDeveloperIconSpy.mockClear()
+      routerSpy.mockClear()
+    })
+
+    afterAll(() => {
+      getDeveloperInfoSpy.mockRestore()
+      getDeveloperIconSpy.mockRestore()
+      routerSpy.mockRestore()
     })
 
     it("should display the developer's name", () => {
@@ -80,6 +120,14 @@ describe('When rendering developer detail page', () => {
     it("should display the developer's icon", () => {
       const image = screen.getByRole('img')
       expect(image).toBeInTheDocument()
+    })
+
+    it('should call getDeveloperInfo() once', () => {
+      expect(getDeveloperInfoSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should call getDeveloperIcon() once', () => {
+      expect(getDeveloperIconSpy).toHaveBeenCalledTimes(1)
     })
 
     it("should display the developer's stats in a table", () => {

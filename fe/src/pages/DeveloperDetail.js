@@ -1,25 +1,45 @@
+import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import {
-  Button,
-  Card,
-  Container,
-  Group,
-  Image,
-  Table,
-  Text,
-} from '@mantine/core'
-import { ArrowBigLeft } from 'tabler-icons-react'
+import { Card, Group, Image, Table, Text } from '@mantine/core'
 
 import styles from '@/styles/developer-detail.module.css'
-import { developersList } from '@/src/utils/dummyData'
+import { getDeveloperIcon, getDeveloperInfo } from '@/src/api/providerApi'
+import Loader from '@/src/components/molecules/Loader'
 
 const DeveloperDetail = () => {
   const router = useRouter()
+  const query = router.query
+  const [imgSrc, setImgSrc] = useState('/nakiri.jpeg')
+  const [devInfo, setDevInfo] = useState({})
+  const [apiFetched, setApiFetched] = useState(false)
+
+  useEffect(() => {
+    if (query.id && !apiFetched) {
+      getDeveloperIcon(query.project_id, 'backlog', query.id).then(
+        (response) => {
+          setImgSrc(response.data)
+        }
+      )
+
+      getDeveloperInfo(query.project_id, 'backlog', query.id)
+        .then((response) => {
+          setDevInfo(response.data)
+        })
+        .catch(() => {
+          setDevInfo({
+            name: 'error',
+            velocity: 0,
+            closedOnTimePercentage: 0,
+            movedIssuePercentage: 0,
+          })
+        })
+
+      setApiFetched(true)
+    }
+  }, [query])
 
   const redirect = () => {
-    const query = router.query
-
     if (query.project_id) {
       router.push(`/project-detail/${query.project_id}`)
     } else {
@@ -45,31 +65,44 @@ const DeveloperDetail = () => {
           <Group position='apart' className={styles['card-header']}>
             <Group direction='column' className={styles['name-and-position']}>
               <Text size='lg' className={styles.name} role='name'>
-                Name: {developersList[0].name}
+                Name:{' '}
+                {devInfo.name ? (
+                  devInfo.name
+                ) : (
+                  <Loader
+                    className={styles['name-loader']}
+                    height={20}
+                    top={7}
+                  />
+                )}
               </Text>
               <Text size='md' className={styles.position} role='position'>
-                Position: {developersList[0].position}
+                Position: Dev...
               </Text>
             </Group>
-            <Image src='/nakiri.jpeg' withPlaceholder width={80} height={80} />
+            <Image src={imgSrc} width={80} height={80} />
           </Group>
 
-          <Table striped>
-            <tbody>
-              <tr>
-                <td>Individual Velocity</td>
-                <td>12</td>
-              </tr>
-              <tr>
-                <td>On time percentage</td>
-                <td>91%</td>
-              </tr>
-              <tr>
-                <td>Moved issue percentage</td>
-                <td>94%</td>
-              </tr>
-            </tbody>
-          </Table>
+          {devInfo.name ? (
+            <Table striped>
+              <tbody>
+                <tr>
+                  <td>Individual Velocity</td>
+                  <td>{devInfo.velocity}</td>
+                </tr>
+                <tr>
+                  <td>On time percentage</td>
+                  <td>{devInfo.closedOnTimePercentage}%</td>
+                </tr>
+                <tr>
+                  <td>Moved issue percentage</td>
+                  <td>{devInfo.movedIssuePercentage}%</td>
+                </tr>
+              </tbody>
+            </Table>
+          ) : (
+            <Loader />
+          )}
         </Card>
       </Group>
     </>

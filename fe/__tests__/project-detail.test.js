@@ -134,7 +134,9 @@ describe('When rendering detail page', () => {
       userEvent.click(rows[1])
 
       expect(routerSpy).toHaveBeenCalledTimes(1)
-      expect(routerSpy).toHaveBeenCalledWith('/developer-detail/1?project_id=3')
+      expect(routerSpy).toHaveBeenCalledWith(
+        '/developer-detail/312892?project_id=3'
+      )
     })
   })
 })

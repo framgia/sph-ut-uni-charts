@@ -104,11 +104,30 @@ export default class BacklogService {
 
   // WILL CONNECT TO BACKLOG API (not microservice)
 
-  async getIssues(space_key: String, api_key: string, milestone_id?: number) {
+  async getDeveloperIcon(space_key: String, api_key: string, developer_id: number) {
     let data
-    let url = `https://${space_key}.backlog.com/api/v2/issues?apiKey=${api_key}${
-      milestone_id ? `&milestoneId[]=${milestone_id}` : ''
-    }`
+    const url = `https://${space_key}.backlog.com/api/v2/users/${developer_id}/icon?apiKey=${api_key}`
+
+    const request = (await axios
+      .get(url, { responseType: 'arraybuffer' })
+
+      .catch((error) => {
+        if (error.response.status === 404) {
+          errorWithCustomMessage(404, [{ message: 'Incorrect namespace' }])
+        } else {
+          errorWithCustomMessage(error.response.status, error.response.data)
+        }
+      })) as any
+
+    const buffer = Buffer.from(request.data, 'binary').toString('base64')
+    data = `data:${request.headers['content-type']};base64,${buffer}`
+
+    return data
+  }
+
+  async getDeveloperInfo(space_key: String, api_key: string, developer_id: number): Promise<any> {
+    let data
+    const url = `https://${space_key}.backlog.com/api/v2/users/${developer_id}?apiKey=${api_key}`
 
     await axios
       .get(url)
@@ -122,10 +141,42 @@ export default class BacklogService {
           errorWithCustomMessage(error.response.status, error.response.data)
         }
       })
+
     return data
   }
 
-  async getMilestones(space_key: String, api_key: string, project_id: number) {
+  async getIssues(
+    space_key: String,
+    api_key: string,
+    milestone_id?: number,
+    user_id?: number,
+    project_id?: number
+  ): Promise<any> {
+    let data
+
+    await axios
+      .get(`https://${space_key}.backlog.com/api/v2/issues`, {
+        params: {
+          apiKey: api_key,
+          ...(milestone_id && { 'milestoneId[]': milestone_id }),
+          ...(user_id && { 'assigneeId[]': user_id }),
+          ...(project_id && { 'projectId[]': project_id })
+        }
+      })
+      .then((response: AxiosResponse) => {
+        data = response.data
+      })
+      .catch((error) => {
+        if (error.response.status === 404) {
+          errorWithCustomMessage(404, [{ message: 'Incorrect namespace' }])
+        } else {
+          errorWithCustomMessage(error.response.status, error.response.data)
+        }
+      })
+    return data
+  }
+
+  async getMilestones(space_key: String, api_key: string, project_id: number): Promise<any> {
     let data
     await axios
       .get(

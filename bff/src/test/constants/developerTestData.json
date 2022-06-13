@@ -1,0 +1,16 @@
+{
+  "sampleDeveloper": {
+    "id": 12,
+    "userId": "ab",
+    "name": "name",
+    "roleType": 1,
+    "lang": "en",
+    "mailAddress": "name@email.com",
+    "nulabAccount": {
+      "nulabId": "test",
+      "name": "name",
+      "uniqueId": "name"
+    },
+    "keyword": "keyword"
+  }
+}

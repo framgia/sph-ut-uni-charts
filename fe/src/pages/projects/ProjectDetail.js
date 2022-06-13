@@ -133,7 +133,7 @@ const ProjectDetail = () => {
                   <tr
                     className={styles.developer}
                     key={`${developer.name}_${developer.position}`}
-                    onClick={() => redirectToDeveloperDetail(developer.id)}
+                    onClick={() => redirectToDeveloperDetail(312892)}
                   >
                     <td>{developer.name}</td>
                     <td>{developer.position}</td>

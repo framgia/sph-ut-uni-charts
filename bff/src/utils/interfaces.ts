@@ -24,6 +24,7 @@ export interface IssuesInterface {
   id: number
   estimatedHours: number
   actualHours: number
+  milestone?: Array<any>
   status?: {
     name: string
   }
@@ -44,6 +45,21 @@ export interface CustomTypedResponse extends Response {
   _getJSONData: () => any
 }
 
-export type getUserInterface {
+export type getUserInterface = {
   email: string
+}
+
+export interface DevInfoInterface {
+  id: number
+  userId: string
+  name: string
+  roleType: number
+  lang: string
+  mailAddress: string
+  nulabAccount: {
+    nulabId: string
+    name: string
+    uniqueId: string
+  }
+  keyword: string
 }
