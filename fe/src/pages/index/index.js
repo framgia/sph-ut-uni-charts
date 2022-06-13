@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Button, Pagination } from '@mantine/core'
+import { Button } from '@mantine/core'
 import Router from 'next/router'
 
 import { getProjects } from '@/src/api/providerApi'

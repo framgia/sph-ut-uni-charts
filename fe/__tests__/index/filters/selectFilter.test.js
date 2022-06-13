@@ -59,15 +59,14 @@ describe('When selecting an option by provider', () => {
   it('should not execute filter twice or more if the selected option value is the same', async () => {
     clickFilterField()
 
-    mockGetProjects()
-    mockGetProjects()
-
     // STEP #1 select the trello option twice
     const backlogOption = await screen.findByRole('option', {
       name: 'Trello',
     })
     userEvent.click(backlogOption)
     userEvent.click(backlogOption)
+
+    mockGetProjects()
 
     expect(spyRouter).toBeCalled()
     expect(spyRouter).toHaveBeenCalledWith({

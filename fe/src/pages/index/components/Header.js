@@ -1,4 +1,4 @@
-import { useCallback, Fragment } from 'react'
+import { Fragment } from 'react'
 import { Button, Group, Pagination, Select, TextInput } from '@mantine/core'
 
 import { providersSelectFieldValues } from '@/src/utils/constants'
