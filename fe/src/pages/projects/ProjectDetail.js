@@ -28,24 +28,50 @@ const ProjectDetail = () => {
 
   useEffect(() => {
     if (query) {
-      const issues = getIssues(Number(router.query.id), 'backlog')
-      setVelocityResponse(issues)
-      getActiveSprintData(Number(router.query.id), 'backlog')
-        .then((data) => {
-          setSprintData(data)
+      getIssues(Number(router.query.id), 'backlog')
+        .then((response) => {
+          setVelocityResponse(response.data)
         })
         .catch(({ response }) => {
-          showNotification({ color: 'red', message: response.data.message })
+          showNotification({
+            color: 'red',
+            message:
+              response.data?.message ||
+              'An error occurred when fetching velocity chart',
+          })
+        })
+
+      getActiveSprintData(Number(router.query.id), 'backlog')
+        .then((response) => {
+          setSprintData(response.data)
+        })
+        .catch(({ response }) => {
+          showNotification({
+            color: 'red',
+            message:
+              response.data?.message ||
+              'An error occurred when fetching burn down/up chart data',
+          })
         })
     }
   }, [query])
 
+  // burn up/down chart
+  useEffect(() => {
+    async function justToWait() {
+      const formattedSprintData = await obtainData(sprintData)
+      setFormattedSprint(formattedSprintData)
+    }
+
+    if (sprintData) {
+      justToWait()
+    }
+  }, [sprintData])
+
+  // velocity chart
   useEffect(() => {
     async function justToWait() {
       const velocityData = await VelocityDataFormatter(velocityResponse)
-      const formattedSprintData = await obtainData(sprintData)
-
-      setFormattedSprint(formattedSprintData)
       setVelocityDataLabels(velocityData.labels)
       setVelocityChartDataSet(ChartDataFormatter(velocityData.data))
 
@@ -58,26 +84,28 @@ const ProjectDetail = () => {
       setVelocity(tempVelocity)
     }
 
-    if (velocityResponse && sprintData) {
+    if (velocityResponse) {
       justToWait()
     }
-  }, [velocityResponse, sprintData])
+  }, [velocityResponse])
 
   const burnDownChartDataSet = ChartDataFormatter(formattedSprint?.data)
-  // const burnUpChartDataSet = ChartDataFormatter(burnUpChartData)
+  const burnUpChartDataSet = ChartDataFormatter(
+    formattedSprint?.burnUpChartData
+  )
 
   return (
     <>
       <Box sx={{ width: '80%' }}>
         <Group position='center'>
-          {/* <div role='burn-up-chart' className={styles['burn-up-chart']}>
+          <div role='burn-up-chart' className={styles['burn-up-chart']}>
             <Chart
               title='Burn Up Chart'
-              labels={sprintLabels}
+              labels={formattedSprint?.dates}
               datasets={burnUpChartDataSet}
               type='line'
             />
-          </div> */}
+          </div>
           <div role='burn-down-chart' className={styles['brn-down-chart']}>
             {/* Select component is for velocity chart */}
             {/* <Select

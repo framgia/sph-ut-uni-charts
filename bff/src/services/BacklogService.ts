@@ -145,7 +145,7 @@ export default class BacklogService {
     key: string,
     project_id: number,
     milestone_id: number
-  ) {
+  ): Promise<any> {
     let data
 
     await axios({

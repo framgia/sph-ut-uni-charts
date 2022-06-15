@@ -20,7 +20,7 @@ describe('When rendering detail page', () => {
     expect(velocity).toBeInTheDocument()
   })
 
-  describe('when rendering burn down chart', () => {
+  describe('when rendering burn down and burn up chart', () => {
     let getSprintDataSpy
 
     beforeEach(async () => {
@@ -35,6 +35,11 @@ describe('When rendering detail page', () => {
     it('should have a burn down chart', () => {
       const burnDownChart = screen.getByRole('burn-down-chart')
       expect(burnDownChart).toBeInTheDocument()
+    })
+
+    it('should have a burn up chart', () => {
+      const burnUpChart = screen.getByRole('burn-up-chart')
+      expect(burnUpChart).toBeInTheDocument()
     })
 
     it('should call getActiveSprintData() once', () => {
@@ -93,13 +98,6 @@ describe('When rendering detail page', () => {
 
     // check if asana is selected
     expect(selectField).toHaveValue(sprintSelectFields[1].label)
-  })
-
-  it('has burn up chart', () => {
-    render(<ProjectDetail />)
-
-    const burnUpChart = screen.getByRole('burn-up-chart')
-    expect(burnUpChart).toBeInTheDocument()
   })*/
 
   it('should have developer list', () => {

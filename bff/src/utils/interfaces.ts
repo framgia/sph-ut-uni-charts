@@ -27,6 +27,8 @@ export interface IssuesInterface {
   status?: {
     name: string
   }
+  created?: string
+  updated?: string
 
   // this will be used by the FE
   // removing undefined will cause type errors
@@ -44,6 +46,6 @@ export interface CustomTypedResponse extends Response {
   _getJSONData: () => any
 }
 
-export type getUserInterface {
+export type getUserInterface = {
   email: string
 }
