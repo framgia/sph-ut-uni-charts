@@ -3,6 +3,7 @@ import BacklogService from '../services/BacklogService'
 import { Request, Response } from 'express'
 import { DateTime } from 'luxon'
 import { errorWithCustomMessage } from '../utils/helpers'
+import { IssuesInterface } from '../utils/interfaces'
 const backlogService = new BacklogService()
 
 export default class ProjectController extends Controller {
@@ -80,6 +81,9 @@ export default class ProjectController extends Controller {
           let estimated = [] as any
           let actual = [] as any
 
+          const total: number[] = [],
+            completed: number[] = []
+
           let totalET = 0
           let closedET = 0
           let estimatedET = 0
@@ -115,7 +119,7 @@ export default class ProjectController extends Controller {
           const { startDate, releaseDueDate, id } = activeSprint
           // Get day before startDate //
           let dateBefore = DateTime.fromISO(startDate).minus({ days: 1 }).toLocaleString()
-          const issues: any = await backlogService.getActiveSprintData(
+          const issues: IssuesInterface[] = await backlogService.getActiveSprintData(
             space_key,
             api_key,
             project_id,
@@ -134,11 +138,12 @@ export default class ProjectController extends Controller {
           dates = arr
 
           // Get initial total ET of sprint
-          issues?.forEach((issue: any) => {
+          issues.forEach((issue: any) => {
             totalET = totalET + issue.estimatedHours
           })
 
-          dates?.forEach((date) => {
+          dates?.forEach((date, index) => {
+            // for burn down chart
             const estimatedIssues = issues.filter((issue: any) => {
               let dueDate = new Date(issue.dueDate).toLocaleDateString()
               if (dueDate === date) {
@@ -163,11 +168,30 @@ export default class ProjectController extends Controller {
 
             actual.push(totalET - closedET)
             estimated.push(totalET - estimatedET)
+
+            // for burn up chart
+            total[index] = 0
+            completed[index] = 0
+
+            issues.forEach((issue) => {
+              const currentDate = DateTime.fromFormat(date, 'D').endOf('day').toMillis()
+              const issueCreatedDate = DateTime.fromISO(issue.created as string).toMillis()
+              const issueUpdatedDate = DateTime.fromISO(issue.updated as string).toMillis()
+
+              if (currentDate > issueCreatedDate) {
+                total[index] += issue.estimatedHours
+              }
+
+              if (issue.status!.name === 'Closed' && currentDate > issueUpdatedDate) {
+                completed[index] += issue.estimatedHours
+              }
+            })
           })
 
           response = {
             dates: dates,
-            data: { estimated, actual }
+            data: { estimated, actual },
+            burnUpChartData: { total, completed }
           }
 
           break

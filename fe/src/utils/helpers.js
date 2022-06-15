@@ -25,7 +25,7 @@ export const VelocityDataFormatter = async (rawData) => {
   const labels = []
   const tempData = await rawData
 
-  tempData.data.forEach((item) => {
+  tempData.forEach((item) => {
     let commitment = 0
     let completed = 0
 
@@ -46,7 +46,7 @@ export const VelocityDataFormatter = async (rawData) => {
 export const obtainData = async (rawData) => {
   const tempData = await rawData
 
-  const { dates, data } = tempData.data
+  const { dates, data, burnUpChartData } = tempData
 
-  return { dates, data }
+  return { dates, data, burnUpChartData }
 }
