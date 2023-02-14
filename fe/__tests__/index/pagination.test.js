@@ -9,6 +9,7 @@ import Home from '@/src/pages/index'
 import testData from '../constants/testData.json'
 import { getProjects, deleteProject } from '@/src/api/providerApi'
 
+// test
 jest.mock('next/router', () => {
   return {
     route: '/',
